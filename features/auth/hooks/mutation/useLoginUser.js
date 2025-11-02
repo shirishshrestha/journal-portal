@@ -1,15 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { login as authLogin } from "../../redux/authSlice";
 import { toast } from "sonner";
 import useCrossTabAuth from "../useCrossTabAuth";
 import { loginUser } from "../../api/LoginApiSlice";
+import { useRoleRedirect } from "@/features/shared";
 
 export const useLoginUser = () => {
   const dispatch = useDispatch();
   const broadcast = useCrossTabAuth();
-  const router = useRouter();
+
+  const { redirectUser } = useRoleRedirect();
+
   return useMutation({
     mutationFn: (data) => loginUser(data),
     onSuccess: (userData) => {
@@ -17,7 +19,7 @@ export const useLoginUser = () => {
       dispatch(authLogin({ userData }));
       broadcast("login");
       setTimeout(() => {
-        router.push("/");
+        redirectUser(userData?.user?.roles || []);
       }, 1000);
     },
     onError: (error) => {

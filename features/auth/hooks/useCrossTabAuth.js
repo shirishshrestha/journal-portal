@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout as authLogout, login as authLogin } from "../redux/authSlice";
 import { usePathname, useRouter } from "next/navigation";
+import { useRoleRedirect } from "@/features/shared";
 
 const useCrossTabAuth = () => {
   const dispatch = useDispatch();
@@ -9,6 +10,8 @@ const useCrossTabAuth = () => {
   const pathname = usePathname();
   const channelRef = useRef(null);
   const currentAuth = useSelector((state) => state.auth?.access);
+  const { redirectUser } = useRoleRedirect();
+  const roles = useSelector((state) => state.auth?.userData?.roles || []);
 
   useEffect(() => {
     const channel = new BroadcastChannel("auth-channel");
@@ -47,7 +50,7 @@ const useCrossTabAuth = () => {
               );
 
               if (pathname === "/login") {
-                router.push("/");
+                redirectUser(roles);
               }
             }
           }
@@ -55,7 +58,7 @@ const useCrossTabAuth = () => {
           console.error("Failed to sync auth state:", error);
 
           if (pathname === "/login") {
-            router.push("/");
+            redirectUser(roles);
           }
         }
       }
@@ -86,7 +89,7 @@ const useCrossTabAuth = () => {
             );
 
             if (pathname === "/login") {
-              router.push("/");
+              redirectUser(roles);
             }
           }
 
@@ -110,7 +113,7 @@ const useCrossTabAuth = () => {
       window.removeEventListener("storage", handleStorageChange);
       channel.close();
     };
-  }, [dispatch, router, pathname, currentAuth]);
+  }, [dispatch, router, pathname, currentAuth, redirectUser, roles]);
 
   const broadcast = (messageType) => {
     channelRef.current?.postMessage(messageType);
