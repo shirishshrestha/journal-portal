@@ -11,7 +11,6 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import Image from "next/image";
 import { LoginForm } from "@/features";
-import { Toaster } from "@/components/ui/sonner";
 
 const LoginPage = () => {
   const { resolvedTheme } = useTheme();
@@ -21,11 +20,11 @@ const LoginPage = () => {
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
           <Link href="/" className="flex flex-col items-center pt-2 mb-2">
-            {resolvedTheme === "dark" ? (
+            {resolvedTheme == "dark" ? (
               <Image
                 width={200}
                 height={100}
-                src="/omway-white-logo.png"
+                src="/omway-white.png"
                 alt="logo"
                 className="w-[200px]"
               />
@@ -56,11 +55,9 @@ const LoginPage = () => {
           </CardContent>
         </Card>
 
-        <div className="text-center mt-8 text-xs ">
+        <div className="text-center mt-8 text-xs text-muted-foreground ">
           © {new Date().getFullYear()} Journal Portal. All rights reserved.
         </div>
-
-        <Toaster />
       </div>
     </div>
   );

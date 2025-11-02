@@ -17,6 +17,7 @@ import { FormInputField, useToggle } from "@/features/shared";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { registerFormSchema } from "../utils/authSchema";
+import { useRegisterUser } from "../hooks";
 
 const RegisterForm = () => {
   const form = useForm({
@@ -27,15 +28,17 @@ const RegisterForm = () => {
       email: "",
       password: "",
       password_confirm: "",
-      agreeToTerms: false,
+      agree_to_terms: false,
     },
   });
 
   const [showPassword, handleShowPassword] = useToggle();
   const [showConfirmPassword, handleShowConfirmPassword] = useToggle();
 
+  const { mutate: RegisterUser } = useRegisterUser();
+
   function onSubmit(values) {
-    console.log(values);
+    RegisterUser(values);
     // Handle form submission here
   }
   return (
@@ -50,6 +53,7 @@ const RegisterForm = () => {
               placeholder="John"
               className="h-11 "
             />
+
             <FormInputField
               name="last_name"
               label="Last Name"
@@ -72,10 +76,11 @@ const RegisterForm = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className=" font-medium">Password</FormLabel>
+                <FormLabel htmlFor="password">Password</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
+                      id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Create strong password"
                       className=" h-11 "
@@ -101,13 +106,16 @@ const RegisterForm = () => {
 
           <FormField
             control={form.control}
-            name="confirmPassword"
+            name="password_confirm"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className=" font-medium">Confirm Password</FormLabel>
+                <FormLabel htmlFor="password_confirm">
+                  Confirm Password
+                </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
+                      id="password_confirm"
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="Confirm your password"
                       className=" h-11 "
@@ -134,7 +142,7 @@ const RegisterForm = () => {
           <div className="space-y-3">
             <FormField
               control={form.control}
-              name="agreeToTerms"
+              name="agree_to_terms"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center space-x-1 space-y-0">
                   <FormControl>
@@ -180,7 +188,7 @@ const RegisterForm = () => {
         </form>
       </Form>
 
-      <div className="text-center text-sm ">
+      <div className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
           href="/login"
@@ -189,7 +197,7 @@ const RegisterForm = () => {
           <Button
             type="button"
             variant="link"
-            className="p-0 h-auto font-normal"
+            className="p-0 h-auto font-normal text-foreground"
           >
             Sign in here
           </Button>

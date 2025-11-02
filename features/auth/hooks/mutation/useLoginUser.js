@@ -13,9 +13,12 @@ export const useLoginUser = () => {
   return useMutation({
     mutationFn: (data) => loginUser(data),
     onSuccess: (userData) => {
+      toast.success("Login successful.");
       dispatch(authLogin({ userData }));
       broadcast("login");
-      router.push("/"); // redirect
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
     },
     onError: (error) => {
       console.log(error);

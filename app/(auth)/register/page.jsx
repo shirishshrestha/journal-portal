@@ -1,10 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { RegisterForm } from "@/features";
 import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const RegisterPage = () => {
   const { resolvedTheme } = useTheme();
@@ -15,18 +15,18 @@ const RegisterPage = () => {
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
           <Link href="/" className="flex flex-col items-center pt-2 mb-2">
-            {resolvedTheme === "dark" ? (
+            {resolvedTheme == "dark" ? (
               <Image
                 width={200}
-                height={150}
-                src="/omway-white-logo.png"
+                height={100}
+                src="/omway-white.png"
                 alt="logo"
                 className="w-[200px]"
               />
             ) : (
               <Image
-                height={150}
-                width={250}
+                width={200}
+                height={100}
                 src="/omway-logo.png"
                 alt="logo"
                 className="w-[200px]"
