@@ -1,4 +1,4 @@
-import { Jost, Poppins } from "next/font/google";
+import { Jost, Karla } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -8,10 +8,10 @@ const jost = Jost({
   variable: "--font-jost",
 });
 
-const poppins = Poppins({
+const karla = Karla({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-karla",
 });
 
 export const metadata = {
@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${poppins.variable} ${jost.variable} font-poppins antialiased`}
+        className={`${karla.variable} ${jost.variable} font-karla antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

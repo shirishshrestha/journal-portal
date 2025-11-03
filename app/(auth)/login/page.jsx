@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useTheme } from "next-themes";
-import Link from "next/link";
 import Image from "next/image";
 import { LoginForm } from "@/features";
 
@@ -19,7 +18,7 @@ const LoginPage = () => {
       <div className="w-full max-w-md">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
-          <Link href="/" className="flex flex-col items-center pt-2 mb-2">
+          <div className="flex flex-col items-center pt-2 mb-2">
             {resolvedTheme == "dark" ? (
               <Image
                 width={200}
@@ -37,7 +36,7 @@ const LoginPage = () => {
                 className="w-[200px]"
               />
             )}
-          </Link>
+          </div>
         </div>
 
         {/* Login Card */}

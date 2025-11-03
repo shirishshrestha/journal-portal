@@ -3,7 +3,6 @@
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { RegisterForm } from "@/features";
-import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const RegisterPage = () => {
@@ -14,7 +13,7 @@ const RegisterPage = () => {
       <div className="w-full max-w-lg">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
-          <Link href="/" className="flex flex-col items-center pt-2 mb-2">
+          <div className="flex flex-col items-center pt-2 mb-2">
             {resolvedTheme == "dark" ? (
               <Image
                 width={200}
@@ -32,7 +31,7 @@ const RegisterPage = () => {
                 className="w-[200px]"
               />
             )}
-          </Link>
+          </div>
         </div>
 
         {/* Signup Card */}
