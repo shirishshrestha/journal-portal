@@ -1,8 +1,5 @@
-import React, { useState } from "react";
-import { orcidSchema } from "../../utils/FormSchema";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { FormInputField } from "@/features/shared";
-import { Form } from "@/components/ui/form";
+import React, { useState, useEffect } from "react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,45 +9,118 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useGetOrcidUrl } from "../../hooks";
+import { useGetOrcidStatus } from "../../hooks/query/useGetOrcidStatus";
+import { useDisconnectOrcid } from "../../hooks/mutation/useDisconnectOrcid";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 const OrcidConnection = () => {
-  const [orcidConnected, setOrcidConnected] = useState(false);
-  const [orcidData, setOrcidData] = useState(null);
+  const [isOrcidLinkPending, setIsOrcidLinkPending] = useState(false);
+  const queryClient = useQueryClient();
 
-  const orcidForm = useForm({
-    resolver: zodResolver(orcidSchema),
-    defaultValues: {
-      orcid_id: "",
-    },
+  const { refetch: refetchOrcidLink } = useGetOrcidUrl({
+    enabled: false,
   });
 
-  const onOrcidSubmit = async (data) => {
+  const { data: orcidStatus, isLoading: isLoadingStatus } = useGetOrcidStatus({
+    enabled: true,
+  });
+
+  const { mutate: disconnectOrcidMutation, isPending: isDisconnecting } =
+    useDisconnectOrcid();
+
+  // Listen for ORCID authentication success
+  useEffect(() => {
+    const handleMessage = (event) => {
+      // Filter out React DevTools messages
+      if (event.data?.source?.includes("react-devtools")) {
+        return;
+      }
+
+      // Verify the origin for security
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+
+      if (event.data.type === "ORCID_SUCCESS") {
+        console.log("ORCID authentication successful, fetching status...");
+
+        setIsOrcidLinkPending(false);
+        toast.success("ORCID connected successfully!");
+        // Fetch the actual ORCID status from API
+        queryClient.invalidateQueries(["orcid-status"]);
+        localStorage.removeItem("orcid_auth_result");
+      } else if (event.data.type === "ORCID_ERROR") {
+        setIsOrcidLinkPending(false);
+        toast.error("Failed to connect ORCID");
+        localStorage.removeItem("orcid_auth_result");
+      }
+    };
+
+    // Check localStorage periodically for ORCID auth result
+    const checkLocalStorage = () => {
+      const result = localStorage.getItem("orcid_auth_result");
+      if (result) {
+        try {
+          const parsedResult = JSON.parse(result);
+          if (parsedResult.type === "ORCID_SUCCESS") {
+            console.log("ORCID authentication successful, fetching status...");
+            setIsOrcidLinkPending(false);
+            toast.success("ORCID connected successfully!");
+            // Fetch the actual ORCID status from API
+            queryClient.invalidateQueries(["orcid-status"]);
+
+            localStorage.removeItem("orcid_auth_result");
+          } else if (parsedResult.type === "ORCID_ERROR") {
+            setIsOrcidLinkPending(false);
+            toast.error("Failed to connect ORCID");
+            localStorage.removeItem("orcid_auth_result");
+          }
+        } catch (e) {
+          console.error("Error parsing localStorage result:", e);
+        }
+      }
+    };
+
+    // Check localStorage every 500ms
+    const storageInterval = setInterval(checkLocalStorage, 500);
+
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      clearInterval(storageInterval);
+    };
+  }, [queryClient]);
+
+  const handleConnectOrcid = async () => {
+    setIsOrcidLinkPending(true);
     try {
-      // Simulate API call to GET /api/v1/users/orcid/connect/
-      // const response = await fetch("/api/v1/users/orcid/connect/", {
-      //   headers: { Authorization: "Bearer {access_token}" },
-      // })
-      // const { authorization_url } = await response.json()
-      // window.open(authorization_url, "orcid-popup", "width=500,height=600")
+      const response = await refetchOrcidLink();
 
-      const mockAuthUrl = "https://orcid.org/oauth/authorize";
-      window.open(mockAuthUrl, "orcid-popup", "width=500,height=600");
+      if (response.isSuccess && response?.data) {
+        // Open in a new tab instead of popup
+        window.open(response.data.authorize_url, "_blank");
 
-      // Simulate callback
-      setTimeout(() => {
-        setOrcidConnected(true);
-        setOrcidData({
-          orcid_id: data.orcid_id,
-          name: "Dr. Sarah Chen",
-          email: "researcher@university.edu",
-          status: "CONNECTED",
-        });
-      }, 2000);
+        // Don't set pending to false immediately, let localStorage polling handle it
+      }
     } catch (error) {
-      console.error("ORCID connection error:", error);
+      toast.error("Failed to get ORCID authorization URL.");
+      setIsOrcidLinkPending(false);
     }
+  };
+
+  const handleDisconnectOrcid = () => {
+    disconnectOrcidMutation(undefined, {
+      onSuccess: () => {
+        toast.success("ORCID disconnected successfully!");
+        queryClient.invalidateQueries(["orcid-status"]);
+      },
+      onError: (error) => {
+        console.error("Failed to disconnect ORCID:", error);
+        toast.error("Failed to disconnect ORCID");
+      },
+    });
   };
 
   return (
@@ -66,7 +136,14 @@ const OrcidConnection = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {orcidConnected && orcidData ? (
+        {isLoadingStatus ? (
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-sm text-muted-foreground">
+              Loading ORCID status...
+            </span>
+          </div>
+        ) : orcidStatus?.connected ? (
           <div className="space-y-4">
             <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg p-4">
               <div className="flex items-start gap-3">
@@ -88,7 +165,7 @@ const OrcidConnection = () => {
                   ORCID iD
                 </p>
                 <p className="text-lg font-mono text-foreground">
-                  {orcidData.orcid_id}
+                  {orcidStatus.orcid_id}
                 </p>
               </div>
               <div className="space-y-2">
@@ -96,64 +173,55 @@ const OrcidConnection = () => {
                   Status
                 </p>
                 <Badge className="bg-emerald-600 dark:bg-emerald-700">
-                  {orcidData.status}
+                  {orcidStatus.status}
                 </Badge>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">
-                  Name
-                </p>
-                <p className="text-foreground">{orcidData.name}</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">
-                  Email
-                </p>
-                <p className="text-foreground">{orcidData.email}</p>
-              </div>
+              {orcidStatus.token_scope && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Token Scope
+                  </p>
+                  <p className="text-foreground">{orcidStatus.token_scope}</p>
+                </div>
+              )}
+              {orcidStatus.last_sync_at && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Last Synced
+                  </p>
+                  <p className="text-foreground">
+                    {new Date(orcidStatus.last_sync_at).toLocaleString()}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6">
+              <Button
+                onClick={handleDisconnectOrcid}
+                variant="destructive"
+                size="md"
+                disabled={isDisconnecting}
+              >
+                {isDisconnecting && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                {isDisconnecting ? "Disconnecting..." : "Disconnect ORCID"}
+              </Button>
             </div>
           </div>
         ) : (
-          <Form {...orcidForm}>
-            <form
-              onSubmit={orcidForm.handleSubmit(onOrcidSubmit)}
-              className="space-y-4"
-            >
-              <FormInputField
-                control={orcidForm.control}
-                name="orcid_id"
-                placeholder={"XXXX-XXXX-XXXX-XXXXX"}
-                label={"Enter Your ORCID iD"}
-                description={
-                  "Format: XXXX-XXXX-XXXX-XXXXX (e.g., 0000-0002-1234-5678)"
-                }
-              />
-
-              <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
-                  <div className="space-y-1">
-                    <p className="font-semibold text-blue-900 dark:text-blue-100">
-                      Secure Connection
-                    </p>
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                      After submitting your ORCID iD, you&apos;ll be redirected
-                      to ORCID.org to authorize the connection.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <Button type="submit" className="w-fit" size="md">
-                {orcidForm.formState.isSubmitting && (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                )}
-                {orcidForm.formState.isSubmitting
-                  ? "Connecting..."
-                  : "Connect ORCID"}
-              </Button>
-            </form>
-          </Form>
+          <Button
+            onClick={() => handleConnectOrcid()}
+            className="w-fit"
+            size="md"
+            disabled={isOrcidLinkPending}
+          >
+            {isOrcidLinkPending && (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            )}
+            {isOrcidLinkPending ? "Redirecting..." : "Connect ORCID"}
+          </Button>
         )}
       </CardContent>
     </Card>
