@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export function ProfileCompletionCard({ completionPercentage }) {
   const [width, setWidth] = useState(0);
@@ -66,30 +67,35 @@ export function ProfileCompletionCard({ completionPercentage }) {
             {/* Description */}
             <div className="space-y-3">
               <h3 className="font-semibold text-amber-900 dark:text-amber-100 text-sm">
-                Complete your profile to access journal submission reviews!
+                Complete your profile to unlock your role!
               </h3>
               <p className="text-xs text-amber-700 dark:text-amber-100/60 leading-relaxed">
-                To unlock access to peer review opportunities and journal
-                submission reviews, complete your profile. Check out our{" "}
-                <a
-                  href="#"
-                  className="font-medium text-amber-600 dark:text-amber-300 hover:text-amber-700 dark:hover:text-amber-200 hover:underline"
-                >
-                  Reviewer Resources
-                </a>{" "}
-                to learn more. When you reach 100%, you&apos;ll unlock full
-                access to submission reviews and editorial opportunities.
+                Request roles like Author, Reviewer, or Editor through the
+                Verification Page. Admins will review your profile and requested
+                role, and once your profile meets the required criteria,
+                you&apos;ll gain full access to journal submissions, peer
+                reviews, and editorial opportunities.
               </p>
             </div>
 
             {/* Button and info icon */}
             <div className="flex items-center gap-3 mt-4">
-              <Button
-                className="bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800"
-                size="sm"
-              >
-                Complete profile
-              </Button>
+              <Link href="/reader/profile">
+                <Button
+                  className="bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800"
+                  size="sm"
+                >
+                  Complete profile
+                </Button>
+              </Link>
+              <Link href="/reader/verification">
+                <Button
+                  className="bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800"
+                  size="sm"
+                >
+                  Go to Verification Page
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

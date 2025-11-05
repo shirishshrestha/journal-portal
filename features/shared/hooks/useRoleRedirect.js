@@ -20,13 +20,13 @@ const useRoleRedirect = () => {
     // Single role (AUTHOR / REVIEWER / EDITOR / ADMIN)
     const singleRoles = ["AUTHOR", "REVIEWER", "EDITOR", "ADMIN"];
     const matchedSingle = roles.find((r) => singleRoles.includes(r));
-    if (roles.length === 1 && matchedSingle) {
+    if (roles.length === 2 && roles.includes("READER") && matchedSingle) {
       router.push(`/${matchedSingle.toLowerCase()}/dashboard`);
       return;
     }
 
     // Multiple roles
-    if (roles.length > 1) {
+    if (roles.length > 2) {
       router.push("/choose-role");
       return;
     }

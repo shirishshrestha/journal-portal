@@ -1,15 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ChevronDown,
-  LogOut,
-  Moon,
-  Sun,
-  Laptop,
-  User,
-  Menu,
-} from "lucide-react";
+import { ChevronDown, LogOut, Moon, Sun, Laptop, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

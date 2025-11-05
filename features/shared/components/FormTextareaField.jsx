@@ -6,15 +6,16 @@ import {
   FormLabel,
   FormDescription,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-export const FormInputField = ({
+export const FormTextareaField = ({
   control,
   name,
   placeholder,
   label,
   className = "",
   description,
+  form_classname = "",
   ...props
 }) => {
   return (
@@ -22,12 +23,12 @@ export const FormInputField = ({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={`${form_classname}`}>
           {label && <FormLabel>{label}</FormLabel>}
           <FormControl>
-            <Input
+            <Textarea
               placeholder={placeholder}
-              className={className}
+              className={`${className} min-h-[100px]`}
               {...field}
               {...props}
             />

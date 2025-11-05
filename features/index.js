@@ -1,3 +1,3 @@
 export * from "./auth";
 export * from "./shared";
-export * from "./dashboard";
+export * from "./panel";

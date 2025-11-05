@@ -19,8 +19,8 @@ export const useLoginUser = () => {
       dispatch(authLogin({ userData }));
       broadcast("login");
       setTimeout(() => {
-        redirectUser(userData?.user?.roles || []);
-      }, 1000);
+        redirectUser(["READER", "AUTHOR", "REVIEWER", "EDITOR"]);
+      }, 700);
     },
     onError: (error) => {
       console.log(error);

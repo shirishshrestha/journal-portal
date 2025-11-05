@@ -4,7 +4,7 @@ import {
   ProfileCompletionCard,
   ProfileLinksCard,
   ScoreCard,
-} from "@/features/dashboard";
+} from "@/features/panel";
 import { useSelector } from "react-redux";
 
 export default function ReaderDashboard() {

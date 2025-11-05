@@ -13,6 +13,7 @@ import {
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 // Add the actual routes for each item
 const sidebarItems = [
@@ -75,10 +76,10 @@ export function ReaderSidebar() {
               return (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton asChild isActive={isActive}>
-                    <a className="flex items-center gap-3" href={item.href}>
+                    <Link className="flex items-center gap-3" href={item.href}>
                       <Icon className="h-4 w-4" />
                       <span>{item.label}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               );
