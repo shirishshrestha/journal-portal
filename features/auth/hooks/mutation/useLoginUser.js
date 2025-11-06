@@ -14,6 +14,7 @@ export const useLoginUser = () => {
 
   return useMutation({
     mutationFn: (data) => loginUser(data),
+    retry: 0, // Don't retry login attempts - incorrect credentials should not be retried
     onSuccess: (userData) => {
       toast.success("Login successful.");
       dispatch(authLogin({ userData }));

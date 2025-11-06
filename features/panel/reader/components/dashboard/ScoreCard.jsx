@@ -4,15 +4,20 @@ import { ScoreBreakdownList } from "./score/ScoreBreakDownList";
 import { AutoScoreChart } from "./score/AutoScoreChart";
 import { useEffect, useState } from "react";
 
-export function ScoreCard({
-  scoreItems,
-  completionPercentage,
-  completedItems,
-}) {
-  const totalScore = scoreItems.reduce(
-    (sum, item) => sum + (item.completed ? item.points : 0),
+export function ScoreCard({ scoreData }) {
+  const totalScore = scoreData?.latest_request?.auto_score || 0;
+  const scoreBreakdown = scoreData?.latest_request?.score_breakdown || [];
+  const maxPossibleScore = scoreBreakdown.reduce(
+    (sum, item) => sum + item.points_possible,
     0
   );
+  const completedItems = scoreBreakdown.filter(
+    (item) => item.status === "completed"
+  ).length;
+  const completionPercentage =
+    scoreBreakdown.length > 0
+      ? (completedItems / scoreBreakdown.length) * 100
+      : 0;
 
   const [width, setWidth] = useState(0);
 
@@ -36,14 +41,14 @@ export function ScoreCard({
           <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg">
             <TrendingUp className="h-5 w-5 text-primary" />
             <span className="text-2xl font-bold text-primary tabular-nums">
-              {totalScore}/100
+              {totalScore}/{maxPossibleScore}
             </span>
           </div>
         </div>
         <div className="mt-4 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">
-              {completedItems} of {scoreItems.length} completed
+              {completedItems} of {scoreBreakdown.length} completed
             </span>
             <span className="font-medium text-foreground">
               {Math.round(completionPercentage)}%
@@ -58,17 +63,20 @@ export function ScoreCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid md:grid-cols-[1.3fr_1fr] gap-6">
-          <div className="order-2 md:order-1">
+        <div className="grid lg:grid-cols-[1.3fr_1fr] gap-6">
+          <div className="order-2 lg:order-1">
             <h3 className="text-sm font-semibold text-foreground mb-3">
               Score Breakdown
             </h3>
-            <ScoreBreakdownList scoreItems={scoreItems} />
+            <ScoreBreakdownList scoreBreakdown={scoreBreakdown} />
           </div>
 
-          <div className="order-1 md:order-2 flex items-center justify-center">
+          <div className="order-1 lg:order-2 flex items-center justify-center">
             <div className="w-full max-w-[280px]">
-              <AutoScoreChart scoreItems={scoreItems} totalScore={totalScore} />
+              <AutoScoreChart
+                scoreBreakdown={scoreBreakdown}
+                totalScore={totalScore}
+              />
             </div>
           </div>
         </div>

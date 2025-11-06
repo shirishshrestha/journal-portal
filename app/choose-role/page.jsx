@@ -56,7 +56,7 @@ export default function ChooseRole() {
   const router = useRouter();
 
   // Get roles from Redux
-  const userRoles = ["AUTHOR"];
+  const userRoles = useSelector((state) => state.auth?.userData?.roles || []);
 
   // Filter ROLES based on user's actual roles
   const availableRoles = ROLES.filter((role) => userRoles.includes(role.id));
@@ -70,6 +70,10 @@ export default function ChooseRole() {
 
     router.push(`/${roleId.toLowerCase()}/dashboard`);
   };
+
+  if (userRoles.length <= 2) {
+    router.push(`/unauthorized`);
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-slate-100 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4">

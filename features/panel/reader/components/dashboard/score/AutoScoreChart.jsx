@@ -6,13 +6,32 @@ import { useMemo } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export function AutoScoreChart({ scoreItems, totalScore }) {
+export function AutoScoreChart({ scoreBreakdown, totalScore }) {
   // Compute chart data efficiently
   const chartData = useMemo(() => {
-    const earnedItems = scoreItems.filter((item) => item.completed);
-    const earnedPoints = earnedItems.map((item) => item.points);
-    const earnedLabels = earnedItems.map((item) => item.label);
-    const remainingPoints = 100 - totalScore;
+    if (!scoreBreakdown || scoreBreakdown.length === 0) {
+      return {
+        labels: ["No Data"],
+        datasets: [
+          {
+            data: [100],
+            backgroundColor: ["hsl(var(--muted))"],
+            hoverOffset: 0,
+          },
+        ],
+      };
+    }
+
+    const completedItems = scoreBreakdown.filter(
+      (item) => item.status === "completed"
+    );
+    const earnedPoints = completedItems.map((item) => item.points_earned);
+    const earnedLabels = completedItems.map((item) => item.criterion);
+    const maxPossibleScore = scoreBreakdown.reduce(
+      (sum, item) => sum + item.points_possible,
+      0
+    );
+    const remainingPoints = maxPossibleScore - totalScore;
 
     return {
       labels: [...earnedLabels, "Remaining"],
@@ -34,7 +53,12 @@ export function AutoScoreChart({ scoreItems, totalScore }) {
         },
       ],
     };
-  }, [scoreItems, totalScore]);
+  }, [scoreBreakdown, totalScore]);
+
+  const maxPossibleScore = useMemo(() => {
+    if (!scoreBreakdown || scoreBreakdown.length === 0) return 100;
+    return scoreBreakdown.reduce((sum, item) => sum + item.points_possible, 0);
+  }, [scoreBreakdown]);
 
   // Chart options
   const chartOptions = useMemo(
@@ -76,7 +100,7 @@ export function AutoScoreChart({ scoreItems, totalScore }) {
             {totalScore}
           </div>
           <div className="text-sm text-muted-foreground font-medium">
-            out of 100
+            out of {maxPossibleScore}
           </div>
         </div>
       </div>

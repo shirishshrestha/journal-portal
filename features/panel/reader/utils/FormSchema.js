@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const roleRequestSchema = z.object({
-  requested_role: z.array(z.string()).min(1, "Please select at least one role"),
+  requested_roles: z.array(z.string()).min(1, "Please select at least one role"),
   affiliation: z.string().min(2, "Affiliation is required"),
   affiliation_email: z.string().email("Invalid email address"),
   research_interests: z

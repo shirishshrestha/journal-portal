@@ -22,12 +22,12 @@ export function ProfileCompletionCard({ completionPercentage }) {
   return (
     <Card className="bg-linear-to-r from-amber-50 to-amber-50 border-amber-200 dark:from-amber-950/30 dark:to-amber-900/20 dark:border-amber-900/40">
       <CardContent className="pt-6">
-        <div className="flex items-start gap-8">
+        <div className="flex flex-col lg:flex-row items-start gap-8">
           {/* Left section with percentage */}
           <div className="flex flex-col items-start min-w-fit">
             <div className="flex items-baseline gap-2">
               <span className="text-5xl font-bold text-amber-900 dark:text-amber-100">
-                {completionPercentage}%
+                {completionPercentage.toFixed(2)}%
               </span>
             </div>
             <p className="text-xl text-amber-800 mt-2 dark:text-amber-100/70 font-medium ">

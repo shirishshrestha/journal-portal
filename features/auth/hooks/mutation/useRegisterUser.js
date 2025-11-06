@@ -7,6 +7,7 @@ export const useRegisterUser = () => {
   const router = useRouter();
   return useMutation({
     mutationFn: (data) => registerUser(data),
+    retry: 0, // Don't retry registration - failed registration should not be automatically retried
     onSuccess: () => {
       toast.success("Registration successful. Please log in.");
       setTimeout(() => {

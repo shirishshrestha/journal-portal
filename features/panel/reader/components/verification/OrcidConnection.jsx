@@ -114,7 +114,10 @@ const OrcidConnection = () => {
     disconnectOrcidMutation(undefined, {
       onSuccess: () => {
         toast.success("ORCID disconnected successfully!");
-        queryClient.invalidateQueries(["orcid-status"]);
+        queryClient.invalidateQueries([
+          "orcid-status",
+          "verification-requests",
+        ]);
       },
       onError: (error) => {
         console.error("Failed to disconnect ORCID:", error);

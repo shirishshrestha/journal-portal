@@ -1,2 +1,2 @@
-export * from "./components/dashboard";
-export * from "./components/verification";
+export * from "./components";
+export * from "./hooks";
