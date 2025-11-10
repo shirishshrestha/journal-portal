@@ -22,7 +22,7 @@ export default function StatsCard({
   valueClass = "text-foreground",
 }) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="shadow-new transition-shadow">
       <CardContent className="">
         <div className="flex items-start justify-between">
           <div className="space-y-2">

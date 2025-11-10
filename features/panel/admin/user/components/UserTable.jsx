@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import DataTable from "@/features/shared/components/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,26 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Checkbox } from "@/components/ui/checkbox";
 import { MoreVertical, Eye, Edit2, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-export function UserTable({ users, onViewDetails, onEdit, onDeactivate }) {
-  const [selectedUsers, setSelectedUsers] = useState(new Set());
-
-  const toggleSelectUser = (userId) => {
-    const newSelected = new Set(selectedUsers);
-    if (newSelected.has(userId)) {
-      newSelected.delete(userId);
-    } else {
-      newSelected.add(userId);
-    }
-    setSelectedUsers(newSelected);
-  };
-
+export function UserTable({ users, onViewDetails, onEdit, onDelete }) {
   const getVerificationColor = (status) => {
     switch (status) {
-      case "VERIFIED":
+      case "GENUINE":
         return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100";
       case "PENDING":
         return "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100";
@@ -42,28 +28,6 @@ export function UserTable({ users, onViewDetails, onEdit, onDeactivate }) {
   };
 
   const columns = [
-    {
-      key: "select",
-      header: (
-        <Checkbox
-          onCheckedChange={(checked) => {
-            if (checked) {
-              setSelectedUsers(new Set(users.map((u) => u.id)));
-            } else {
-              setSelectedUsers(new Set());
-            }
-          }}
-        />
-      ),
-      render: (row) => (
-        <Checkbox
-          checked={selectedUsers.has(row.id)}
-          onCheckedChange={() => toggleSelectUser(row.id)}
-        />
-      ),
-      headerClassName: "w-12",
-      cellClassName: "w-12",
-    },
     {
       key: "name",
       header: "Name",
@@ -141,22 +105,29 @@ export function UserTable({ users, onViewDetails, onEdit, onDeactivate }) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => onViewDetails(row)}
-              className="gap-2"
+              className="gap-2 group"
             >
-              <Eye className="h-4 w-4" />
+              <Eye className="h-4 w-4 group-hover:text-primary-foreground" />
               View Details
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onEdit(row)} className="gap-2">
-              <Edit2 className="h-4 w-4" />
+            <DropdownMenuItem
+              onClick={() => onEdit(row)}
+              className="gap-2 group"
+            >
+              <Edit2 className="h-4 w-4 group-hover:text-primary-foreground" />
               Edit Info
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDeactivate(row.id)}
-              className="gap-2 text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-              {row.is_active ? "Deactivate" : "Reactivate"}
-            </DropdownMenuItem>
+            {row.is_active ? (
+              <DropdownMenuItem
+                onClick={() => onDelete(row.id)}
+                className="gap-2 text-destructive group"
+              >
+                <Trash2 className="h-4 w-4 group-hover:text-primary-foreground" />
+                Delete
+              </DropdownMenuItem>
+            ) : (
+              <></>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -167,8 +138,10 @@ export function UserTable({ users, onViewDetails, onEdit, onDeactivate }) {
   ];
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <DataTable data={users} columns={columns} tableClassName="bg-card" />
-    </div>
+    <DataTable
+      data={users}
+      columns={columns}
+      tableClassName="bg-card border flex justify-center"
+    />
   );
 }

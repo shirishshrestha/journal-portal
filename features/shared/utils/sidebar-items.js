@@ -53,7 +53,7 @@ export const sidebarConfig = {
         },
         {
           name: "Appearance",
-          path: "settings/appearance",
+          path: "/settings/appearance",
           icon: Palette,
         },
       ],
@@ -97,7 +97,7 @@ export const sidebarConfig = {
         },
         {
           name: "Appearance",
-          path: "settings/appearance",
+          path: "/settings/appearance",
           icon: Palette,
         },
       ],
@@ -141,7 +141,7 @@ export const sidebarConfig = {
         },
         {
           name: "Appearance",
-          path: "settings/appearance",
+          path: "/settings/appearance",
           icon: Palette,
         },
       ],
@@ -190,7 +190,7 @@ export const sidebarConfig = {
         },
         {
           name: "Appearance",
-          path: "settings/appearance",
+          path: "/settings/appearance",
           icon: Palette,
         },
       ],
@@ -214,7 +214,7 @@ export const sidebarConfig = {
         },
         {
           name: "Verification Requests",
-          path: "/admin/users/verification-requests",
+          path: "/admin/verification-requests",
           icon: CheckCircle,
         },
       ],
@@ -246,7 +246,7 @@ export const sidebarConfig = {
         },
         {
           name: "Appearance",
-          path: "settings/appearance",
+          path: "/settings/appearance",
           icon: Palette,
         },
         {

@@ -99,7 +99,7 @@
 
   --muted: #1f314f;
   --muted-foreground: #a0aec0;
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: oklch(66.904% 0.21814 24.503);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);

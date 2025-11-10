@@ -65,7 +65,7 @@ const quickLinks = [
 
 export function QuickLinksPanel() {
   return (
-    <Card className="border-0 shadow-lg dark:shadow-xl py-4 gap-3">
+    <Card className=" shadow-new  py-4 gap-3">
       <CardHeader className="border-b border-border/50 py-0! pb-2!">
         <CardTitle className="text-xl">Quick Links</CardTitle>
       </CardHeader>

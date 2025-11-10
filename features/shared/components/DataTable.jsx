@@ -132,8 +132,8 @@ export default function DataTable({
   };
 
   return (
-    <div className={` w-full overflow-x-auto rounded-lg  ${tableClassName}`}>
-      <Table className={" bg-card "}>
+    <div className={`w-full overflow-x-auto rounded-lg ${tableClassName}`}>
+      <Table className={" "}>
         <TableHeader>
           <TableRow className="border-b border-border">
             {columns.map((column) => (

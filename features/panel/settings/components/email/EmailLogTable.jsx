@@ -85,6 +85,7 @@ export default function EmailLogTable({ emails, onViewEmail }) {
       columns={columns}
       emptyMessage="No emails found"
       hoverable={true}
+      tableClassName="bg-card border flex justify-center"
     />
   );
 }

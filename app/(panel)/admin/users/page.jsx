@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Download, Mail } from "lucide-react";
-import { toast } from "sonner";
 import {
   LoadingScreen,
   useGetUsers,
@@ -82,8 +81,8 @@ export default function UserManagementPage() {
       </div>
 
       {/* Toolbar */}
-      <Card className="border-0 bg-muted/30">
-        <CardContent className="pt-6 space-y-4">
+      <Card className="">
+        <CardContent className=" space-y-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
             <div className="flex-1">
               <label className="text-sm font-medium text-muted-foreground block mb-2">
@@ -108,7 +107,7 @@ export default function UserManagementPage() {
                 value={verificationFilter}
                 onValueChange={setVerificationFilter}
               >
-                <SelectTrigger>
+                <SelectTrigger className={"w-full"}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -125,7 +124,7 @@ export default function UserManagementPage() {
                 Account Status
               </label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
+                <SelectTrigger className={"w-full"}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -135,44 +134,23 @@ export default function UserManagementPage() {
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportCSV}
-                className="gap-2 bg-transparent"
-              >
-                <Download className="h-4 w-4" />
-                Export
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 bg-transparent"
-              >
-                <Mail className="h-4 w-4" />
-                Email
-              </Button>
-            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Users Table */}
-      <div>
-        <UserTable
-          users={users?.results || []}
-          onViewDetails={(user) => {
-            setSelectedUser(user);
-            setIsDetailsOpen(true);
-          }}
-          onEdit={(user) => {
-            setSelectedUser(user);
-            setIsDetailsOpen(true);
-          }}
-        />
-      </div>
+      <UserTable
+        users={users?.results || []}
+        onViewDetails={(user) => {
+          setSelectedUser(user);
+          setIsDetailsOpen(true);
+        }}
+        onEdit={(user) => {
+          setSelectedUser(user);
+          setIsDetailsOpen(true);
+        }}
+        
+      />
 
       {/* Details Modal */}
       <UserDetailsModal

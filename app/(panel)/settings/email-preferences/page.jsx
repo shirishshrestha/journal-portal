@@ -93,7 +93,7 @@ export default function EmailPreferencesTab() {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="md:flex md:items-center md:justify-between gap-4">
           <h2 className="text-xl font-semibold text-foreground ">
             Email Notification Preferences

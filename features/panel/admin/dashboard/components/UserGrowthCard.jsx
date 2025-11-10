@@ -29,7 +29,7 @@ const data = {
 
 export function UserGrowthChart({ dateRange }) {
   return (
-    <Card>
+    <Card className={"shadow-new"}>
       <CardHeader>
         <CardTitle>User Growth</CardTitle>
       </CardHeader>

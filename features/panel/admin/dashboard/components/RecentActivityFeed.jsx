@@ -66,7 +66,7 @@ const statusConfig = {
 
 export function RecentActivityFeed() {
   return (
-    <Card className="border-0 shadow-lg dark:shadow-xl py-4 gap-3">
+    <Card className="shadow-new py-4 gap-3">
       <CardHeader className="border-b border-border/50 py-0! pb-2! ">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl">Recent Activity</CardTitle>
