@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AvatarUpload,
@@ -55,6 +56,7 @@ export default function ReaderProfilePage() {
     try {
       await patchProfileMutation.mutateAsync({ id: profileData.id, data });
       setSaveSuccess(true);
+      toast.success("Profile updated successfully!");
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error("Profile update error:", error);

@@ -4,6 +4,7 @@ import { FormSelectField } from "./FormSelectField";
 import { FormTextareaField } from "./FormTextareaField";
 import LoadingScreen from "./Loading";
 import { MultiSelect } from "./MultiSelect";
+import { SearchableSelect } from "./SearchableSelect";
 import RoleBasedRoute from "./RoleBasedAuth";
 import { UnifiedSidebar } from "./UnifiedSidebar";
 import { UnifiedAppbar } from "./UnifiedAppbar";
@@ -17,6 +18,7 @@ export {
   FormTextareaField,
   FormSelectField,
   MultiSelect,
+  SearchableSelect,
   LoadingScreen,
   ErrorCard,
   UnifiedSidebar,

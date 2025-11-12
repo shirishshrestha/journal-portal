@@ -1,0 +1,161 @@
+// AuthorsStep.jsx
+import { Card } from "@/components/ui/card";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Trash2, Plus } from "lucide-react";
+import { useFormContext, useWatch } from "react-hook-form";
+
+export default function AuthorsStep({
+  form,
+  handleAddCoauthor,
+  handleRemoveCoauthor,
+}) {
+  const coAuthors = useWatch({
+    control: form.control,
+    name: "co_authors",
+    defaultValue: [],
+  });
+
+  return (
+    <div className="space-y-6">
+      <Card className="p-4 bg-muted/50 border border-border">
+        <h3 className="font-semibold text-foreground mb-4">
+          Corresponding Author
+        </h3>
+        <div className="space-y-4">
+          <FormField
+            control={form.control}
+            name="corresponding_author.name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="corresponding_author.email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="corresponding_author.institution"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Institution</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      </Card>
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold text-foreground">Co-Authors</h3>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAddCoauthor}
+            className="gap-2 bg-transparent"
+          >
+            <Plus className="h-4 w-4" /> Add Co-Author
+          </Button>
+        </div>
+        {coAuthors?.map((_, index) => (
+          <Card key={index} className="p-4 bg-muted/30 border border-border">
+            <div className="flex items-start justify-between mb-4">
+              <h4 className="font-medium text-foreground">
+                Co-Author {index + 1}
+              </h4>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleRemoveCoauthor(index)}
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name={`co_authors.${index}.name`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`co_authors.${index}.email`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="Email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`co_authors.${index}.institution`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Institution</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Institution" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`co_authors.${index}.orcid`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ORCID (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="0000-0000-0000-0000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

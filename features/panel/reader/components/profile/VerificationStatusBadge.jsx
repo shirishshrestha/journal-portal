@@ -8,7 +8,7 @@ const verificationStatusConfig = {
     badgeColor: "bg-amber-600 dark:bg-amber-700",
     borderColor: " border-amber-200 dark:border-amber-900/50",
   },
-  VERIFIED: {
+  GENUINE: {
     color: "bg-emerald-100 dark:bg-emerald-950/30",
     textColor: "text-emerald-800 dark:text-emerald-200",
     badgeColor: "bg-emerald-600 dark:bg-emerald-700",

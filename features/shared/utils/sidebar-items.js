@@ -11,6 +11,10 @@ import {
   Mail,
   Shield,
   Palette,
+  Files,
+  FilePlus2Icon,
+  File,
+  Inbox,
 } from "lucide-react";
 
 // Sidebar configuration for each role
@@ -68,12 +72,19 @@ export const sidebarConfig = {
     {
       name: "Submissions",
       path: "/author/submissions",
-      icon: FileText,
-    },
-    {
-      name: "Profile",
-      path: "/author/profile",
-      icon: User,
+      icon: Inbox,
+      children: [
+        {
+          name: "Submissions",
+          path: "/author/submissions",
+          icon: Files,
+        },
+        {
+          name: "New Submission",
+          path: "/author/new-submission",
+          icon: FilePlus2Icon,
+        },
+      ],
     },
     {
       name: "Settings",
@@ -114,11 +125,7 @@ export const sidebarConfig = {
       path: "/reviewer/assignments",
       icon: UserCheck,
     },
-    {
-      name: "Profile",
-      path: "/reviewer/profile",
-      icon: User,
-    },
+
     {
       name: "Settings",
       path: "/settings",
@@ -163,11 +170,7 @@ export const sidebarConfig = {
       path: "/editor/reviewers",
       icon: Users,
     },
-    {
-      name: "Profile",
-      path: "/editor/profile",
-      icon: User,
-    },
+
     {
       name: "Settings",
       path: "/settings",
@@ -219,11 +222,7 @@ export const sidebarConfig = {
         },
       ],
     },
-    {
-      name: "Analytics",
-      path: "/admin/analytics",
-      icon: BarChart,
-    },
+
     {
       name: "Settings",
       path: "/settings",
