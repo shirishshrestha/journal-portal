@@ -35,7 +35,7 @@ const RegisterForm = () => {
   const [showPassword, handleShowPassword] = useToggle();
   const [showConfirmPassword, handleShowConfirmPassword] = useToggle();
 
-  const { mutate: RegisterUser } = useRegisterUser();
+  const { mutate: RegisterUser, isPending } = useRegisterUser({ form });
 
   function onSubmit(values) {
     RegisterUser(values);
@@ -179,11 +179,9 @@ const RegisterForm = () => {
           <Button
             type="submit"
             className="w-full h-11 font-medium tracking-wide mt-1 mb-4 rounded-sm"
-            disabled={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting || isPending}
           >
-            {form.formState.isSubmitting
-              ? "Creating Account..."
-              : "Create Account"}
+            {isPending ? "Creating Account..." : "Create Account"}
           </Button>
         </form>
       </Form>

@@ -222,7 +222,11 @@ export const sidebarConfig = {
         },
       ],
     },
-
+    {
+      name: "Journals",
+      path: "/admin/journals",
+      icon: BookOpen,
+    },
     {
       name: "Settings",
       path: "/settings",

@@ -24,7 +24,18 @@ export const useLoginUser = () => {
       }, 700);
     },
     onError: (error) => {
-      toast.error("Login failed. Please check your credentials.");
+      const detail = error?.response?.data?.detail;
+      if (detail) {
+        if (detail.includes("throttled")) {
+          toast.error(detail);
+        } else if (detail.includes("No active account")) {
+          toast.error("Invalid email or password.");
+        } else {
+          toast.error(detail);
+        }
+      } else {
+        toast.error("Login failed. Please check your credentials.");
+      }
     },
   });
 };

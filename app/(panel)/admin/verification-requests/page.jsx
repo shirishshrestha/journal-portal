@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { FilterToolbar } from "@/features/shared";
 import {
   ActionConfirmationPopup,
   VerificationDetailsModal,
@@ -114,30 +115,26 @@ export default function VerificationsPage() {
       </div>
 
       {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="APPROVED">Approved</SelectItem>
-            <SelectItem value="REJECTED">Rejected</SelectItem>
-            <SelectItem value="INFO_REQUESTED">Info Requested</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <FilterToolbar>
+        <FilterToolbar.Search
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by name or email..."
+          label="Search"
+        />
+        <FilterToolbar.Select
+          label="Status"
+          value={statusFilter}
+          onChange={setStatusFilter}
+          options={[
+            { value: "all", label: "All Status" },
+            { value: "PENDING", label: "Pending" },
+            { value: "APPROVED", label: "Approved" },
+            { value: "REJECTED", label: "Rejected" },
+            { value: "INFO_REQUESTED", label: "Info Requested" },
+          ]}
+        />
+      </FilterToolbar>
 
       {/* Verifications Table */}
       <VerificationRequestsTable

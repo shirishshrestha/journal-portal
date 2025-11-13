@@ -13,6 +13,7 @@ import DataTable from "./DataTable";
 import StatsCard from "./StatsCard";
 import CardSkeleton from "./CardSkeleton";
 import StatsErrorCard from "./StatsErrorCard";
+import { FilterToolbar } from "./FilterToolbar";
 
 export {
   FormInputField,
@@ -30,4 +31,5 @@ export {
   StatsCard,
   CardSkeleton,
   StatsErrorCard,
+  FilterToolbar,
 };
