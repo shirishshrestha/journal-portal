@@ -212,6 +212,7 @@ export default function JournalsPage() {
           </p>
         </div>
         <Button
+          variant="secondary"
           onClick={() => {
             setEditingJournal(null);
             setIsFormOpen(true);

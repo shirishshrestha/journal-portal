@@ -17,8 +17,8 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { FormInputField } from "@/features/shared/components/FormInputField";
+import { FormTextareaField } from "@/features/shared/components/FormTextareaField";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -90,7 +90,7 @@ export function JournalFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] p-0">
+      <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] p-0">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="text-xl">
             {isEditMode ? "Edit Journal" : "Create New Journal"}
@@ -115,50 +115,33 @@ export function JournalFormModal({
                   Basic Information
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField
+                  <FormInputField
                     control={form.control}
                     name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Title <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Journal of..." />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    label={
+                      <span>
+                        Title <span className="text-destructive">*</span>
+                      </span>
+                    }
+                    placeholder="Journal of..."
                   />
-                  <FormField
+                  <FormInputField
                     control={form.control}
                     name="short_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Short Name <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="JOS" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    label={
+                      <span>
+                        Short Name <span className="text-destructive">*</span>
+                      </span>
+                    }
+                    placeholder="JOS"
                   />
                 </div>
 
-                <FormField
+                <FormInputField
                   control={form.control}
                   name="publisher"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Publisher</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Publishing house name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Publisher"
+                  placeholder="Publishing house name"
                 />
               </div>
 
@@ -168,31 +151,17 @@ export function JournalFormModal({
                   ISSN Information
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField
+                  <FormInputField
                     control={form.control}
                     name="issn_print"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ISSN Print</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="0000-0000" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    label="ISSN Print"
+                    placeholder="0000-0000"
                   />
-                  <FormField
+                  <FormInputField
                     control={form.control}
                     name="issn_online"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ISSN Online</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="0000-0000" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    label="ISSN Online"
+                    placeholder="0000-0000"
                   />
                 </div>
               </div>
@@ -202,22 +171,12 @@ export function JournalFormModal({
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                   Description
                 </h3>
-                <FormField
+                <FormTextareaField
                   control={form.control}
                   name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Journal Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={4}
-                          placeholder="Brief description of the journal's scope and focus"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Journal Description"
+                  placeholder="Brief description of the journal's scope and focus"
+                  rows={4}
                 />
               </div>
 
@@ -227,39 +186,19 @@ export function JournalFormModal({
                   Contact Information
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField
+                  <FormInputField
                     control={form.control}
                     name="website"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Website URL</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="url"
-                            placeholder="https://example.com"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    label="Website URL"
+                    placeholder="https://example.com"
+                    type="url"
                   />
-                  <FormField
+                  <FormInputField
                     control={form.control}
                     name="contact_email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Contact Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="email"
-                            placeholder="contact@journal.com"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    label="Contact Email"
+                    placeholder="contact@journal.com"
+                    type="email"
                   />
                 </div>
               </div>

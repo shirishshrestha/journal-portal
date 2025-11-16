@@ -56,7 +56,9 @@ const RoleRequestForm = () => {
   const { mutate: submitRequest, isPending: isSubmitting } =
     useSubmitVerificationRequest();
 
-  const defaultRoles = ["READER", "AUTHOR", "REVIEWER"];
+  const defaultRoles = ["READER", "AUTHOR", "REVIEWER", "EDITOR"];
+
+  console.log(RoleLists);
 
   const existingRoleNames =
     RoleLists?.map((role) => role?.trim().toUpperCase()) || [];
@@ -124,7 +126,7 @@ const RoleRequestForm = () => {
         )
       )}
       {/* Role Request Form */}
-      {RoleLists.length >= 3 ? null : (
+      {defaultRoles.every((role) => RoleLists?.includes(role)) ? null : (
         <Card className="border-border dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

@@ -21,7 +21,7 @@ export const useLoginUser = () => {
       broadcast("login");
       setTimeout(() => {
         redirectUser(userData?.user?.roles || []);
-      }, 700);
+      }, 300);
     },
     onError: (error) => {
       const detail = error?.response?.data?.detail;

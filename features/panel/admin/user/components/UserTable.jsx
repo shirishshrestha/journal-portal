@@ -94,7 +94,7 @@ export function UserTable({ users, onViewDetails, onEdit, onDelete }) {
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (row) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

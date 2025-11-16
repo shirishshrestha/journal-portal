@@ -2,4 +2,8 @@ export { QuickLinksPanel } from "./QuickLinks";
 export { RecentActivityFeed } from "./RecentActivityFeed";
 export { UserGrowthChart } from "./UserGrowthCard";
 export { SubmissionTrendsChart } from "./SubmissionTrends";
+export { SubmissionStatusChart } from "./SubmissionStatusChart";
+export { ReviewStatusChart } from "./ReviewStatusChart";
+export { UserDistributionChart } from "./UserDistributionChart";
+export { JournalDistributionChart } from "./JournalDistributionChart";
 export { StatisticsCard } from "./StatisticsCard";

@@ -11,6 +11,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// Custom color classes for status badges
+const statusBadgeColors = {
+  active: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100",
+  inactive:
+    "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100",
+  accepting: "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100",
+  closed:
+    "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100",
+};
+
 export default function JournalsTable({
   journals = [],
   onViewDetails,
@@ -82,7 +92,13 @@ export default function JournalsTable({
       header: "Active",
       align: "center",
       render: (row) => (
-        <Badge variant={row.is_active ? "default" : "outline"}>
+        <Badge
+          className={
+            row.is_active
+              ? statusBadgeColors.active
+              : statusBadgeColors.inactive
+          }
+        >
           {row.is_active ? "Active" : "Inactive"}
         </Badge>
       ),
@@ -93,7 +109,13 @@ export default function JournalsTable({
       header: "Accepting",
       align: "center",
       render: (row) => (
-        <Badge variant={row.is_accepting_submissions ? "default" : "outline"}>
+        <Badge
+          className={
+            row.is_accepting_submissions
+              ? statusBadgeColors.accepting
+              : statusBadgeColors.closed
+          }
+        >
           {row.is_accepting_submissions ? "Accepting" : "Closed"}
         </Badge>
       ),
