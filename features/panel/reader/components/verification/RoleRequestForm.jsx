@@ -127,8 +127,11 @@ const RoleRequestForm = () => {
       )}
       {/* Role Request Form */}
       {defaultRoles.every((role) => RoleLists?.includes(role)) ||
-      (verificationRequests && verificationRequests[0].status === "PENDING") ||
       (verificationRequests &&
+        verificationRequests[0] &&
+        verificationRequests[0].status === "PENDING") ||
+      (verificationRequests &&
+        verificationRequests[0] &&
         verificationRequests[0].status === "INFO_REQUESTED") ? null : (
         <Card className="border-border dark:border-slate-700">
           <CardHeader>

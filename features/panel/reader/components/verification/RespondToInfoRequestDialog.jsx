@@ -26,8 +26,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRespondRequest } from "../../hooks/useRespondRequest";
 import * as z from "zod";
+import { useRespondRequest } from "../../hooks";
 
 // Schema for responding to info request
 const respondToInfoRequestSchema = z.object({

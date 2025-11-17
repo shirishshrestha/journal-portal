@@ -15,6 +15,7 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import RespondToInfoRequestDialog from "./RespondToInfoRequestDialog";
+import { useWithdrawVerificationRequest } from "../../hooks/mutation/useWithdrawVerificationRequest";
 import { Button } from "@/components/ui/button";
 
 const getStatusBadge = (status, onRespond) => {
@@ -57,6 +58,13 @@ const getStatusBadge = (status, onRespond) => {
           Rejected
         </Badge>
       );
+    case "WITHDRAWN":
+      return (
+        <Badge className="bg-gray-400 dark:bg-gray-700 text-white dark:text-gray-200">
+          <XCircle className="w-3 h-3 mr-1" />
+          Withdrawn
+        </Badge>
+      );
     default:
       return <Badge>{status}</Badge>;
   }
@@ -64,6 +72,7 @@ const getStatusBadge = (status, onRespond) => {
 
 const VerificationRequestList = ({ requests }) => {
   const [respondRequest, setRespondRequest] = React.useState(null);
+  const withdrawMutation = useWithdrawVerificationRequest();
 
   function formatRoleRequest(requested_roles) {
     if (!requested_roles || requested_roles?.length === 0) return "";
@@ -174,6 +183,25 @@ const VerificationRequestList = ({ requests }) => {
               without any changes to notify the admin.
             </p>
           </div>
+        )}
+        {(request.status === "PENDING" ||
+          request.status === "INFO_REQUESTED") && (
+          <Button
+            type="button"
+            size="sm"
+            variant="destructive"
+            className="text-xs px-4 py-0! leading-[0.2]"
+            onClick={() => withdrawMutation.mutate(request.id)}
+            disabled={
+              withdrawMutation.isPending &&
+              withdrawMutation.variables === request.id
+            }
+          >
+            {withdrawMutation.isPending &&
+            withdrawMutation.variables === request.id
+              ? "Withdrawing..."
+              : "Withdraw Request"}
+          </Button>
         )}
       </CardContent>
     </Card>

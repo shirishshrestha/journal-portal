@@ -13,6 +13,8 @@ const statusColors = {
   REJECTED: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100",
   INFO_REQUESTED:
     "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100",
+  WITHDRAWN:
+    "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100",
 };
 
 export function VerificationRequestsTable({

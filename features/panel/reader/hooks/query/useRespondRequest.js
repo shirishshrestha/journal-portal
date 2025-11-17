@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { respondToInfoRequest } from "../api/RespondToInfoRequestApi";
 import { toast } from "sonner";
+import { respondToInfoRequest } from "../../api/VerificationApiSlice";
 
 export const useRespondRequest = () => {
   return useMutation({
