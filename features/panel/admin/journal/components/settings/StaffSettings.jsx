@@ -276,12 +276,12 @@ function AddStaffDialog({ isOpen, onClose, onSubmit }) {
                   </SelectItem>
                 ) : (
                   profiles.map((profile) => (
-                    <SelectItem key={profile.id} value={profile.id}>
+                    <SelectItem key={profile.profile.id} value={profile.profile.id}>
                       <div>
                         <p className="font-medium">
-                          {profile.display_name || profile.user_name || 'No name'}
+                          {profile.profile.display_name || profile.profile.user_name || 'No name'}
                         </p>
-                        <p className="text-xs text-muted-foreground">{profile.user_email}</p>
+                        <p className="text-xs text-muted-foreground">{profile.profile.user_email}</p>
                       </div>
                     </SelectItem>
                   ))

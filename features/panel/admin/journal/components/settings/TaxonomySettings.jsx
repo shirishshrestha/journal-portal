@@ -45,7 +45,7 @@ import {
   useCreateArea,
   useUpdateArea,
   useDeleteArea,
-  useGetUsers
+  useGetJournalStaff
 } from "@/features";
 
 export function TaxonomySettings({ journalId }) {
@@ -63,6 +63,9 @@ export function TaxonomySettings({ journalId }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedResearchType, setSelectedResearchType] = useState(null);
   const [selectedArea, setSelectedArea] = useState(null);
+  
+  const [researchTypesDialogOpen, setResearchTypesDialogOpen] = useState(false);
+  const [viewingCategory, setViewingCategory] = useState(null);
   
   const [editingSection, setEditingSection] = useState(null);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -347,7 +350,7 @@ export function TaxonomySettings({ journalId }) {
                 </div>
                 <AccordionContent className="pt-4 pb-2">
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center mb-2">
+                    <div className="flex justify-between items-center">
                       <p className="text-sm font-medium">Categories</p>
                       <Button
                         size="sm"
@@ -362,181 +365,69 @@ export function TaxonomySettings({ journalId }) {
                       </Button>
                     </div>
 
-                    <Accordion type="multiple" className="space-y-2">
-                      {section.categories.map((category) => (
-                        <AccordionItem
-                          key={category.id}
-                          value={category.id}
-                          className="border rounded-lg px-3 ml-4"
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <AccordionTrigger className="hover:no-underline text-sm flex-1">
-                              <div className="flex items-center gap-2">
-                                <ChevronRight className="h-4 w-4" />
+                    {section.categories && section.categories.length > 0 ? (
+                      <div className="space-y-2">
+                        {section.categories.map((category) => (
+                          <div
+                            key={category.id}
+                            className="border rounded-lg p-3 ml-4"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-3 flex-1">
                                 <Badge variant="secondary" className="text-xs">
                                   {category.code}
                                 </Badge>
-                                <span className="font-medium">{category.name}</span>
+                                <div>
+                                  <p className="font-medium text-sm">{category.name}</p>
+                                  {category.description && (
+                                    <p className="text-xs text-muted-foreground">{category.description}</p>
+                                  )}
+                                </div>
+                                <Badge variant="outline" className="ml-auto">
+                                  {category.research_types?.length || 0} types
+                                </Badge>
                               </div>
-                            </AccordionTrigger>
-                            <div className="flex gap-1">
-                              <div
-                                className="p-1 hover:bg-muted rounded cursor-pointer"
-                                onClick={() => {
-                                  setEditingCategory(category);
-                                  setIsEditCategoryOpen(true);
-                                }}
-                              >
-                                <Edit className="h-3 w-3" />
-                              </div>
-                              <div
-                                className="p-1 hover:bg-muted rounded cursor-pointer text-destructive"
-                                onClick={() => handleDeleteCategory(category)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </div>
-                            </div>
-                          </div>
-                          <AccordionContent className="pt-3 pb-2">
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center">
-                                <p className="text-xs font-medium text-muted-foreground">
-                                  Research Types
-                                </p>
+                              <div className="flex gap-1">
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() => {
-                                    setSelectedCategory(category);
-                                    setIsAddResearchTypeOpen(true);
+                                    setViewingCategory(category);
+                                    setResearchTypesDialogOpen(true);
                                   }}
                                   className="h-7 text-xs"
                                 >
-                                  <Plus className="h-3 w-3 mr-1" />
-                                  Add Type
+                                  View Types
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setEditingCategory(category);
+                                    setIsEditCategoryOpen(true);
+                                  }}
+                                  className="h-7 px-2"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteCategory(category)}
+                                  className="h-7 px-2 text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-3 w-3" />
                                 </Button>
                               </div>
-
-                              <Accordion type="multiple" className="space-y-2">
-                                {category.research_types.map((researchType) => (
-                                  <AccordionItem
-                                    key={researchType.id}
-                                    value={researchType.id}
-                                    className="border rounded px-2 ml-4"
-                                  >
-                                    <div className="flex items-center justify-between gap-2">
-                                      <AccordionTrigger className="hover:no-underline text-xs py-2 flex-1">
-                                        <div className="flex items-center gap-2">
-                                          <Badge variant="outline" className="text-xs">
-                                            {researchType.code}
-                                          </Badge>
-                                          <span>{researchType.name}</span>
-                                        </div>
-                                      </AccordionTrigger>
-                                      <div className="flex gap-1">
-                                        <div
-                                          className="p-1 hover:bg-muted rounded cursor-pointer"
-                                          onClick={() => {
-                                            setEditingResearchType(researchType);
-                                            setIsEditResearchTypeOpen(true);
-                                          }}
-                                        >
-                                          <Edit className="h-3 w-3" />
-                                        </div>
-                                        <div
-                                          className="p-1 hover:bg-muted rounded cursor-pointer text-destructive"
-                                          onClick={() => handleDeleteResearchType(researchType)}
-                                        >
-                                          <Trash2 className="h-3 w-3" />
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <AccordionContent className="pt-2 pb-2">
-                                      <div className="space-y-2">
-                                        <div className="flex justify-between items-center">
-                                          <p className="text-xs font-medium text-muted-foreground">
-                                            Areas
-                                          </p>
-                                          <Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => {
-                                              setSelectedResearchType(researchType);
-                                              setIsAddAreaOpen(true);
-                                            }}
-                                            className="h-6 text-xs"
-                                          >
-                                            <Plus className="h-3 w-3 mr-1" />
-                                            Add Area
-                                          </Button>
-                                        </div>
-                                    
-                                        {researchType.areas.length > 0 ? (
-                                          <div className="space-y-2 ml-4">
-                                            {researchType.areas.map((area) => (
-                                              <div
-                                                key={area.id}
-                                                className="flex items-start justify-between border rounded p-2 text-xs"
-                                              >
-                                                <div className="flex-1">
-                                                  <div className="flex items-center gap-2 mb-1">
-                                                    <Badge variant="secondary" className="text-xs">
-                                                      {area.code}
-                                                    </Badge>
-                                                    <span className="font-medium">{area.name}</span>
-                                                  </div>
-                                                  {area.keywords && area.keywords.length > 0 && (
-                                                    <div className="flex flex-wrap gap-1 mt-1">
-                                                      {area.keywords.map((keyword, idx) => (
-                                                        <span
-                                                          key={idx}
-                                                          className="bg-muted px-1.5 py-0.5 rounded text-xs"
-                                                        >
-                                                          {keyword}
-                                                        </span>
-                                                      ))}
-                                                    </div>
-                                                  )}
-                                                </div>
-                                                <div className="flex gap-1 ml-2">
-                                                  <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    onClick={() => {
-                                                      setEditingArea(area);
-                                                      setIsEditAreaOpen(true);
-                                                    }}
-                                                    className="h-6 px-1"
-                                                  >
-                                                    <Edit className="h-3 w-3" />
-                                                  </Button>
-                                                  <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    onClick={() => handleDeleteArea(area)}
-                                                    className="h-6 px-1 text-destructive hover:text-destructive"
-                                                  >
-                                                    <Trash2 className="h-3 w-3" />
-                                                  </Button>
-                                                </div>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        ) : (
-                                          <p className="text-xs text-muted-foreground ml-4">
-                                            No areas defined
-                                          </p>
-                                        )}
-                                      </div>
-                                    </AccordionContent>
-                                  </AccordionItem>
-                                ))}
-                              </Accordion>
                             </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground ml-4">
+                        No categories defined
+                      </p>
+                    )}
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -558,8 +449,9 @@ export function TaxonomySettings({ journalId }) {
         onClose={() => setIsAddSectionOpen(false)}
         title="Add Section"
         onSubmit={handleAddSection}
-        fields={["name", "code", "description", "order", "is_active"]}
+        fields={["name", "code", "description", "section_editor", "is_active"]}
         journalId={journalId}
+        taxonomyType="section"
       />
 
       {/* Add Category Dialog */}
@@ -568,7 +460,8 @@ export function TaxonomySettings({ journalId }) {
         onClose={() => setIsAddCategoryOpen(false)}
         title="Add Category"
         onSubmit={handleAddCategory}
-        fields={["name", "code", "description", "order", "is_active"]}
+        fields={["name", "code", "description", "is_active"]}
+        taxonomyType="category"
       />
 
       {/* Add Research Type Dialog */}
@@ -577,7 +470,8 @@ export function TaxonomySettings({ journalId }) {
         onClose={() => setIsAddResearchTypeOpen(false)}
         title="Add Research Type"
         onSubmit={handleAddResearchType}
-        fields={["name", "code", "description", "requirements", "order", "is_active"]}
+        fields={["name", "code", "description", "requirements", "is_active"]}
+        taxonomyType="researchType"
       />
 
       {/* Add Area Dialog */}
@@ -586,7 +480,8 @@ export function TaxonomySettings({ journalId }) {
         onClose={() => setIsAddAreaOpen(false)}
         title="Add Area"
         onSubmit={handleAddArea}
-        fields={["name", "code", "description", "keywords", "order", "is_active"]}
+        fields={["name", "code", "description", "keywords", "is_active"]}
+        taxonomyType="area"
       />
 
       {/* Edit Section Dialog */}
@@ -599,9 +494,10 @@ export function TaxonomySettings({ journalId }) {
           }}
           title="Edit Section"
           onSubmit={handleEditSection}
-          fields={["name", "code", "description", "order", "is_active"]}
+          fields={["name", "code", "description", "section_editor", "is_active"]}
           initialData={editingSection}
           journalId={journalId}
+          taxonomyType="section"
         />
       )}
 
@@ -615,8 +511,9 @@ export function TaxonomySettings({ journalId }) {
           }}
           title="Edit Category"
           onSubmit={handleEditCategory}
-          fields={["name", "code", "description", "order", "is_active"]}
+          fields={["name", "code", "description", "is_active"]}
           initialData={editingCategory}
+          taxonomyType="category"
         />
       )}
 
@@ -630,8 +527,9 @@ export function TaxonomySettings({ journalId }) {
           }}
           title="Edit Research Type"
           onSubmit={handleEditResearchType}
-          fields={["name", "code", "description", "requirements", "order", "is_active"]}
+          fields={["name", "code", "description", "requirements", "is_active"]}
           initialData={editingResearchType}
+          taxonomyType="researchType"
         />
       )}
 
@@ -645,45 +543,272 @@ export function TaxonomySettings({ journalId }) {
           }}
           title="Edit Area"
           onSubmit={handleEditArea}
-          fields={["name", "code", "description", "keywords", "order", "is_active"]}
+          fields={["name", "code", "description", "keywords", "is_active"]}
           initialData={editingArea}
+          taxonomyType="area"
         />
       )}
+
+      {/* Research Types Dialog */}
+      <Dialog open={researchTypesDialogOpen} onOpenChange={setResearchTypesDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Research Types in {viewingCategory?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Manage research types and their areas
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-4">
+            {viewingCategory?.research_types && viewingCategory.research_types.length > 0 ? (
+              <Accordion type="multiple" className="space-y-3">
+                {viewingCategory.research_types.map((researchType) => (
+                  <AccordionItem
+                    key={researchType.id}
+                    value={researchType.id}
+                    className="border rounded-lg px-4"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <AccordionTrigger className="hover:no-underline flex-1">
+                        <div className="flex items-center gap-3">
+                          <Badge variant="secondary">{researchType.code}</Badge>
+                          <div className="text-left">
+                            <p className="font-medium">{researchType.name}</p>
+                            {researchType.description && (
+                              <p className="text-sm text-muted-foreground">{researchType.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      </AccordionTrigger>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditingResearchType(researchType);
+                            setIsEditResearchTypeOpen(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteResearchType(researchType)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <AccordionContent className="pt-4 pb-2">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            Areas
+                          </p>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedResearchType(researchType);
+                              setIsAddAreaOpen(true);
+                            }}
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Add Area
+                          </Button>
+                        </div>
+
+                        {researchType.areas && researchType.areas.length > 0 ? (
+                          <div className="space-y-2">
+                            {researchType.areas.map((area) => (
+                              <div
+                                key={area.id}
+                                className="flex items-start justify-between border rounded p-2 text-sm"
+                              >
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Badge variant="secondary" className="text-xs">
+                                      {area.code}
+                                    </Badge>
+                                    <span className="font-medium">{area.name}</span>
+                                  </div>
+                                  {area.keywords && area.keywords.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                      {area.keywords.map((keyword, idx) => (
+                                        <span
+                                          key={idx}
+                                          className="bg-muted px-1.5 py-0.5 rounded text-xs"
+                                        >
+                                          {keyword}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex gap-1 ml-2">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => {
+                                      setEditingArea(area);
+                                      setIsEditAreaOpen(true);
+                                    }}
+                                    className="h-7 px-2"
+                                  >
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleDeleteArea(area)}
+                                    className="h-7 px-2 text-destructive hover:text-destructive"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            No areas defined
+                          </p>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No research types in this category</p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => {
+                    setSelectedCategory(viewingCategory);
+                    setIsAddResearchTypeOpen(true);
+                    setResearchTypesDialogOpen(false);
+                  }}
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add First Research Type
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function TaxonomyFormDialog({ isOpen, onClose, title, onSubmit, fields, initialData, journalId }) {
+function TaxonomyFormDialog({ isOpen, onClose, title, onSubmit, fields, initialData, journalId, taxonomyType }) {
   const [formData, setFormData] = useState({
-    name: initialData?.name || "",
-    code: initialData?.code || "",
-    description: initialData?.description || "",
-    keywords: initialData?.keywords ? initialData.keywords.join(", ") : "",
-    order: initialData?.order || 0,
-    is_active: initialData?.is_active !== undefined ? initialData.is_active : true,
-    section_editor: initialData?.section_editor || "",
-    requirements: initialData?.requirements ? JSON.stringify(initialData.requirements, null, 2) : "{}",
+    name: "",
+    code: "",
+    description: "",
+    keywords: "",
+    is_active: true,
+    section_editor: "",
+    // Requirements as separate fields instead of JSON
+    word_count: "",
+    required_sections: "",
   });
+  
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
-  // Fetch users for section editor dropdown
-  const { data: usersData } = useGetUsers(journalId);
-  const users = usersData?.results || usersData || [];
+  // Fetch staff members for section editor dropdown (only for sections)
+  const { data: staffData } = useGetJournalStaff(journalId);
+  const staffMembers = staffData || [];
+  
+  console.log("TaxonomyFormDialog - Current formData:", formData);
+  console.log("TaxonomyFormDialog - Staff members:", staffMembers);
 
-  // Update form when initialData changes
+  // Fetch data when editing
   useEffect(() => {
-    if (initialData) {
-      setFormData({
-        name: initialData.name || "",
-        code: initialData.code || "",
-        description: initialData.description || "",
-        keywords: initialData.keywords ? initialData.keywords.join(", ") : "",
-        order: initialData.order || 0,
-        is_active: initialData.is_active !== undefined ? initialData.is_active : true,
-        section_editor: initialData.section_editor || "",
-        requirements: initialData.requirements ? JSON.stringify(initialData.requirements, null, 2) : "{}",
-      });
-    }
-  }, [initialData]);
+    const fetchData = async () => {
+      if (initialData?.id && isOpen) {
+        setIsLoadingData(true);
+        try {
+          let response;
+          
+          // Import the API functions dynamically
+          const { 
+            getSectionById, 
+            getCategoryById, 
+            getResearchTypeById, 
+            getAreaById 
+          } = await import("../../api/journalsApi");
+          
+          // Fetch based on taxonomy type
+          if (taxonomyType === 'section') {
+            response = await getSectionById(initialData.id);
+          } else if (taxonomyType === 'category') {
+            response = await getCategoryById(initialData.id);
+          } else if (taxonomyType === 'researchType') {
+            response = await getResearchTypeById(initialData.id);
+          } else if (taxonomyType === 'area') {
+            response = await getAreaById(initialData.id);
+          }
+          
+          console.log("Fetched taxonomy data:", response);
+          
+          if (response) {
+            // Handle section_editor - could be ID string or object with id property
+            let sectionEditorValue = "";
+            if (response.section_editor) {
+              if (typeof response.section_editor === 'string') {
+                sectionEditorValue = response.section_editor;
+              } else if (response.section_editor.id) {
+                sectionEditorValue = response.section_editor.id;
+              }
+            }
+            
+            // Extract requirements fields
+            const requirements = response.requirements || {};
+            
+            setFormData({
+              name: response.name || "",
+              code: response.code || "",
+              description: response.description || "",
+              keywords: Array.isArray(response.keywords) ? response.keywords.join(", ") : "",
+              is_active: response.is_active !== undefined ? response.is_active : true,
+              section_editor: sectionEditorValue,
+              word_count: requirements.word_count || "",
+              required_sections: Array.isArray(requirements.required_sections) 
+                ? requirements.required_sections.join(", ") 
+                : "",
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching taxonomy data:", error);
+          toast.error("Failed to load data");
+        } finally {
+          setIsLoadingData(false);
+        }
+      } else if (!initialData && isOpen) {
+        // Reset form for add mode
+        setFormData({
+          name: "",
+          code: "",
+          description: "",
+          keywords: "",
+          is_active: true,
+          section_editor: "",
+          word_count: "",
+          required_sections: "",
+        });
+      }
+    };
+    
+    fetchData();
+  }, [initialData?.id, isOpen, taxonomyType]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -694,19 +819,26 @@ function TaxonomyFormDialog({ isOpen, onClose, title, onSubmit, fields, initialD
       data.keywords = formData.keywords.split(",").map((k) => k.trim()).filter(Boolean);
     }
     
-    // Process requirements JSON
+    // Process requirements - build JSON from form fields
     if (fields.includes("requirements")) {
-      try {
-        data.requirements = JSON.parse(formData.requirements);
-      } catch (error) {
-        toast.error("Invalid JSON format for requirements");
-        return;
+      const requirements = {};
+      
+      if (formData.word_count) {
+        requirements.word_count = parseInt(formData.word_count);
       }
-    }
-    
-    // Convert order to number
-    if (fields.includes("order")) {
-      data.order = parseInt(formData.order) || 0;
+      
+      if (formData.required_sections && formData.required_sections.trim()) {
+        requirements.required_sections = formData.required_sections
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+      
+      data.requirements = Object.keys(requirements).length > 0 ? requirements : {};
+      
+      // Remove the individual fields from data
+      delete data.word_count;
+      delete data.required_sections;
     }
     
     // Ensure is_active is boolean
@@ -726,10 +858,10 @@ function TaxonomyFormDialog({ isOpen, onClose, title, onSubmit, fields, initialD
         code: "", 
         description: "", 
         keywords: "",
-        order: 0,
         is_active: true,
         section_editor: "",
-        requirements: "{}",
+        word_count: "",
+        required_sections: "",
       });
     }
   };
@@ -743,7 +875,12 @@ function TaxonomyFormDialog({ isOpen, onClose, title, onSubmit, fields, initialD
             {initialData ? "Update the taxonomy entry details" : "Fill in the details below to create a new taxonomy entry"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {isLoadingData ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
           {fields.includes("name") && (
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -793,41 +930,55 @@ function TaxonomyFormDialog({ isOpen, onClose, title, onSubmit, fields, initialD
             </div>
           )}
           {fields.includes("requirements") && (
-            <div className="space-y-2">
-              <Label htmlFor="requirements">Requirements (JSON)</Label>
-              <Textarea
-                id="requirements"
-                value={formData.requirements}
-                onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-                rows={5}
-                placeholder='{"word_count": 5000, "sections": ["abstract", "introduction"]}'
-                className="font-mono text-sm"
-              />
-              <p className="text-xs text-muted-foreground">
-                Manuscript requirements in JSON format (word count, required sections, etc.)
-              </p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="word_count">Word Count</Label>
+                <Input
+                  id="word_count"
+                  type="number"
+                  value={formData.word_count}
+                  onChange={(e) => setFormData({ ...formData, word_count: e.target.value })}
+                  placeholder="e.g., 5000"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="required_sections">Required Sections</Label>
+                <Input
+                  id="required_sections"
+                  type="text"
+                  value={formData.required_sections}
+                  onChange={(e) => setFormData({ ...formData, required_sections: e.target.value })}
+                  placeholder="e.g., abstract, introduction, methodology, conclusion"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter section names separated by commas
+                </p>
+              </div>
             </div>
           )}
           {fields.includes("section_editor") && (
             <div className="space-y-2">
               <Label htmlFor="section_editor">Section Editor (Optional)</Label>
               <Select
-                value={formData.section_editor}
-                onValueChange={(value) => setFormData({ ...formData, section_editor: value })}
+                value={formData.section_editor || undefined}
+                onValueChange={(value) => setFormData({ ...formData, section_editor: value === "none" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a section editor" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
-                  {users.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.profile?.display_name || user.profile?.user_name || "Unknown User"}
-                      {user.profile?.affiliation_name && ` (${user.profile.affiliation_name})`}
+                  <SelectItem value="none">None</SelectItem>
+                  {staffMembers.map((staff) => (
+                    <SelectItem key={staff.id} value={staff.profile?.id || staff.id}>
+                      {staff.profile?.display_name || staff.profile?.user_name || "Unknown User"}
+                      {staff.profile?.affiliation_name && ` (${staff.profile.affiliation_name})`}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                Assign a staff member as the section editor
+              </p>
             </div>
           )}
           {fields.includes("order") && (
@@ -868,6 +1019,7 @@ function TaxonomyFormDialog({ isOpen, onClose, title, onSubmit, fields, initialD
             <Button type="submit">{initialData ? "Update" : "Create"}</Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

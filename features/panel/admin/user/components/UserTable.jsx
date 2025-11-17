@@ -41,10 +41,10 @@ export function UserTable({
       render: (row) => (
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={row.profile.avatar || ""} />
+            <AvatarImage src={row.profile?.avatar || ""} />
             <AvatarFallback className="bg-primary/20">
               {(
-                row.profile.display_name || `${row.first_name} ${row.last_name}`
+                row.profile?.display_name || `${row.first_name} ${row.last_name}`
               )
                 .split(" ")
                 .map((n) => n[0])
@@ -52,7 +52,7 @@ export function UserTable({
             </AvatarFallback>
           </Avatar>
           <span className="font-medium text-sm">
-            {row.profile.display_name || `${row.first_name} ${row.last_name}`}
+            {row.profile?.display_name || `${row.first_name} ${row.last_name}`}
           </span>
         </div>
       ),
@@ -67,10 +67,10 @@ export function UserTable({
       header: "Verification",
       render: (row) => (
         <Badge
-          className={getVerificationColor(row.profile.verification_status)}
+          className={getVerificationColor(row.profile?.verification_status || "PENDING")}
           variant="secondary"
         >
-          {row.profile.verification_status}
+          {row.profile?.verification_status || "PENDING"}
         </Badge>
       ),
     },

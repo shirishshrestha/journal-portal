@@ -92,6 +92,16 @@ export const deleteSection = async (id) => {
 };
 
 /**
+ * Get section by ID
+ * @param {string} id - Section ID
+ * @returns {Promise} API response
+ */
+export const getSectionById = async (id) => {
+  const response = await instance.get(`journals/sections/${id}/`);
+  return response.data;
+};
+
+/**
  * Get all categories for a section or journal
  * @param {string} sectionId - Section ID (optional)
  * @param {string} journalId - Journal ID (optional)
@@ -143,7 +153,17 @@ export const deleteCategory = async (id) => {
 };
 
 /**
- * Get all research types
+ * Get category by ID
+ * @param {string} id - Category ID
+ * @returns {Promise} API response
+ */
+export const getCategoryById = async (id) => {
+  const response = await instance.get(`journals/categories/${id}/`);
+  return response.data;
+};
+
+/**
+ * Get all research types for a category, section, or journal
  * @param {string} categoryId - Category ID (optional)
  * @param {string} journalId - Journal ID (optional)
  * @returns {Promise} API response
@@ -197,6 +217,16 @@ export const deleteResearchType = async (id) => {
 };
 
 /**
+ * Get research type by ID
+ * @param {string} id - Research type ID
+ * @returns {Promise} API response
+ */
+export const getResearchTypeById = async (id) => {
+  const response = await instance.get(`journals/research-types/${id}/`);
+  return response.data;
+};
+
+/**
  * Get all areas
  * @param {string} researchTypeId - Research type ID (optional)
  * @param {string} journalId - Journal ID (optional)
@@ -241,6 +271,16 @@ export const updateArea = async ({ id, ...areaData }) => {
  */
 export const deleteArea = async (id) => {
   const response = await instance.delete(`journals/areas/${id}/`);
+  return response.data;
+};
+
+/**
+ * Get area by ID
+ * @param {string} id - Area ID
+ * @returns {Promise} API response
+ */
+export const getAreaById = async (id) => {
+  const response = await instance.get(`journals/areas/${id}/`);
   return response.data;
 };
 
@@ -337,13 +377,3 @@ export const updateSubmissionSettings = async ({ journalId, settings }) => {
   return response.data;
 };
 
-// ==================== USERS APIs ====================
-
-/**
- * Get all users/profiles
- * @returns {Promise} API response
- */
-export const getUsers = async () => {
-  const response = await instance.get("profiles/");
-  return response.data;
-};
