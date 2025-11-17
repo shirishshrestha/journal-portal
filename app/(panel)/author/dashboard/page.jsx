@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AuthorDashboardTable, RoleBasedRoute } from "@/features";
 import AuthorSubmissionsChart from "@/features/panel/author/components/dashboard/AuthorSubmissionsChart";
 import { useGetMyAnalytics } from "@/features/shared/hooks";
-import { useGetSubmissions } from "@/features/panel/author/hooks/useGetSubmissions";
+import { useGetSubmissions } from "@/features/panel/author/hooks/query/useGetSubmissions";
 import StatsCard from "@/features/shared/components/StatsCard";
 import { Plus, FileText, Clock, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";

@@ -72,7 +72,7 @@ export default function DataTable({
   emptyMessage = "No data found",
   error = null,
   errorMessage = "Error loading data",
-  isPending,
+  isPending = false,
   pendingRows = 5,
   onRowClick,
   rowClassName = "",
