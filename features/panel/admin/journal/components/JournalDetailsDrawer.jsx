@@ -18,22 +18,22 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
     <Drawer open={isOpen} onOpenChange={onClose} direction="right">
       <DrawerContent className="w-full max-w-xl">
         <DrawerHeader>
-          <DrawerTitle>{journal.title}</DrawerTitle>
-          <DrawerDescription>{journal.publisher}</DrawerDescription>
+          <DrawerTitle>{journal?.title || "-"}</DrawerTitle>
+          <DrawerDescription>{journal?.publisher || "-"}</DrawerDescription>
         </DrawerHeader>
 
         <div className="space-y-6 px-4 pb-6 overflow-y-auto">
           {/* Status Badges */}
           <div className="flex gap-2">
-            <Badge variant={journal.is_active ? "default" : "outline"}>
-              {journal.is_active ? "Active" : "Inactive"}
+            <Badge variant={journal?.is_active ? "default" : "outline"}>
+              {journal?.is_active ? "Active" : "Inactive"}
             </Badge>
             <Badge
               variant={
-                journal.is_accepting_submissions ? "default" : "secondary"
+                journal?.is_accepting_submissions ? "default" : "secondary"
               }
             >
-              {journal.is_accepting_submissions
+              {journal?.is_accepting_submissions
                 ? "Accepting Submissions"
                 : "Not Accepting"}
             </Badge>
@@ -46,20 +46,22 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Short Name
                 </p>
-                <p className="text-sm font-mono">{journal.short_name}</p>
+                <p className="text-sm font-mono">
+                  {journal?.short_name || "-"}
+                </p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Publisher
                 </p>
-                <p className="text-sm">{journal.publisher}</p>
+                <p className="text-sm">{journal?.publisher || "-"}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Submission Count
                 </p>
                 <p className="text-2xl font-bold text-primary">
-                  {journal.submission_count}
+                  {journal?.submission_count ?? "-"}
                 </p>
               </div>
             </CardContent>
@@ -72,13 +74,17 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   ISSN Print
                 </p>
-                <p className="text-sm font-mono">{journal.issn_print}</p>
+                <p className="text-sm font-mono">
+                  {journal?.issn_print || "-"}
+                </p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   ISSN Online
                 </p>
-                <p className="text-sm font-mono">{journal.issn_online}</p>
+                <p className="text-sm font-mono">
+                  {journal?.issn_online || "-"}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -91,10 +97,10 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                   Editor-in-Chief
                 </p>
                 <p className="text-sm font-medium">
-                  {journal.editor_in_chief.name}
+                  {journal?.editor_in_chief?.name || "-"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {journal.editor_in_chief.email}
+                  {journal?.editor_in_chief?.email || "-"}
                 </p>
               </div>
             </CardContent>
@@ -107,7 +113,9 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                   Description
                 </p>
-                <p className="text-sm leading-relaxed">{journal.description}</p>
+                <p className="text-sm leading-relaxed">
+                  {journal?.description || "-"}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -119,19 +127,19 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Contact Email
                 </p>
-                <p className="text-sm">{journal.contact_email}</p>
+                <p className="text-sm">{journal?.contact_email || "-"}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                   Website
                 </p>
                 <a
-                  href={journal.website}
+                  href={journal?.website_url || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline flex items-center gap-1"
                 >
-                  {journal.website}
+                  {journal?.website_url || "-"}
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
@@ -146,7 +154,9 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                   Created At
                 </p>
                 <p className="text-sm">
-                  {new Date(journal.created_at).toLocaleString()}
+                  {journal?.created_at
+                    ? new Date(journal.created_at).toLocaleString()
+                    : "-"}
                 </p>
               </div>
             </CardContent>

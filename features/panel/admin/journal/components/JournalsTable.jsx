@@ -67,9 +67,9 @@ export default function JournalsTable({
       header: "Editor-in-Chief",
       render: (row) => (
         <div className="text-sm">
-          <p className="font-medium">{row.editor_in_chief.name}</p>
+          <p className="font-medium">{row.editor_in_chief?.name || "-"}</p>
           <p className="text-xs text-muted-foreground">
-            {row.editor_in_chief.email}
+            {row.editor_in_chief?.email || "-"}
           </p>
         </div>
       ),

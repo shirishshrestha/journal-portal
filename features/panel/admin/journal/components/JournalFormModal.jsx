@@ -26,6 +26,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useCreateJournal } from "../hooks/mutation/useCreateJournal";
+import { useUpdateJournal } from "../hooks/mutation/useUpdateJournal";
 
 const journalSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -34,7 +36,11 @@ const journalSchema = z.object({
   issn_print: z.string().optional(),
   issn_online: z.string().optional(),
   description: z.string().optional(),
-  website: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  website_url: z
+    .string()
+    .url("Must be a valid URL")
+    .optional()
+    .or(z.literal("")),
   contact_email: z
     .string()
     .email("Must be a valid email")
@@ -51,7 +57,7 @@ const defaultValues = {
   issn_print: "",
   issn_online: "",
   description: "",
-  website: "",
+  website_url: "",
   contact_email: "",
   is_active: true,
   is_accepting_submissions: true,
@@ -71,6 +77,22 @@ export function JournalFormModal({
     defaultValues: journal || defaultValues,
   });
 
+  // Integrate create journal mutation
+  const createJournalMutation = useCreateJournal({
+    onSuccess: (data) => {
+      onSave?.(data);
+      onClose?.();
+    },
+  });
+
+  // Integrate update journal mutation
+  const updateJournalMutation = useUpdateJournal({
+    onSuccess: (data) => {
+      onSave?.(data);
+      onClose?.();
+    },
+  });
+
   // Reset form when modal opens/closes or journal changes
   useEffect(() => {
     if (isOpen) {
@@ -79,7 +101,11 @@ export function JournalFormModal({
   }, [isOpen, journal, form]);
 
   const handleSubmit = async (data) => {
-    await onSave(data);
+    if (!isEditMode) {
+      createJournalMutation.mutate(data);
+    } else {
+      updateJournalMutation.mutate({ id: journal.id, ...data });
+    }
     // Parent component should close modal and handle success
   };
 
@@ -87,6 +113,11 @@ export function JournalFormModal({
     form.reset();
     onClose();
   };
+
+  const isMutating =
+    isLoading ||
+    createJournalMutation.isLoading ||
+    updateJournalMutation.isLoading;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -188,7 +219,7 @@ export function JournalFormModal({
                 <div className="grid grid-cols-2 gap-4">
                   <FormInputField
                     control={form.control}
-                    name="website"
+                    name="website_url"
                     label="Website URL"
                     placeholder="https://example.com"
                     type="url"
@@ -260,12 +291,12 @@ export function JournalFormModal({
             variant="outline"
             onClick={handleClose}
             type="button"
-            disabled={isLoading}
+            disabled={isMutating}
           >
             Cancel
           </Button>
-          <Button type="submit" form="journal-form" disabled={isLoading}>
-            {isLoading ? (
+          <Button type="submit" form="journal-form" disabled={isMutating}>
+            {isMutating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 {isEditMode ? "Updating..." : "Creating..."}

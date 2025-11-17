@@ -181,18 +181,7 @@ export default function JournalsPage() {
     }
   };
 
-  const handleSaveJournal = (data) => {
-    if (editingJournal) {
-      setJournals(
-        journals.map((j) =>
-          j.id === editingJournal.id ? { ...editingJournal, ...data } : j
-        )
-      );
-      toast.success("Journal updated successfully");
-    } else {
-      setJournals([...journals, { ...data, id: Date.now().toString() }]);
-      toast.success("Journal created successfully");
-    }
+  const handleSaveJournal = () => {
     setIsFormOpen(false);
     setEditingJournal(null);
   };
