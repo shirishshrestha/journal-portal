@@ -6,7 +6,7 @@ import { instance } from "@/lib/instance";
  * @returns {Promise} API response
  */
 export const createSubmission = async (data) => {
-  const response = await instance.post("/submissions/", data);
+  const response = await instance.post("submissions/", data);
   return response.data;
 };
 
@@ -15,7 +15,7 @@ export const createSubmission = async (data) => {
  * @returns {Promise} API response
  */
 export const getSubmissions = async () => {
-  const response = await instance.get("/submissions/");
+  const response = await instance.get("submissions/");
   return response.data;
 };
 
@@ -25,7 +25,7 @@ export const getSubmissions = async () => {
  * @returns {Promise} API response
  */
 export const getSubmissionById = async (id) => {
-  const response = await instance.get("/submissions/" + id + "/");
+  const response = await instance.get("submissions/" + id + "/");
   return response.data;
 };
 
@@ -36,7 +36,7 @@ export const getSubmissionById = async (id) => {
  * @returns {Promise} API response
  */
 export const updateSubmission = async (id, data) => {
-  const response = await instance.patch("/submissions/" + id + "/", data);
+  const response = await instance.patch("submissions/" + id + "/", data);
   return response.data;
 };
 
@@ -46,7 +46,7 @@ export const updateSubmission = async (id, data) => {
  * @returns {Promise} API response
  */
 export const deleteSubmission = async (id) => {
-  const response = await instance.delete("/submissions/" + id + "/");
+  const response = await instance.delete("submissions/" + id + "/");
   return response.data;
 };
 
@@ -56,7 +56,7 @@ export const deleteSubmission = async (id) => {
  * @returns {Promise} API response
  */
 export const submitForReview = async (id) => {
-  const response = await instance.post("/submissions/" + id + "/submit/");
+  const response = await instance.post("submissions/" + id + "/submit/");
   return response.data;
 };
 
@@ -66,6 +66,35 @@ export const submitForReview = async (id) => {
  * @returns {Promise} API response
  */
 export const withdrawSubmission = async (id) => {
-  const response = await instance.post("/submissions/" + id + "/withdraw/");
+  const response = await instance.post("submissions/" + id + "/withdraw/");
+  return response.data;
+};
+
+/**
+ * Upload documents to a submission
+ * @param {string} id - Submission ID
+ * @param {FormData} data - Form data with files
+ * @returns {Promise} API response
+ */
+export const uploadDocument = async (id, data) => {
+  const response = await instance.post(
+    "submissions/" + id + "/upload_document/",
+    data,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * Get documents for a submission
+ * @param {string} id - Submission ID
+ * @returns {Promise} API response
+ */
+export const getSubmissionDocuments = async (id) => {
+  const response = await instance.get("submissions/" + id + "/documents/");
   return response.data;
 };

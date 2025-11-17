@@ -47,9 +47,6 @@ const fullFormSchema = z.object({
   requirements: z
     .array(z.literal(true))
     .min(5, "All requirements must be accepted"),
-  terms_accepted: z
-    .boolean()
-    .refine((val) => val === true, "Terms must be accepted"),
 });
 
 export default function NewSubmissionForm() {

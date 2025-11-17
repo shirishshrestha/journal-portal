@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSubmissions } from "../api/submissionsApi";
+import { getSubmissions } from "../../api/submissionsApi";
 
 /**
  * Hook to get all submissions for the current user

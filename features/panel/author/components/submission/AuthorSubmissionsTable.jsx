@@ -1,8 +1,23 @@
 import React from "react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/features/shared";
-import { BookOpen } from "lucide-react";
+import {
+  BookOpen,
+  MoreVertical,
+  FileUp,
+  Send,
+  Trash2,
+  Eye,
+} from "lucide-react";
 
 const statusConfig = {
   DRAFT: {
@@ -88,11 +103,20 @@ const columns = [
     render: (row) => <StatusBadge status={row.status} />,
   },
   {
+    key: "document_counts",
+    header: "Documents",
+    render: (row) => (
+      <p className="text-xs text-muted-foreground">{row?.document_count}</p>
+    ),
+  },
+  {
     key: "submitted_at",
     header: "Submission Date",
     cellClassName: "text-muted-foreground text-sm",
     render: (row) =>
-      row.submitted_at ? format(new Date(row.submitted_at), "PPP") : "-",
+      row.submitted_at
+        ? format(new Date(row.submitted_at), "PPP")
+        : "Not Submitted Yet",
   },
   {
     key: "updated_at",
@@ -101,15 +125,70 @@ const columns = [
     render: (row) =>
       row.updated_at ? format(new Date(row.updated_at), "PPP") : "-",
   },
+  {
+    key: "actions",
+    header: "Actions",
+    render: (row) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => row.onAddDocuments?.(row)}>
+            <FileUp className="mr-2 h-4 w-4" />
+            Add Documents
+          </DropdownMenuItem>
+          {row.document_count > 0 && (
+            <DropdownMenuItem onClick={() => row.onViewDocuments?.(row)}>
+              <Eye className="mr-2 h-4 w-4" />
+              View Documents
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem onClick={() => row.onSubmit?.(row)}>
+            <Send className="mr-2 h-4 w-4" />
+            Submit
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => row.onDelete?.(row)}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  },
 ];
 
-export default function AuthorSubmissionsTable({ submissions = [] }) {
+export default function AuthorSubmissionsTable({
+  submissions = [],
+  isPending,
+  error,
+  onAddDocuments,
+  onViewDocuments,
+  onSubmit,
+  onDelete,
+}) {
+  // Attach action handlers to each submission row
+  const submissionsWithActions = submissions.map((submission) => ({
+    ...submission,
+    onAddDocuments,
+    onViewDocuments,
+    onSubmit,
+    onDelete,
+  }));
   return (
     <DataTable
-      data={submissions}
+      data={submissionsWithActions}
       columns={columns}
       emptyMessage="No submissions found"
       tableClassName="bg-card border flex justify-center"
+      isPending={isPending}
+      error={error}
       hoverable
     />
   );

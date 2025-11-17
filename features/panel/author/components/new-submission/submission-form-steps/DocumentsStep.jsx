@@ -1,9 +1,10 @@
 // DocumentsStep.jsx
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { X, Upload } from "lucide-react";
 
-export default function DocumentsStep() {
+export default function DocumentsStep({ onFilesChange }) {
   const [uploadedFiles, setUploadedFiles] = useState({
     manuscript: [],
     supplementary: [],
@@ -11,18 +12,22 @@ export default function DocumentsStep() {
   });
   const handleFileUpload = (category, files) => {
     if (files) {
-      setUploadedFiles((prev) => ({
-        ...prev,
-        [category]: [...prev[category], ...Array.from(files)],
-      }));
+      const newFiles = {
+        ...uploadedFiles,
+        [category]: [...uploadedFiles[category], ...Array.from(files)],
+      };
+      setUploadedFiles(newFiles);
+      onFilesChange?.(newFiles);
     }
   };
 
   const handleRemoveFile = (category, index) => {
-    setUploadedFiles((prev) => ({
-      ...prev,
-      [category]: prev[category].filter((_, i) => i !== index),
-    }));
+    const newFiles = {
+      ...uploadedFiles,
+      [category]: uploadedFiles[category].filter((_, i) => i !== index),
+    };
+    setUploadedFiles(newFiles);
+    onFilesChange?.(newFiles);
   };
   return (
     <div className="space-y-6">
