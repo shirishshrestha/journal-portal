@@ -6,10 +6,9 @@ import {
   AuthorSubmissionsTable,
   LoadingScreen,
   RoleBasedRoute,
-  useGetSubmissions,
   SubmissionsLayout,
-  useCategorizedSubmissions,
 } from "@/features";
+import { useGetActiveSubmissions } from "@/features/panel/author/hooks/query/useGetActiveSubmissions";
 import DocumentUploadModal from "@/features/panel/author/components/submission/DocumentUploadModal";
 import DocumentViewModal from "@/features/panel/author/components/submission/DocumentViewModal";
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
@@ -31,11 +30,7 @@ export default function ActivePage() {
     data: SubmissionsData,
     isPending: isSubmissionsPending,
     error,
-  } = useGetSubmissions();
-
-  const { categorized, counts } = useCategorizedSubmissions(
-    SubmissionsData?.results || []
-  );
+  } = useGetActiveSubmissions();
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -81,11 +76,10 @@ export default function ActivePage() {
       {isSubmissionsPending && <LoadingScreen />}
       <SubmissionsLayout
         title="Active Submissions"
-        description="Manuscripts currently under review with assigned reviewers"
-        counts={counts}
+        description="Manuscripts currently under review"
       >
         <AuthorSubmissionsTable
-          submissions={categorized.active}
+          submissions={SubmissionsData?.results || []}
           isPending={isSubmissionsPending}
           error={error}
           onAddDocuments={handleAddDocuments}

@@ -20,6 +20,42 @@ export const getSubmissions = async () => {
 };
 
 /**
+ * Get draft submissions
+ * @returns {Promise} API response
+ */
+export const getDraftSubmissions = async () => {
+  const response = await instance.get("submissions/drafts/");
+  return response.data;
+};
+
+/**
+ * Get unassigned submissions (no reviewers assigned)
+ * @returns {Promise} API response
+ */
+export const getUnassignedSubmissions = async () => {
+  const response = await instance.get("submissions/unassigned/");
+  return response.data;
+};
+
+/**
+ * Get active submissions (with reviewers assigned)
+ * @returns {Promise} API response
+ */
+export const getActiveSubmissions = async () => {
+  const response = await instance.get("submissions/active/");
+  return response.data;
+};
+
+/**
+ * Get archived submissions (completed)
+ * @returns {Promise} API response
+ */
+export const getArchivedSubmissions = async () => {
+  const response = await instance.get("submissions/archived/");
+  return response.data;
+};
+
+/**
  * Get a single submission by ID
  * @param {string} id - Submission ID
  * @returns {Promise} API response

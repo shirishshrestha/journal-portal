@@ -6,10 +6,9 @@ import {
   AuthorSubmissionsTable,
   LoadingScreen,
   RoleBasedRoute,
-  useGetSubmissions,
   SubmissionsLayout,
-  useCategorizedSubmissions,
 } from "@/features";
+import { useGetUnassignedSubmissions } from "@/features/panel/author/hooks/query/useGetUnassignedSubmissions";
 import DocumentUploadModal from "@/features/panel/author/components/submission/DocumentUploadModal";
 import DocumentViewModal from "@/features/panel/author/components/submission/DocumentViewModal";
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
@@ -31,11 +30,7 @@ export default function UnassignedPage() {
     data: SubmissionsData,
     isPending: isSubmissionsPending,
     error,
-  } = useGetSubmissions();
-
-  const { categorized, counts } = useCategorizedSubmissions(
-    SubmissionsData?.results || []
-  );
+  } = useGetUnassignedSubmissions();
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -82,10 +77,9 @@ export default function UnassignedPage() {
       <SubmissionsLayout
         title="Unassigned Submissions"
         description="Submitted manuscripts awaiting reviewer assignment"
-        counts={counts}
       >
         <AuthorSubmissionsTable
-          submissions={categorized.unassigned}
+          submissions={SubmissionsData?.results || []}
           isPending={isSubmissionsPending}
           error={error}
           onAddDocuments={handleAddDocuments}

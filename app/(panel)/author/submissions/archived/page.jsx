@@ -6,10 +6,9 @@ import {
   AuthorSubmissionsTable,
   LoadingScreen,
   RoleBasedRoute,
-  useGetSubmissions,
   SubmissionsLayout,
-  useCategorizedSubmissions,
 } from "@/features";
+import { useGetArchivedSubmissions } from "@/features/panel/author/hooks/query/useGetArchivedSubmissions";
 import DocumentUploadModal from "@/features/panel/author/components/submission/DocumentUploadModal";
 import DocumentViewModal from "@/features/panel/author/components/submission/DocumentViewModal";
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
@@ -31,11 +30,7 @@ export default function ArchivedPage() {
     data: SubmissionsData,
     isPending: isSubmissionsPending,
     error,
-  } = useGetSubmissions();
-
-  const { categorized, counts } = useCategorizedSubmissions(
-    SubmissionsData?.results || []
-  );
+  } = useGetArchivedSubmissions();
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -81,11 +76,10 @@ export default function ArchivedPage() {
       {isSubmissionsPending && <LoadingScreen />}
       <SubmissionsLayout
         title="Archived Submissions"
-        description="Completed submissions (accepted, rejected, withdrawn, or published)"
-        counts={counts}
+        description="Completed manuscripts (accepted, rejected, withdrawn, or published)"
       >
         <AuthorSubmissionsTable
-          submissions={categorized.archived}
+          submissions={SubmissionsData?.results || []}
           isPending={isSubmissionsPending}
           error={error}
           onAddDocuments={handleAddDocuments}
