@@ -109,7 +109,7 @@ export default function AuthorDashboard() {
             error={submissionsError}
           />
 
-          <Link href="/author/submissions/">
+          <Link href="/author/submissions/drafts/">
             <Button variant="secondary" size="lg" className="">
               View All Submissions
             </Button>

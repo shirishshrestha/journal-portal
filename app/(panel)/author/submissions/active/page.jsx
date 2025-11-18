@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import {
   AuthorSubmissionsTable,
   LoadingScreen,
   RoleBasedRoute,
   useGetSubmissions,
+  SubmissionsLayout,
+  useCategorizedSubmissions,
 } from "@/features";
 import DocumentUploadModal from "@/features/panel/author/components/submission/DocumentUploadModal";
 import DocumentViewModal from "@/features/panel/author/components/submission/DocumentViewModal";
@@ -25,13 +25,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export default function SubmissionsPage() {
+export default function ActivePage() {
   const router = useRouter();
   const {
     data: SubmissionsData,
     isPending: isSubmissionsPending,
     error,
   } = useGetSubmissions();
+
+  const { categorized, counts } = useCategorizedSubmissions(
+    SubmissionsData?.results || []
+  );
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -75,29 +79,13 @@ export default function SubmissionsPage() {
   return (
     <RoleBasedRoute allowedRoles={["AUTHOR"]}>
       {isSubmissionsPending && <LoadingScreen />}
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              My Submissions
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Manage and track your manuscript submissions
-            </p>
-          </div>
-          <Button
-            onClick={() => router.push("/author/new-submission/")}
-            className="gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            New Submission
-          </Button>
-        </div>
-
-        {/* Table */}
+      <SubmissionsLayout
+        title="Active Submissions"
+        description="Manuscripts currently under review with assigned reviewers"
+        counts={counts}
+      >
         <AuthorSubmissionsTable
-          submissions={SubmissionsData?.results || []}
+          submissions={categorized.active}
           isPending={isSubmissionsPending}
           error={error}
           onAddDocuments={handleAddDocuments}
@@ -105,7 +93,7 @@ export default function SubmissionsPage() {
           onSubmit={handleSubmit}
           onDelete={handleDelete}
         />
-      </div>
+      </SubmissionsLayout>
 
       {/* Document Upload Modal */}
       <DocumentUploadModal

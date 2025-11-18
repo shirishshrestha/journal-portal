@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -80,17 +81,27 @@ const columns = [
   {
     key: "title",
     header: "Title",
-    render: (row) => (
-      <div className="flex items-center gap-2">
-        <BookOpen className="w-4 h-4 text-muted-foreground" />
-        <div>
-          <p className="font-medium">{row.title}</p>
-          <p className="text-xs text-muted-foreground">
-            {row.submission_number}
-          </p>
+    render: (row) => {
+      const router = useRouter();
+      return (
+        <div
+          className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+          onClick={() => {
+            if (row.status === 'DRAFT') {
+              router.push(`/author/submissions/drafts/${row.id}`);
+            }
+          }}
+        >
+          <BookOpen className="w-4 h-4 text-muted-foreground" />
+          <div>
+            <p className="font-medium">{row.title}</p>
+            <p className="text-xs text-muted-foreground">
+              {row.submission_number}
+            </p>
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   },
   {
     key: "journal_name",
