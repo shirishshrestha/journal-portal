@@ -115,8 +115,9 @@ export default function DraftDetailPage() {
               variant="ghost"
               size="sm"
               onClick={() => router.push("/author/submissions/drafts")}
+              className={"hover:text-primary-foreground"}
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Drafts
             </Button>
           </div>
@@ -169,7 +170,9 @@ export default function DraftDetailPage() {
           <CardContent className="space-y-4">
             <div>
               <h3 className="font-semibold mb-2">Journal</h3>
-              <p className="text-muted-foreground">{submission?.journal_name}</p>
+              <p className="text-muted-foreground">
+                {submission?.journal_name}
+              </p>
             </div>
 
             <Separator />
@@ -209,7 +212,10 @@ export default function DraftDetailPage() {
                   Manage manuscript files and supporting documents
                 </CardDescription>
               </div>
-              <Button onClick={() => setUploadModalOpen(true)} className="gap-2">
+              <Button
+                onClick={() => setUploadModalOpen(true)}
+                className="gap-2"
+              >
                 <Upload className="h-4 w-4" />
                 Upload Document
               </Button>
@@ -224,7 +230,10 @@ export default function DraftDetailPage() {
                   Upload your manuscript and supporting documents to submit for
                   review
                 </p>
-                <Button onClick={() => setUploadModalOpen(true)} className="gap-2">
+                <Button
+                  onClick={() => setUploadModalOpen(true)}
+                  className="gap-2"
+                >
                   <Upload className="h-4 w-4" />
                   Upload First Document
                 </Button>

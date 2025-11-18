@@ -19,6 +19,7 @@ import {
   Trash2,
   Eye,
 } from "lucide-react";
+import Link from "next/link";
 
 const statusConfig = {
   DRAFT: {
@@ -82,16 +83,8 @@ const columns = [
     key: "title",
     header: "Title",
     render: (row) => {
-      const router = useRouter();
       return (
-        <div
-          className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-          onClick={() => {
-            if (row.status === 'DRAFT') {
-              router.push(`/author/submissions/drafts/${row.id}`);
-            }
-          }}
-        >
+        <div className="flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-muted-foreground" />
           <div>
             <p className="font-medium">{row.title}</p>
@@ -140,37 +133,35 @@ const columns = [
     key: "actions",
     header: "Actions",
     render: (row) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => row.onAddDocuments?.(row)}>
-            <FileUp className="mr-2 h-4 w-4" />
-            Add Documents
-          </DropdownMenuItem>
-          {row.document_count > 0 && (
-            <DropdownMenuItem onClick={() => row.onViewDocuments?.(row)}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Documents
+      <div className="flex gap-2 items-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>
+              <Link
+                href={`/author/submissions/drafts/${row.id}`}
+                className={"flex items-center text-sm gap-2 "}
+              >
+                <Eye className=" h-4 w-4  text-primary-foreground" />
+                View Submission
+              </Link>
             </DropdownMenuItem>
-          )}
-          <DropdownMenuItem onClick={() => row.onSubmit?.(row)}>
-            <Send className="mr-2 h-4 w-4" />
-            Submit
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => row.onDelete?.(row)}
-            className="text-destructive focus:text-destructive"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => row.onDelete?.(row)}
+              className="text-destructive group hover:text-primary-foreground"
+            >
+              <Trash2 className=" h-4 w-4 text-destructive group-hover:text-primary-foreground" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     ),
   },
 ];
