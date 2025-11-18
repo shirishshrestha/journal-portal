@@ -563,7 +563,22 @@ export function TaxonomySettings({ journalId }) {
           
           <div className="space-y-4 mt-4">
             {viewingCategory?.research_types && viewingCategory.research_types.length > 0 ? (
-              <Accordion type="multiple" className="space-y-3">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-medium">Research Types</p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedCategory(viewingCategory);
+                      setIsAddResearchTypeOpen(true);
+                    }}
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add Research Type
+                  </Button>
+                </div>
+                <Accordion type="multiple" className="space-y-3">
                 {viewingCategory.research_types.map((researchType) => (
                   <AccordionItem
                     key={researchType.id}
@@ -683,6 +698,7 @@ export function TaxonomySettings({ journalId }) {
                   </AccordionItem>
                 ))}
               </Accordion>
+              </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <p>No research types in this category</p>
