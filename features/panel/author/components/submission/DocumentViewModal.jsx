@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Loader2 } from "lucide-react";
+import { FileText, Download, Loader2, Edit } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getSubmissionDocuments } from "../../api/submissionsApi";
 
@@ -18,6 +19,7 @@ export default function DocumentViewModal({
   onOpenChange,
   submissionId,
 }) {
+  const router = useRouter();
   const {
     data: documents,
     isPending,
@@ -30,6 +32,10 @@ export default function DocumentViewModal({
 
   const handleDownload = (documentUrl) => {
     window.open(documentUrl, "_blank");
+  };
+
+  const handleEdit = (docId) => {
+    router.push(`/author/submissions/drafts/${submissionId}/editor/${docId}`);
   };
 
   return (
@@ -73,22 +79,28 @@ export default function DocumentViewModal({
                       <FileText className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="font-medium">
-                          {doc.file_name || doc.document_type}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {doc.document_type} •{" "}
-                          {doc.file_size || "Unknown size"}
+                          {doc.document_type_display}
                         </p>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDownload(doc.file_url || doc.file)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleEdit(doc.id)}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownload(doc.file_url || doc.file)}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}

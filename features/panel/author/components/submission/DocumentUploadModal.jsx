@@ -20,8 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload, X, FileText, Plus } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useUploadDocument } from "../../hooks/mutation/useUploadDocument";
+import { useMutation } from "@tanstack/react-query";
+import { saveYjsState } from "../../api/superdocApi";
 import { toast } from "sonner";
 
 const DOCUMENT_TYPES = [
@@ -38,106 +40,70 @@ export default function DocumentUploadModal({
   onOpenChange,
   submissionId,
 }) {
-  // Current document being added
-  const [currentDocument, setCurrentDocument] = useState({
+  const [document, setDocument] = useState({
     title: "",
     document_type: "MANUSCRIPT",
     description: "",
     file: null,
   });
 
-  // List of documents to upload
-  const [documentsToUpload, setDocumentsToUpload] = useState([]);
-  const [isUploading, setIsUploading] = useState(false);
-
   const uploadMutation = useUploadDocument();
-  const isPending = uploadMutation.isPending;
+
+  // Mutation to initialize Yjs state after document upload
+  const initYjsStateMutation = useMutation({
+    mutationFn: ({ documentId, yjsState }) =>
+      saveYjsState(documentId, yjsState),
+    onSuccess: () => {
+      toast.success("Document initialized successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to initialize Yjs state:", error);
+      toast.error("Document uploaded but failed to initialize editor state");
+    },
+  });
+
+  const isPending = uploadMutation.isPending || initYjsStateMutation.isPending;
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setCurrentDocument((prev) => ({ ...prev, file }));
+      setDocument((prev) => ({ ...prev, file }));
     }
   };
 
-  const handleAddDocument = () => {
+  const handleUpload = async () => {
     if (
-      !currentDocument.title ||
-      !currentDocument.document_type ||
-      !currentDocument.description ||
-      !currentDocument.file
+      !document.title ||
+      !document.document_type ||
+      !document.description ||
+      !document.file
     ) {
       toast.error("Please fill in all fields and select a file");
       return;
     }
 
-    // Add document to upload list
-    setDocumentsToUpload((prev) => [...prev, { ...currentDocument, id: Date.now() }]);
-    
-    // Reset current document form
-    setCurrentDocument({
-      title: "",
-      document_type: "MANUSCRIPT",
-      description: "",
-      file: null,
-    });
+    const data = new FormData();
+    data.append("title", document.title);
+    data.append("document_type", document.document_type);
+    data.append("description", document.description);
+    data.append("file", document.file);
 
-    // Reset file input
-    const fileInput = document.getElementById("file-input");
-    if (fileInput) fileInput.value = "";
+    try {
+      uploadMutation.mutateAsync({
+        id: submissionId,
+        data,
+      });
 
-    toast.success("Document added to upload queue");
-  };
-
-  const handleRemoveDocument = (id) => {
-    setDocumentsToUpload((prev) => prev.filter((doc) => doc.id !== id));
-    toast.success("Document removed from queue");
-  };
-
-  const handleUploadAll = async () => {
-    if (documentsToUpload.length === 0) {
-      toast.error("No documents to upload");
-      return;
-    }
-
-    setIsUploading(true);
-    let successCount = 0;
-    let failCount = 0;
-
-    for (const doc of documentsToUpload) {
-      const data = new FormData();
-      data.append("title", doc.title);
-      data.append("document_type", doc.document_type);
-      data.append("description", doc.description);
-      data.append("file", doc.file);
-
-      try {
-        await uploadMutation.mutateAsync({ id: submissionId, data });
-        successCount++;
-      } catch (error) {
-        failCount++;
-      }
-    }
-
-    setIsUploading(false);
-
-    if (successCount > 0) {
-      toast.success(`${successCount} document(s) uploaded successfully`);
-    }
-    if (failCount > 0) {
-      toast.error(`${failCount} document(s) failed to upload`);
-    }
-
-    if (failCount === 0) {
-      // Close modal and reset state
-      setDocumentsToUpload([]);
-      setCurrentDocument({
+      // Reset form and close modal
+      setDocument({
         title: "",
         document_type: "MANUSCRIPT",
         description: "",
         file: null,
       });
       onOpenChange(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.detail || "Failed to upload document");
     }
   };
 
@@ -151,128 +117,73 @@ export default function DocumentUploadModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Documents to Upload List */}
-          {documentsToUpload.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">Documents to Upload ({documentsToUpload.length})</Label>
-              </div>
-              <div className="space-y-2 border rounded-lg p-4 bg-muted/30">
-                {documentsToUpload.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-start justify-between gap-4 p-3 bg-background border rounded-lg"
-                  >
-                    <div className="flex items-start gap-3 flex-1">
-                      <FileText className="h-5 w-5 mt-0.5 text-muted-foreground shrink-0" />
-                      <div className="space-y-1 flex-1 min-w-0">
-                        <p className="font-medium text-sm">{doc.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {DOCUMENT_TYPES.find(t => t.value === doc.document_type)?.label}
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate">{doc.description}</p>
-                        <p className="text-xs text-muted-foreground">File: {doc.file.name}</p>
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveDocument(doc.id)}
-                      disabled={isUploading}
-                      className="shrink-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title *</Label>
+            <Input
+              id="title"
+              placeholder="Enter document title"
+              value={document.title}
+              onChange={(e) =>
+                setDocument((prev) => ({ ...prev, title: e.target.value }))
+              }
+              disabled={isPending}
+            />
+          </div>
 
-          {/* Add Document Form */}
-          <div className="space-y-4 border rounded-lg p-4">
-            <Label className="text-base font-semibold">Add New Document</Label>
-            
-            <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
-              <Input
-                id="title"
-                placeholder="Enter document title"
-                value={currentDocument.title}
-                onChange={(e) =>
-                  setCurrentDocument((prev) => ({ ...prev, title: e.target.value }))
-                }
-                disabled={isUploading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="document_type">Document Type *</Label>
-              <Select
-                value={currentDocument.document_type}
-                onValueChange={(value) =>
-                  setCurrentDocument((prev) => ({ ...prev, document_type: value }))
-                }
-                disabled={isUploading}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select document type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DOCUMENT_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
-              <Textarea
-                id="description"
-                placeholder="Enter document description"
-                value={currentDocument.description}
-                onChange={(e) =>
-                  setCurrentDocument((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-                disabled={isUploading}
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="file-input">File *</Label>
-              <Input
-                id="file-input"
-                type="file"
-                accept=".docx,.pdf,.doc"
-                onChange={handleFileChange}
-                disabled={isUploading}
-              />
-              {currentDocument.file && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: {currentDocument.file.name}
-                </p>
-              )}
-            </div>
-
-            <Button
-              type="button"
-              onClick={handleAddDocument}
-              disabled={isUploading}
-              variant="outline"
-              className="w-full"
+          <div className="space-y-2">
+            <Label htmlFor="document_type">Document Type *</Label>
+            <Select
+              value={document.document_type}
+              onValueChange={(value) =>
+                setDocument((prev) => ({ ...prev, document_type: value }))
+              }
+              disabled={isPending}
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Document to Queue
-            </Button>
+              <SelectTrigger>
+                <SelectValue placeholder="Select document type" />
+              </SelectTrigger>
+              <SelectContent>
+                {DOCUMENT_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description *</Label>
+            <Textarea
+              id="description"
+              placeholder="Enter document description"
+              value={document.description}
+              onChange={(e) =>
+                setDocument((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              disabled={isPending}
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="file-input">File *</Label>
+            <Input
+              id="file-input"
+              type="file"
+              accept=".docx,.pdf,.doc"
+              onChange={handleFileChange}
+              disabled={isPending}
+            />
+            {document.file && (
+              <p className="text-sm text-muted-foreground">
+                Selected: {document.file.name}
+              </p>
+            )}
           </div>
         </div>
 
@@ -280,18 +191,13 @@ export default function DocumentUploadModal({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isUploading}
+            disabled={isPending}
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleUploadAll} 
-            disabled={isUploading || documentsToUpload.length === 0}
-          >
+          <Button onClick={handleUpload} disabled={isPending}>
             <Upload className="mr-2 h-4 w-4" />
-            {isUploading 
-              ? "Uploading..." 
-              : `Upload ${documentsToUpload.length} Document${documentsToUpload.length !== 1 ? 's' : ''}`}
+            {isPending ? "Uploading..." : "Upload Document"}
           </Button>
         </DialogFooter>
       </DialogContent>

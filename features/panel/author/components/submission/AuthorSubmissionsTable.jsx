@@ -19,6 +19,7 @@ import {
   Trash2,
   Eye,
 } from "lucide-react";
+import Link from "next/link";
 
 const statusConfig = {
   DRAFT: {
@@ -82,16 +83,8 @@ const columns = [
     key: "title",
     header: "Title",
     render: (row) => {
-      const router = useRouter();
       return (
-        <div
-          className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-          onClick={() => {
-            if (row.status === 'DRAFT') {
-              router.push(`/author/submissions/drafts/${row.id}`);
-            }
-          }}
-        >
+        <div className="flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-muted-foreground" />
           <div>
             <p className="font-medium">{row.title}</p>
@@ -139,49 +132,8 @@ const columns = [
   {
     key: "actions",
     header: "Actions",
-    render: (row) => {
-      const router = useRouter();
-      
-      // For drafts, show View and Delete buttons
-      if (row.status === 'DRAFT') {
-        return (
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => router.push(`/author/submissions/drafts/${row.id}`)}
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              View
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => row.onDelete?.(row)}
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        );
-      }
-      
-      // For unassigned submissions (SUBMITTED or UNDER_REVIEW with no reviewers), show View button
-      if ((row.status === 'SUBMITTED' || row.status === 'UNDER_REVIEW') && row.review_assignment_count === 0) {
-        return (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => router.push(`/author/submissions/unassigned/${row.id}`)}
-          >
-            <Eye className="mr-2 h-4 w-4" />
-            View
-          </Button>
-        );
-      }
-      
-      // For other statuses, show full menu
-      return (
+    render: (row) => (
+      <div className="flex gap-2 items-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -189,32 +141,28 @@ const columns = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => row.onAddDocuments?.(row)}>
-              <FileUp className="mr-2 h-4 w-4" />
-              Add Documents
+            <DropdownMenuItem>
+              <Link
+                href={`/author/submissions/drafts/${row.id}`}
+                className={"flex items-center text-sm gap-2 "}
+              >
+                <Eye className=" h-4 w-4  text-primary-foreground" />
+                View Submission
+              </Link>
             </DropdownMenuItem>
-            {row.document_count > 0 && (
-              <DropdownMenuItem onClick={() => row.onViewDocuments?.(row)}>
-                <Eye className="mr-2 h-4 w-4" />
-                View Documents
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem onClick={() => row.onSubmit?.(row)}>
-              <Send className="mr-2 h-4 w-4" />
-              Submit
-            </DropdownMenuItem>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => row.onDelete?.(row)}
-              className="text-destructive focus:text-destructive"
+              className="text-destructive group hover:text-primary-foreground"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className=" h-4 w-4 text-destructive group-hover:text-primary-foreground" />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      );
-    },
+      </div>
+    ),
   },
 ];
 
