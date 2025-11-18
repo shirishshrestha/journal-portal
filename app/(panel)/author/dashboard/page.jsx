@@ -104,7 +104,7 @@ export default function AuthorDashboard() {
           </div>
 
           <AuthorDashboardTable
-            submissions={submissions || []}
+            submissions={submissions?.results || []}
             isPending={isSubmissionsPending}
             error={submissionsError}
           />

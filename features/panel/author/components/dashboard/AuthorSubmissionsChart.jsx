@@ -52,7 +52,10 @@ export default function AuthorSubmissionsChart({ data, isLoading }) {
           <CardTitle>Submission Status Distribution</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[300px]">
-          <p className="text-muted-foreground">No submissions yet</p>
+          <p className="text-muted-foreground">
+            No submissions in Accepted, Rejected, Under Review, or Pending
+            status yet
+          </p>
         </CardContent>
       </Card>
     );

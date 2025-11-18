@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { logoutApi } from "../api/LogoutApiSlice";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
@@ -16,10 +16,14 @@ import { logout as logoutAction } from "../redux/authSlice";
 export const useLogout = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: logoutApi,
     onSuccess: () => {
+      // Clear all React Query cache
+      queryClient.clear();
+
       // Dispatch logout action to clear Redux state
       dispatch(logoutAction());
 

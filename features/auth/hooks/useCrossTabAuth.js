@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout as authLogout, login as authLogin } from "../redux/authSlice";
 import { usePathname, useRouter } from "next/navigation";
 import { useRoleRedirect } from "@/features/shared";
+import { useQueryClient } from "@tanstack/react-query";
 
 const useCrossTabAuth = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ const useCrossTabAuth = () => {
   const currentAuth = useSelector((state) => state.auth?.access);
   const { redirectUser } = useRoleRedirect();
   const roles = useSelector((state) => state.auth?.userData?.roles || []);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const channel = new BroadcastChannel("auth-channel");
@@ -19,6 +21,7 @@ const useCrossTabAuth = () => {
 
     const handleMessage = (event) => {
       if (event.data === "logout") {
+        queryClient.clear();
         dispatch(authLogout());
         router.push("/login");
       }
@@ -92,6 +95,7 @@ const useCrossTabAuth = () => {
 
           // Logout detected
           if (!access && currentAuth) {
+            queryClient.clear();
             dispatch(authLogout());
             router.push("/login");
           }
@@ -109,7 +113,15 @@ const useCrossTabAuth = () => {
       window.removeEventListener("storage", handleStorageChange);
       channel.close();
     };
-  }, [dispatch, router, pathname, currentAuth, redirectUser, roles]);
+  }, [
+    dispatch,
+    router,
+    pathname,
+    currentAuth,
+    redirectUser,
+    roles,
+    queryClient,
+  ]);
 
   const broadcast = (messageType) => {
     channelRef.current?.postMessage(messageType);
