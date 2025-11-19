@@ -8,10 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, FileText, Calendar, User, Loader2 } from "lucide-react";
 import { DataTable } from "@/features/shared";
 import { format } from "date-fns";
-import { 
-  useGetJournalById, 
-  useGetJournalSubmissions 
-} from "@/features/panel/admin/journal";
+import { useGetJournalById, useGetJournalSubmissions } from "@/features";
 
 export default function JournalSubmissionsPage() {
   const params = useParams();
@@ -31,18 +28,16 @@ export default function JournalSubmissionsPage() {
     data: submissionsData,
     isPending: isSubmissionsPending,
     error: submissionsError,
-  } = useGetJournalSubmissions(
-    journalId,
-    { status: statusFilter !== "all" ? statusFilter : undefined }
-  );
+  } = useGetJournalSubmissions(journalId, {
+    status: statusFilter !== "all" ? statusFilter : undefined,
+  });
 
   const submissions = submissionsData?.results || [];
 
   // Status badge colors
   const statusColors = {
     DRAFT: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100",
-    SUBMITTED:
-      "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100",
+    SUBMITTED: "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100",
     UNDER_REVIEW:
       "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100",
     REVISION_REQUESTED:
@@ -114,9 +109,7 @@ export default function JournalSubmissionsPage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() =>
-            router.push(`/admin/submissions/${row.id}`)
-          }
+          onClick={() => router.push(`/admin/submissions/${row.id}`)}
         >
           <FileText className="h-4 w-4 mr-2" />
           View
@@ -186,9 +179,7 @@ export default function JournalSubmissionsPage() {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total Submissions</p>
-              <p className="font-medium text-2xl">
-                {submissions.length}
-              </p>
+              <p className="font-medium text-2xl">{submissions.length}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>

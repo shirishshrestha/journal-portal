@@ -1,13 +1,13 @@
 "use client";
 
-import { RoleBasedRoute } from "@/features";
 import {
   EditorDashboardStats,
-  EditorSubmissionsChart,
   EditorJournalsDoughnutChart,
-} from "@/features/panel/editor/components/dashboard";
-import { useGetMyAnalytics } from "@/features/shared/hooks";
-import ErrorCard from "@/features/shared/components/ErrorCard";
+  EditorSubmissionsChart,
+  ErrorCard,
+  RoleBasedRoute,
+  useGetMyAnalytics,
+} from "@/features";
 import React from "react";
 
 export default function EditorDashboard() {

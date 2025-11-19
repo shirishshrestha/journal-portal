@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import {
   JournalDetailsDrawer,
   JournalFormModal,
-  AdminJournalsTable,
+  JournalsTable,
   useGetJournals,
 } from "@/features";
 import { FilterToolbar } from "@/features/shared";
@@ -112,11 +112,16 @@ export default function JournalsPage() {
       </FilterToolbar>
 
       {/* Journals Table */}
-      <AdminJournalsTable
+      <JournalsTable
         journals={journals}
-        onViewDrawer={(row) => {
-          setSelectedJournal(row);
-          setIsDetailsOpen(true);
+        onViewSubmissions={(row) => {
+          router.push(`/editor/journals/${row.id}/submissions`);
+        }}
+        onEdit={(row) => {
+          router.push(`/editor/journals/${row.id}/settings`);
+        }}
+        onSettings={(row) => {
+          router.push(`/editor/journals/${row.id}/settings`);
         }}
         onDelete={handleDelete}
         isPending={isJournalDataPending}
