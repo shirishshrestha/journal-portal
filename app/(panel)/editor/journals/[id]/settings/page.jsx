@@ -5,14 +5,16 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
+  ContactSettings,
   GeneralSettings,
-  TaxonomySettings,
+  LoadingScreen,
   StaffSettings,
   SubmissionSettings,
-  ContactSettings,
-} from "@/features/panel/admin/journal/components/settings";
-import { LoadingScreen, useGetJournalById } from "@/features";
+  TaxonomySettings,
+  useGetJournalById,
+} from "@/features";
 import ErrorCard from "@/features/shared/components/ErrorCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -46,7 +48,7 @@ export default function JournalSettingsPage() {
       <ErrorCard
         title="Failed to load journal"
         description={error.message}
-        onBack={() => router.push("/admin/journals")}
+        onBack={() => router.push("/editor/journals")}
       />
     );
   }
@@ -60,7 +62,8 @@ export default function JournalSettingsPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.push("/admin/journals")}
+              className={"hover:text-primary-foreground"}
+              onClick={() => router.push("/editor/journals")}
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>

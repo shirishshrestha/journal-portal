@@ -6,9 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, FileText, Calendar, User, Loader2 } from "lucide-react";
-import { DataTable } from "@/features/shared";
+import {
+  DataTable,
+  ErrorCard,
+  LoadingScreen,
+  RoleBasedRoute,
+} from "@/features/shared";
 import { format } from "date-fns";
-import { useGetJournalById, useGetJournalSubmissions } from "@/features";
+import {
+  useGetJournalById,
+  useGetJournalSubmissions,
+} from "@/features/panel/admin/journal";
 
 export default function JournalSubmissionsPage() {
   const params = useParams();
@@ -109,7 +117,7 @@ export default function JournalSubmissionsPage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push(`/admin/submissions/${row.id}`)}
+          onClick={() => router.push(`/editor/submissions/${row.id}`)}
         >
           <FileText className="h-4 w-4 mr-2" />
           View
@@ -118,133 +126,130 @@ export default function JournalSubmissionsPage() {
     },
   ];
 
-  if (isJournalPending) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   if (journalError) {
     return (
-      <div className="space-y-6">
-        <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-destructive">Failed to load journal details</p>
-          </CardContent>
-        </Card>
-      </div>
+      <RoleBasedRoute allowedRoles={["EDITOR"]}>
+        <ErrorCard
+          title="Failed to load journal submissions"
+          description={error.message}
+          onBack={() => router.push("/editor/journals")}
+        />
+      </RoleBasedRoute>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => router.back()}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">
-            {journal?.title}
-          </h1>
-          <p className="text-muted-foreground">
-            View and manage all submissions for this journal
-          </p>
-        </div>
-      </div>
-
-      {/* Journal Info Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Journal Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Short Name</p>
-              <p className="font-medium">{journal?.short_name}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Publisher</p>
-              <p className="font-medium">{journal?.publisher || "-"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Total Submissions</p>
-              <p className="font-medium text-2xl">{submissions.length}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Status</p>
-              <Badge
-                className={
-                  journal?.is_active
-                    ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100"
-                    : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100"
-                }
+    <RoleBasedRoute allowedRoles={["EDITOR"]}>
+      <div className="space-y-6">
+        {/* Header */}
+        {isJournalPending && <LoadingScreen />}
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                className={"hover:text-primary-foreground"}
+                onClick={() => router.push("/editor/journals")}
               >
-                {journal?.is_active ? "Active" : "Inactive"}
-              </Badge>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
             </div>
+            <h1 className="text-3xl font-bold text-foreground">
+              {journal?.title}
+            </h1>
+            <p className="text-muted-foreground">
+              View and manage all submissions for this journal
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
-            <label className="text-sm font-medium">Filter by Status:</label>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: "all", label: "All" },
-                { value: "SUBMITTED", label: "Submitted" },
-                { value: "UNDER_REVIEW", label: "Under Review" },
-                { value: "REVISION_REQUESTED", label: "Revision Requested" },
-                { value: "ACCEPTED", label: "Accepted" },
-                { value: "REJECTED", label: "Rejected" },
-                { value: "PUBLISHED", label: "Published" },
-              ].map((status) => (
-                <Button
-                  key={status.value}
-                  variant={
-                    statusFilter === status.value ? "default" : "outline"
+        {/* Journal Info Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Journal Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Short Name</p>
+                <p className="font-medium">{journal?.short_name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Publisher</p>
+                <p className="font-medium">{journal?.publisher || "-"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Total Submissions
+                </p>
+                <p className="font-medium text-2xl">{submissions.length}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Status</p>
+                <Badge
+                  className={
+                    journal?.is_active
+                      ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100"
+                      : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100"
                   }
-                  size="sm"
-                  onClick={() => setStatusFilter(status.value)}
                 >
-                  {status.label}
-                </Button>
-              ))}
+                  {journal?.is_active ? "Active" : "Inactive"}
+                </Badge>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Submissions Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Submissions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            data={submissions}
-            columns={columns}
-            emptyMessage="No submissions found for this journal"
-            isPending={isSubmissionsPending}
-            error={submissionsError}
-            errorMessage="Error loading submissions"
-            hoverable={true}
-          />
-        </CardContent>
-      </Card>
-    </div>
+        {/* Filters */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium">Filter by Status:</label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: "all", label: "All" },
+                  { value: "SUBMITTED", label: "Submitted" },
+                  { value: "UNDER_REVIEW", label: "Under Review" },
+                  { value: "REVISION_REQUESTED", label: "Revision Requested" },
+                  { value: "ACCEPTED", label: "Accepted" },
+                  { value: "REJECTED", label: "Rejected" },
+                  { value: "PUBLISHED", label: "Published" },
+                ].map((status) => (
+                  <Button
+                    key={status.value}
+                    variant={
+                      statusFilter === status.value ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => setStatusFilter(status.value)}
+                  >
+                    {status.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Submissions Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Submissions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DataTable
+              data={submissions}
+              columns={columns}
+              emptyMessage="No submissions found for this journal"
+              isPending={isSubmissionsPending}
+              error={submissionsError}
+              errorMessage="Error loading submissions"
+              hoverable={true}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </RoleBasedRoute>
   );
 }
