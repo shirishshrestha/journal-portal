@@ -115,9 +115,8 @@ export default function JournalsPage() {
       {/* Journals Table */}
       <JournalsTable
         journals={journals}
-        onViewDetails={(row) => {
-          setSelectedJournal(row);
-          setIsDetailsOpen(true);
+        onViewSubmissions={(row) => {
+          router.push(`/admin/journals/${row.id}/submissions`);
         }}
         onEdit={(row) => {
           router.push(`/admin/journals/${row.id}/settings`);
