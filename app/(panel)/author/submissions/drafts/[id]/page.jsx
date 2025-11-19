@@ -23,11 +23,12 @@ import {
   Trash2,
   Calendar,
   User,
+  Edit,
 } from "lucide-react";
 import { format } from "date-fns";
 import { RoleBasedRoute, LoadingScreen } from "@/features";
 import DocumentUploadModal from "@/features/panel/author/components/submission/DocumentUploadModal";
-import DocumentViewModal from "@/features/panel/author/components/submission/DocumentViewModal";
+// Removed DocumentViewModal import
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
 import { useDeleteSubmission } from "@/features/panel/author/hooks/mutation/useDeleteSubmission";
 import {
@@ -40,6 +41,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import Link from "next/link";
 
 export default function DraftDetailPage() {
   const params = useParams();
@@ -47,7 +49,6 @@ export default function DraftDetailPage() {
   const submissionId = params.id;
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const {
@@ -239,14 +240,14 @@ export default function DraftDetailPage() {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className=" grid grid-cols-1 md:grid-cols-2  gap-4">
                 {submission.documents.map((doc) => (
                   <div
                     key={doc.id}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <FileText className="h-8 w-8 text-primary" />
+                      <FileText className="h-6 w-6 text-primary stroke-[1.5px]" />
                       <div>
                         <p className="font-medium">{doc.title}</p>
                         <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -264,13 +265,20 @@ export default function DraftDetailPage() {
                         </div>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setViewModalOpen(true)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/author/submissions/drafts/${submissionId}/editor/${doc.id}`}
+                      >
+                        <Button
+                          variant="outline"
+                          className={"font-medium"}
+                          size="sm"
+                        >
+                          <Edit className="h-4 w-4 mr-1 stroke-[1.5px]" />
+                          Edit
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -315,13 +323,6 @@ export default function DraftDetailPage() {
       <DocumentUploadModal
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
-        submissionId={submissionId}
-      />
-
-      {/* Document View Modal */}
-      <DocumentViewModal
-        open={viewModalOpen}
-        onOpenChange={setViewModalOpen}
         submissionId={submissionId}
       />
 

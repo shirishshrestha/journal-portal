@@ -27,7 +27,7 @@ import {
   submitUpdatedDocument,
   getReviewComments,
 } from "@/features/panel/author/api/superdocApi";
-import { SuperDocEditor } from "@/features";
+import { SuperDocEditor, useCurrentRole } from "@/features";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useSubmitUpdatedDocument } from "@/features/panel/author/hooks/mutation/useSubmitUpdatedDocument";
 
@@ -42,7 +42,7 @@ export default function SuperDocEditorPage() {
   const superDocEditorRef = useRef(null);
   const queryClient = useQueryClient();
   const userData = useSelector((state) => state.auth.userData);
-  const userRole = userData?.roles?.[0] || "AUTHOR";
+  const { currentRole } = useCurrentRole();
 
   // Load document data
   const {
@@ -147,7 +147,7 @@ export default function SuperDocEditorPage() {
   };
 
   return (
-    <Card className="h-screen  flex flex-col">
+    <Card className=" flex flex-col">
       <CardContent>
         {/* Header */}
         <CardHeader className="border-b pb-3! px-0 ">
@@ -273,11 +273,11 @@ export default function SuperDocEditorPage() {
                 <SuperDocEditor
                   documentData={documentData}
                   userData={userData}
-                  userRole={userRole}
+                  userRole={currentRole}
                   onSave={handleSaveFromEditor}
                   onUnsavedChanges={handleUnsavedChanges}
                   editorRef={superDocEditorRef}
-                  className="flex-1 border rounded-lg bg-background overflow-auto"
+                  className=" border rounded-lg "
                 />
               </div>
             </div>

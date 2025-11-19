@@ -9,8 +9,7 @@ export const useUploadDocument = () => {
     mutationFn: (params) => uploadDocument(params.id, params.data),
     onSuccess: (data) => {
       toast.success("Documents uploaded successfully!");
-      queryClient.invalidateQueries({ queryKey: ["submissions"] });
-      queryClient.invalidateQueries({ queryKey: ["submission-documents"] });
+      queryClient.invalidateQueries({ queryKey: ["submission"] });
     },
     onError: (error) => {
       const errorMessage =

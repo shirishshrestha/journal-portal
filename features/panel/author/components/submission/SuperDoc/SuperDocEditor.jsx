@@ -1,180 +1,174 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { SuperDoc } from "@harbour-enterprises/superdoc";
+import "@harbour-enterprises/superdoc/style.css";
+import { useTheme } from "next-themes";
 
 /**
  * SuperDoc Editor Component
- * Handles SuperDoc initialization, Yjs state management, and auto-save
+ * Handles SuperDoc initialization and Yjs state management
  */
 export default function SuperDocEditor({
   documentData,
   userData,
-  userRole = "AUTHOR",
+  userRole,
   onSave,
   onChange,
   onUnsavedChanges,
-  autoSaveInterval = 30000, // 30 seconds
   className = "",
   editorRef, // External ref to access editor instance
 }) {
-  const editorContainerRef = useRef(null);
   const superDocInstanceRef = useRef(null);
-  const autoSaveIntervalRef = useRef(null);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Initialize SuperDoc editor
   useEffect(() => {
-    if (
-      !documentData ||
-      !editorContainerRef.current ||
-      superDocInstanceRef.current
-    ) {
+    if (!documentData) {
       return;
     }
+    const initSuperDoc = async () => {
+      try {
+        // Import SuperDoc dynamically
+        const { SuperDoc } = await import("@harbour-enterprises/superdoc");
 
-    try {
-      // Convert base64 Yjs state to Uint8Array if exists
-      let yjsStateData = undefined;
-      if (documentData.yjs_state) {
-        yjsStateData = Uint8Array.from(atob(documentData.yjs_state), (c) =>
-          c.charCodeAt(0)
-        );
-      }
-
-      // Initialize SuperDoc with the document
-      const superdoc = new SuperDoc({
-        container: editorContainerRef.current,
-        fileUrl: documentData.file_url,
-        editable: documentData.can_edit,
-        user: {
-          id: userData?.id || "unknown",
-          name: userData?.name || "User",
-          role: userRole.toLowerCase(),
-        },
-        comments: {
-          enabled: true,
-          readOnly: userRole === "AUTHOR", // Authors can only read comments
-        },
-        yjsState: yjsStateData,
-        onSave: async (yjsState) => {
-          // Convert Yjs state (Uint8Array) to base64
-          const base64State = btoa(
-            String.fromCharCode.apply(null, new Uint8Array(yjsState))
+        // Convert base64 Yjs state to Uint8Array if exists
+        let yjsStateData = undefined;
+        if (documentData.yjs_state) {
+          yjsStateData = Uint8Array.from(atob(documentData.yjs_state), (c) =>
+            c.charCodeAt(0)
           );
+        }
 
-          if (onSave) {
-            await onSave(base64State);
-          }
-          setHasUnsavedChanges(false);
-        },
-        onChange: () => {
-          setHasUnsavedChanges(true);
-          if (onUnsavedChanges) {
-            onUnsavedChanges(true);
-          }
-          if (onChange) {
-            onChange();
-          }
-        },
-      });
+        // Initialize SuperDoc
+        const superdoc = new SuperDoc({
+          selector: "#superdoc",
+          document: documentData.file_url,
+          pagination: true,
+          user: {
+            name: userData?.name || "User",
+            email: userData?.email || userData?.id || "user@example.com",
+          },
+          // toolbar: "#toolbar",
+          theme: "light",
 
-      superDocInstanceRef.current = superdoc;
+          modules: {
+            comments: {
+              enabled: true,
+              readOnly: userRole === "AUTHOR",
+            },
+            toolbar: {
+              selector: "#toolbar",
+            },
+          },
+          yjsState: yjsStateData,
+          onReady: () => {
+            const superdocRoot = document.getElementById("superdoc");
+            if (superdocRoot) {
+              superdocRoot.classList.remove("dark");
+              superdocRoot.classList.add("light");
+              // Force all text to be dark regardless of theme
+              superdocRoot.style.setProperty("color", "#222", "important");
+              // Apply to all child elements to ensure text is always visible
+              const allElements = superdocRoot.querySelectorAll("*");
+              allElements.forEach((el) => {
+                el.style.setProperty("color", "#222", "important");
+              });
+            }
+            const toolbar = document.getElementById("toolbar");
+            if (toolbar) {
+              toolbar.classList.remove("dark");
+              toolbar.classList.add("light");
+            }
+            console.debug("SuperDoc is ready!");
+            toast.success("Document loaded successfully");
+          },
+          onChange: () => {
+            if (onUnsavedChanges) {
+              onUnsavedChanges(true);
+            }
+            if (onChange) {
+              onChange();
+            }
+          },
+        });
 
-      // Expose instance via external ref if provided
-      if (editorRef) {
-        editorRef.current = superdoc;
+        superDocInstanceRef.current = superdoc;
+
+        // Expose instance via external ref if provided
+        if (editorRef) {
+          editorRef.current = superdoc;
+        }
+      } catch (error) {
+        console.error("Failed to initialize SuperDoc:", error);
+        toast.error("Failed to initialize document editor");
       }
-      toast.success("Document loaded successfully");
-    } catch (error) {
-      console.error("Failed to initialize SuperDoc:", error);
-      toast.error("Failed to initialize document editor");
-    }
+    };
+
+    initSuperDoc();
 
     return () => {
       if (superDocInstanceRef.current) {
-        superDocInstanceRef.current.destroy?.();
+        try {
+          superDocInstanceRef.current.destroy?.();
+        } catch (error) {
+          console.error("Error destroying SuperDoc instance:", error);
+        }
         superDocInstanceRef.current = null;
+
+        if (editorRef) {
+          editorRef.current = null;
+        }
       }
     };
-  }, [
-    documentData,
-    userData,
-    userRole,
-    onSave,
-    onChange,
-    onUnsavedChanges,
-    editorRef,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documentData?.id]);
 
-  // Manual save function (exposed via ref)
-  const handleSave = useCallback(
-    async (silent = false) => {
-      if (!superDocInstanceRef.current) {
-        if (!silent) toast.error("Editor not initialized");
-        return false;
-      }
-
-      try {
-        const yjsState = superDocInstanceRef.current.getYjsState();
-        const base64State = btoa(
-          String.fromCharCode.apply(null, new Uint8Array(yjsState))
-        );
-
-        if (onSave) {
+  // Expose manual save method to parent via ref
+  useEffect(() => {
+    if (superDocInstanceRef.current && editorRef && onSave) {
+      editorRef.current.manualSave = async () => {
+        try {
+          const yjsState = superDocInstanceRef.current.getYjsState();
+          const base64State = btoa(
+            String.fromCharCode.apply(null, new Uint8Array(yjsState))
+          );
           await onSave(base64State);
+          if (onUnsavedChanges) {
+            onUnsavedChanges(false);
+          }
+          toast.success("Document saved successfully");
+          return true;
+        } catch (error) {
+          console.error("Save error:", error);
+          toast.error("Failed to save document");
+          return false;
         }
-
-        setHasUnsavedChanges(false);
-        if (onUnsavedChanges) {
-          onUnsavedChanges(false);
-        }
-        if (!silent) toast.success("Document saved successfully");
-        return true;
-      } catch (error) {
-        if (!silent) toast.error("Failed to save document");
-        return false;
-      }
-    },
-    [onSave, onUnsavedChanges]
-  );
-
-  // Auto-save functionality
-  useEffect(() => {
-    if (
-      !documentData?.can_edit ||
-      !superDocInstanceRef.current ||
-      autoSaveInterval <= 0
-    ) {
-      return;
+      };
     }
-
-    autoSaveIntervalRef.current = setInterval(() => {
-      if (hasUnsavedChanges && superDocInstanceRef.current) {
-        handleSave(true); // Silent auto-save
-      }
-    }, autoSaveInterval);
-
-    return () => {
-      if (autoSaveIntervalRef.current) {
-        clearInterval(autoSaveIntervalRef.current);
-      }
-    };
-  }, [hasUnsavedChanges, documentData, autoSaveInterval, handleSave]);
-
-  // Expose save method to parent via ref
-  useEffect(() => {
-    if (superDocInstanceRef.current && editorRef) {
-      editorRef.current.manualSave = handleSave;
-    }
-  }, [handleSave, editorRef]);
+  }, [editorRef, onSave, onUnsavedChanges]);
 
   return (
-    <div
-      ref={editorContainerRef}
-      className={className}
-      style={{ minHeight: "600px" }}
-    />
+    <div className={`${className} flex flex-col items-center`}>
+      {/* Toolbar container with styling */}
+      <div
+        id="toolbar"
+        className="bg-white border-b border-gray-200 overflow-x-auto max-w-5xl"
+        style={{
+          color: "#222",
+          fontSize: "14px",
+        }}
+      />
+      {/* SuperDoc container with proper styling */}
+      <div
+        id="superdoc"
+        className="text-black  "
+        style={{
+          minHeight: "600px",
+          padding: "20px",
+          background: "#fff",
+          color: "#222 !important",
+        }}
+      />
+    </div>
   );
 }

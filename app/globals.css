@@ -132,3 +132,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+#toolbar::-webkit-scrollbar {
+  width: 2px !important;
+}
+
+#toolbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.5);
+  border-radius: 10px;
+}
+
+#toolbar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
