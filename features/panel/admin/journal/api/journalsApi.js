@@ -2,10 +2,11 @@ import { instance } from "@/lib/instance";
 
 /**
  * Fetch all journals
+ * @param {Object} params - Query parameters (e.g., { active_role: 'AUTHOR' })
  * @returns {Promise} API response
  */
-export const getJournals = async () => {
-  const response = await instance.get("journals/journals/");
+export const getJournals = async (params = {}) => {
+  const response = await instance.get("journals/journals/", { params });
   return response.data;
 };
 

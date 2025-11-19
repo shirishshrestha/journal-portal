@@ -27,7 +27,9 @@ const SUBMISSION_GUIDELINES = [
 ];
 
 export default function SubmissionGuidelines({ form }) {
-  const { data: journalData, isPending: isLoadingJournals } = useGetJournals();
+  const { data: journalData, isPending: isLoadingJournals } = useGetJournals({
+    active_role: "AUTHOR",
+  });
 
   const journals = useMemo(() => journalData?.results || [], [journalData]);
 

@@ -35,6 +35,16 @@ export const assignReviewers = async (id, data) => {
 };
 
 /**
+ * Assign a single reviewer to a submission
+ * @param {Object} data - { submission: string, reviewer: string, due_date: string, invitation_message: string }
+ * @returns {Promise} API response
+ */
+export const assignReviewer = async (data) => {
+  const response = await instance.post(`reviews/assignments/`, data);
+  return response.data;
+};
+
+/**
  * Get reviewer recommendations for a submission
  * @param {string} id - Submission ID
  * @returns {Promise} API response
