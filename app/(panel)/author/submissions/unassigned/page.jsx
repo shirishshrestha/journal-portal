@@ -86,6 +86,7 @@ export default function UnassignedPage() {
           onViewDocuments={handleViewDocuments}
           onSubmit={handleSubmit}
           onDelete={handleDelete}
+          viewUrl={(submission) => `/author/submissions/unassigned/${submission.id}`}
         />
       </SubmissionsLayout>
 

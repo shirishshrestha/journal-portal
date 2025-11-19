@@ -85,6 +85,7 @@ export default function ArchivedPage() {
           onAddDocuments={handleAddDocuments}
           onViewDocuments={handleViewDocuments}
           onSubmit={handleSubmit}
+          viewUrl={(submission) => `/author/submissions/archived/${submission.id}`}
           onDelete={handleDelete}
         />
       </SubmissionsLayout>

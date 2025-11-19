@@ -50,11 +50,19 @@ export default function UnassignedDetailPage() {
   // Get review type from journal settings, fallback to submission review_type
   const reviewType = submission?.journal?.settings?.review_type || submission?.review_type;
 
+  console.log('Review Type:', reviewType);
+  console.log('Journal Settings:', submission?.journal?.settings);
+  console.log('Submission Review Type:', submission?.review_type);
+
   const {
     data: recommendations,
     isPending: isRecommendationsPending,
     error: recommendationsError,
   } = useGetReviewerRecommendations(submissionId);
+
+  console.log('Recommendations Data:', recommendations);
+  console.log('Is Pending:', isRecommendationsPending);
+  console.log('Error:', recommendationsError);
 
   if (isPending) {
     return <LoadingScreen />;
@@ -396,17 +404,17 @@ export default function UnassignedDetailPage() {
                             <span className="font-medium">Why recommended:</span> {reviewer.recommendation_reason}
                           </p>
                         )}
-                      </div>
+                        </div>
                       
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Rank #{index + 1}
-                        </p>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            Rank #{index + 1}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
               </div>
             )}
           </CardContent>

@@ -85,6 +85,7 @@ export default function DraftsPage() {
           onAddDocuments={handleAddDocuments}
           onViewDocuments={handleViewDocuments}
           onSubmit={handleSubmit}
+          viewUrl={(submission) => `/author/submissions/drafts/${submission.id}`}
           onDelete={handleDelete}
         />
       </SubmissionsLayout>

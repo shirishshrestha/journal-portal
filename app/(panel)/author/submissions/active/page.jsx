@@ -85,6 +85,7 @@ export default function ActivePage() {
           onAddDocuments={handleAddDocuments}
           onViewDocuments={handleViewDocuments}
           onSubmit={handleSubmit}
+          viewUrl={(submission) => `/author/submissions/active/${submission.id}`}
           onDelete={handleDelete}
         />
       </SubmissionsLayout>
