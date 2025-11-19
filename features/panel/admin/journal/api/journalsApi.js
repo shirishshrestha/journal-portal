@@ -377,3 +377,30 @@ export const updateSubmissionSettings = async ({ journalId, settings }) => {
   return response.data;
 };
 
+// ==================== JOURNAL SUBMISSIONS APIs ====================
+
+/**
+ * Get submissions for a specific journal
+ * @param {string} journalId - Journal ID
+ * @param {Object} params - Query parameters (status, etc.)
+ * @returns {Promise} API response
+ */
+export const getJournalSubmissions = async (journalId, params = {}) => {
+  const response = await instance.get("submissions/", {
+    params: {
+      journal: journalId,
+      ...params,
+    },
+  });
+  return response.data;
+};
+
+/**
+ * Get journal statistics
+ * @param {string} journalId - Journal ID
+ * @returns {Promise} API response
+ */
+export const getJournalStatistics = async (journalId) => {
+  const response = await instance.get(`journals/journals/${journalId}/statistics/`);
+  return response.data;
+};

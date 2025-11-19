@@ -9,6 +9,7 @@ import {
   Settings,
   MoreVertical,
   ArrowUpDown,
+  FileText,
 } from "lucide-react";
 import { DataTable } from "@/features/shared";
 import {
@@ -30,7 +31,7 @@ const statusBadgeColors = {
 
 export default function JournalsTable({
   journals = [],
-  onViewDetails,
+  onViewSubmissions,
   onEdit,
   onDelete,
   onSettings,
@@ -142,10 +143,10 @@ export default function JournalsTable({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => onViewDetails(row)}
+              onClick={() => onViewSubmissions(row)}
               className="gap-2"
             >
-              <Eye className="h-4 w-4" /> View
+              <FileText className="h-4 w-4" /> View Submissions
             </DropdownMenuItem>
 
             <DropdownMenuItem onClick={() => onSettings(row)} className="gap-2">
