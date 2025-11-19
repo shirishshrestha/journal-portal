@@ -61,10 +61,7 @@ export default function AdminSubmissionDetailPage() {
     data: recommendations,
     isLoading: isRecommendationsPending,
     error: recommendationsError,
-  } = useGetReviewerRecommendations(
-    submissionId,
-    !!submission
-  );
+  } = useGetReviewerRecommendations(submissionId, !!submission);
 
   // Update status mutation
   const updateStatusMutation = useUpdateSubmissionStatus();
@@ -148,21 +145,15 @@ export default function AdminSubmissionDetailPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className=" space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold">Submission Details</h1>
-          <p className="text-muted-foreground">
-            Review and manage submission
-          </p>
+          <p className="text-muted-foreground">Review and manage submission</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.back()}
-          >
+          <Button variant="ghost" size="sm" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
@@ -467,9 +458,9 @@ export default function AdminSubmissionDetailPage() {
                                     Availability:
                                   </span>
                                   <span>
-                                    {(reviewer.scores.availability * 100).toFixed(
-                                      0
-                                    )}
+                                    {(
+                                      reviewer.scores.availability * 100
+                                    ).toFixed(0)}
                                     %
                                   </span>
                                 </div>

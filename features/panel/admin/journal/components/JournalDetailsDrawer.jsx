@@ -15,15 +15,11 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
   if (!journal) return null;
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="h-[96vh] ">
-        <DrawerHeader className="border-b">
-          <DrawerTitle className="text-2xl">
-            {journal?.title || "-"}
-          </DrawerTitle>
-          <DrawerDescription className="text-base">
-            {journal?.publisher || "-"}
-          </DrawerDescription>
+    <Drawer open={isOpen} onOpenChange={onClose} direction="right">
+      <DrawerContent className="w-full max-w-xl">
+        <DrawerHeader>
+          <DrawerTitle>{journal?.title || "-"}</DrawerTitle>
+          <DrawerDescription>{journal?.publisher || "-"}</DrawerDescription>
         </DrawerHeader>
 
         <div className="space-y-6 px-4 pb-6 overflow-y-auto">
@@ -45,7 +41,7 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
 
           {/* Basic Information */}
           <Card>
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className=" space-y-4">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Short Name
@@ -65,7 +61,7 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                   Submission Count
                 </p>
                 <p className="text-2xl font-bold text-primary">
-                  {journal?.submission_count ?? 0}
+                  {journal?.submission_count ?? "-"}
                 </p>
               </div>
             </CardContent>
@@ -73,7 +69,7 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
 
           {/* ISSNs */}
           <Card>
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className=" space-y-4">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   ISSN Print
@@ -95,36 +91,30 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
 
           {/* Editor-in-Chief */}
           <Card>
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className=" space-y-4">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Editor-in-Chief
                 </p>
-                {journal?.editor_in_chief ? (
-                  <>
-                    <p className="text-sm font-medium">
-                      {journal.editor_in_chief.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {journal.editor_in_chief.email}
-                    </p>
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Not assigned</p>
-                )}
+                <p className="text-sm font-medium">
+                  {journal?.editor_in_chief?.name || "-"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {journal?.editor_in_chief?.email || "-"}
+                </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Description */}
           <Card>
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className=" space-y-4">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                   Description
                 </p>
                 <p className="text-sm leading-relaxed">
-                  {journal?.description || "No description provided"}
+                  {journal?.description || "-"}
                 </p>
               </div>
             </CardContent>
@@ -132,7 +122,7 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
 
           {/* Contact Information */}
           <Card>
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className=" space-y-4">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Contact Email
@@ -143,47 +133,29 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                   Website
                 </p>
-                {journal?.website_url ? (
-                  <a
-                    href={journal.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline flex items-center gap-1"
-                  >
-                    {journal.website_url}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                ) : (
-                  <p className="text-sm text-muted-foreground">-</p>
-                )}
+                <a
+                  href={journal?.website_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline flex items-center gap-1"
+                >
+                  {journal?.website_url || "-"}
+                  <ExternalLink className="h-3 w-3" />
+                </a>
               </div>
             </CardContent>
           </Card>
 
           {/* Metadata */}
           <Card>
-            <CardContent className="pt-6 space-y-4">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                  Journal ID
-                </p>
-                <p className="text-xs font-mono text-muted-foreground break-all">
-                  {journal?.id || "-"}
-                </p>
-              </div>
+            <CardContent className=" space-y-4">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Created At
                 </p>
                 <p className="text-sm">
                   {journal?.created_at
-                    ? new Date(journal.created_at).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                    ? new Date(journal.created_at).toLocaleString()
                     : "-"}
                 </p>
               </div>

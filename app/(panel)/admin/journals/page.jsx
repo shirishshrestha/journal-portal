@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import {
-  JournalDetailsDrawer,
-  JournalFormModal,
   AdminJournalsTable,
+  JournalDetailsDrawer,
   useGetJournals,
 } from "@/features";
-import { FilterToolbar } from "@/features/shared";
+import { FilterToolbar, RoleBasedRoute } from "@/features/shared";
 
 export default function JournalsPage() {
   const router = useRouter();
@@ -58,118 +57,113 @@ export default function JournalsPage() {
   );
 
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            Journal Management
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage all academic journals and their submission settings.
+    <RoleBasedRoute allowedRoles={["ADMIN"]}>
+      <div className="space-y-5">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">
+              Journal Management
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Manage all academic journals and their submission settings.
+            </p>
+          </div>
+          <Button
+            variant="secondary"
+            onClick={() => setIsFormOpen(true)}
+            className="gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Create Journal
+          </Button>
+        </div>
+
+        {/* Toolbar */}
+        <FilterToolbar>
+          <FilterToolbar.Search
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Search by title, short name, or publisher..."
+            label="Search"
+          />
+
+          <FilterToolbar.Select
+            label="Status"
+            value={activeFilter}
+            onChange={setActiveFilter}
+            options={[
+              { value: "all", label: "All Status" },
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+            ]}
+          />
+
+          <FilterToolbar.Select
+            label="Submissions"
+            value={acceptingFilter}
+            onChange={setAcceptingFilter}
+            options={[
+              { value: "all", label: "All" },
+              { value: "accepting", label: "Accepting" },
+              { value: "not-accepting", label: "Not Accepting" },
+            ]}
+          />
+        </FilterToolbar>
+
+        {/* Journals Table */}
+        <AdminJournalsTable
+          journals={journals}
+          onViewDrawer={(row) => {
+            setSelectedJournal(row);
+            setIsDetailsOpen(true);
+          }}
+          onDelete={handleDelete}
+          isPending={isJournalDataPending}
+          error={JournalDataError}
+          sortColumn={sortColumn}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+        />
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing{" "}
+            {paginatedJournals.length === 0
+              ? 0
+              : (currentPage - 1) * itemsPerPage + 1}{" "}
+            to {Math.min(currentPage * itemsPerPage, journals.length)} of{" "}
+            {journals.length} journals
           </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setCurrentPage(Math.min(totalPages, currentPage + 1))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-        <Button
-          variant="secondary"
-          onClick={() => setIsFormOpen(true)}
-          className="gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Create Journal
-        </Button>
+
+        <JournalDetailsDrawer
+          journal={selectedJournal}
+          isOpen={isDetailsOpen}
+          onClose={() => setIsDetailsOpen(false)}
+        />
       </div>
-
-      {/* Toolbar */}
-      <FilterToolbar>
-        <FilterToolbar.Search
-          value={searchTerm}
-          onChange={setSearchTerm}
-          placeholder="Search by title, short name, or publisher..."
-          label="Search"
-        />
-
-        <FilterToolbar.Select
-          label="Status"
-          value={activeFilter}
-          onChange={setActiveFilter}
-          options={[
-            { value: "all", label: "All Status" },
-            { value: "active", label: "Active" },
-            { value: "inactive", label: "Inactive" },
-          ]}
-        />
-
-        <FilterToolbar.Select
-          label="Submissions"
-          value={acceptingFilter}
-          onChange={setAcceptingFilter}
-          options={[
-            { value: "all", label: "All" },
-            { value: "accepting", label: "Accepting" },
-            { value: "not-accepting", label: "Not Accepting" },
-          ]}
-        />
-      </FilterToolbar>
-
-      {/* Journals Table */}
-      <AdminJournalsTable
-        journals={journals}
-        onViewDrawer={(row) => {
-          setSelectedJournal(row);
-          setIsDetailsOpen(true);
-        }}
-        onDelete={handleDelete}
-        isPending={isJournalDataPending}
-        error={JournalDataError}
-        sortColumn={sortColumn}
-        sortOrder={sortOrder}
-        onSort={handleSort}
-      />
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing{" "}
-          {paginatedJournals.length === 0
-            ? 0
-            : (currentPage - 1) * itemsPerPage + 1}{" "}
-          to {Math.min(currentPage * itemsPerPage, journals.length)} of{" "}
-          {journals.length} journals
-        </p>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-
-      {/* Modals */}
-      <JournalFormModal
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSave={handleSaveJournal}
-      />
-
-      <JournalDetailsDrawer
-        journal={selectedJournal}
-        isOpen={isDetailsOpen}
-        onClose={() => setIsDetailsOpen(false)}
-      />
-    </div>
+    </RoleBasedRoute>
   );
 }
