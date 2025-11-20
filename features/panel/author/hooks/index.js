@@ -6,3 +6,5 @@ export { useGetActiveSubmissions } from "./query/useGetActiveSubmissions";
 export { useGetArchivedSubmissions } from "./query/useGetArchivedSubmissions";
 export { useCategorizedSubmissions } from "./useCategorizedSubmissions";
 export { useSubmitUpdatedDocument } from "./mutation/useSubmitUpdatedDocument";
+export { useDeleteSubmission } from "./mutation/useDeleteSubmission";
+export { useGetSubmissionById } from "./query/useGetSubmissionById";

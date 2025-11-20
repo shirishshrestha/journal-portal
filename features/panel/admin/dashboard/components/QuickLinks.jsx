@@ -55,7 +55,7 @@ const quickLinks = [
     title: "Settings",
     description: "Platform settings",
     icon: Settings,
-    href: "/settings/email-preferences",
+    href: "/settings/email-log",
     color:
       "from-slate-500/20 to-slate-600/20 dark:from-slate-500/10 dark:to-slate-600/10",
     iconBg: "bg-slate-500/20 dark:bg-slate-500/10",
