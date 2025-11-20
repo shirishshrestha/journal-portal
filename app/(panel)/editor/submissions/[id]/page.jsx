@@ -15,12 +15,6 @@ import {
   Eye,
   Download,
 } from "lucide-react";
-import {
-  useGetAdminSubmissionById,
-  useGetReviewerRecommendations,
-  useUpdateSubmissionStatus,
-  useAssignReviewer,
-} from "@/features/panel/admin/submission";
 import { useGetSubmissionReviews } from "@/features/panel/editor/submission/hooks/useGetSubmissionReviews";
 import { useGetSubmissionDecisions } from "@/features/panel/editor/submission/hooks/useGetSubmissionDecisions";
 import EditorialDecisionForm from "@/features/panel/editor/submission/components/EditorialDecisionForm";
@@ -42,6 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAssignReviewers, useGetAdminSubmissionById, useGetReviewerRecommendations, useUpdateSubmissionStatus } from "@/features/panel/editor/submission";
 
 export default function AdminSubmissionDetailPage() {
   const params = useParams();
@@ -88,7 +83,7 @@ export default function AdminSubmissionDetailPage() {
   const updateStatusMutation = useUpdateSubmissionStatus();
 
   // Assign reviewer mutation
-  const assignReviewerMutation = useAssignReviewer();
+  const assignReviewerMutation = useAssignReviewers();
 
   // Set initial status when submission loads
   React.useEffect(() => {
