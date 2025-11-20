@@ -60,6 +60,6 @@ export const getMyReviews = async () => {
  * @returns {Promise} API response
  */
 export const submitReview = async (data) => {
-  const response = await instance.post("/reviews/", data);
+  const response = await instance.post("/reviews/reviews/", data);
   return response.data;
 };

@@ -14,9 +14,11 @@ import {
   User,
   AlertCircle,
   Clock,
+  CheckCircle2,
 } from "lucide-react";
 import { RoleBasedRoute } from "@/features";
 import { useGetReviewAssignmentById } from "@/features/panel/reviewer/hooks/useGetReviewAssignmentById";
+import { ReviewSubmissionForm } from "@/features/panel/reviewer/components";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -472,26 +474,23 @@ export default function ReviewDetailPage() {
 
             {assignment.status === "ACCEPTED" && (
               <TabsContent value="review" className="space-y-4 mt-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Submit Your Review</CardTitle>
-                    <CardDescription>
-                      Provide your detailed review and recommendation
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="font-semibold mb-2">
-                        Review Form Coming Soon
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        The review submission form will be available here
-                      </p>
-                      <Button disabled>Start Review</Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                {!assignment.review ? (
+                  <ReviewSubmissionForm assignment={assignment} />
+                ) : (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center py-12">
+                        <CheckCircle2 className="h-16 w-16 mx-auto text-green-600 mb-4" />
+                        <h3 className="text-2xl font-bold mb-2">
+                          Review Already Submitted
+                        </h3>
+                        <p className="text-muted-foreground">
+                          You have already submitted your review for this manuscript
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
             )}
           </Tabs>
