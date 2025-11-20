@@ -91,7 +91,10 @@ export default function SuperDocEditor({
           },
           modules: {
             comments: { enabled: true },
-            toolbar: { selector: "#superdoc-toolbar" },
+            toolbar: {
+              selector: "#superdoc-toolbar",
+              excludeItems: ["documentMode"],
+            },
           },
           onReady: () => {
             const superdocRoot = document.getElementById("superdoc-editor");
@@ -181,7 +184,7 @@ export default function SuperDocEditor({
         <div className="flex flex-col items-center relative">
           <div
             id="superdoc-toolbar"
-            className="bg-white border-b sticky top-0 z-1  border-gray-200  overflow-x-auto max-w-5xl w-fit"
+            className="bg-white border-b sticky top-0 z-4  border-gray-200  overflow-x-auto max-w-5xl w-fit"
           />
           <div
             id="superdoc-editor"

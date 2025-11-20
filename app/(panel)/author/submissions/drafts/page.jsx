@@ -23,9 +23,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useSubmissionById } from "@/features/panel/author/hooks/query/useGetSubmissionById";
 
 export default function DraftsPage() {
   const router = useRouter();
+
   const {
     data: SubmissionsData,
     isPending: isSubmissionsPending,
@@ -85,7 +87,9 @@ export default function DraftsPage() {
           onAddDocuments={handleAddDocuments}
           onViewDocuments={handleViewDocuments}
           onSubmit={handleSubmit}
-          viewUrl={(submission) => `/author/submissions/drafts/${submission.id}`}
+          viewUrl={(submission) =>
+            `/author/submissions/drafts/${submission.id}`
+          }
           onDelete={handleDelete}
         />
       </SubmissionsLayout>

@@ -60,7 +60,7 @@ export const getArchivedSubmissions = async () => {
  * @param {string} id - Submission ID
  * @returns {Promise} API response
  */
-export const getSubmissionById = async (id) => {
+export const getSingleSubmissionById = async (id) => {
   const response = await instance.get("submissions/" + id + "/");
   return response.data;
 };

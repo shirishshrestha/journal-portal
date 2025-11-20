@@ -16,66 +16,33 @@ import {
   ArrowLeft,
   FileText,
   Upload,
-  Trash2,
   Calendar,
   User,
   Edit,
-  Send,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
   RoleBasedRoute,
   LoadingScreen,
-  useDeleteSubmission,
   DocumentUploadModal,
   useGetSubmissionById,
 } from "@/features";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import Link from "next/link";
-import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
 
-export default function DraftDetailPage() {
+export default function ActiveDetailPage() {
   const params = useParams();
   const router = useRouter();
   const submissionId = params.id;
+
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+
   const {
     data: submission,
-    isPending,
+    isPending: isSubmissionPending,
     error,
   } = useGetSubmissionById(submissionId);
 
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  const deleteSubmissionMutation = useDeleteSubmission();
-
-  const submitForReviewMutation = useSubmitForReview();
-  const handleSubmitForReview = () => {
-    submitForReviewMutation.mutate(submissionId, {
-      onSuccess: () => {
-        router.push("/author/submissions/unassigned");
-      },
-    });
-  };
-
-  const handleDelete = () => {
-    deleteSubmissionMutation.mutate(submissionId, {
-      onSuccess: () => {
-        router.push("/author/submissions/drafts");
-      },
-    });
-  };
-
-  if (isPending) {
+  if (isSubmissionPending) {
     return <LoadingScreen />;
   }
 
@@ -115,30 +82,6 @@ export default function DraftDetailPage() {
             >
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Drafts
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(true)}
-              className="gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </Button>
-            <Button
-              onClick={handleSubmitForReview}
-              disabled={
-                !submission?.documents ||
-                submission.documents.length === 0 ||
-                submitForReviewMutation.isPending
-              }
-              className="gap-2"
-            >
-              <Send className="h-4 w-4" />
-              {submitForReviewMutation.isPending
-                ? "Submitting..."
-                : "Submit for Review"}
             </Button>
           </div>
         </div>
@@ -320,28 +263,6 @@ export default function DraftDetailPage() {
         onOpenChange={setUploadModalOpen}
         submissionId={submissionId}
       />
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete your submission &quot;
-              {submission?.title}&quot;. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteSubmissionMutation.isPending ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </RoleBasedRoute>
   );
 }

@@ -148,10 +148,6 @@
   background-color: transparent;
 }
 
-[data-item-id="65f1cfbe-921e-45d5-8c59-fbcab4b3e47b"] {
-  display: none !important;
-}
-
 #superdoc__container::-webkit-scrollbar {
   width: 7px !important;
   padding-top: 4px !important;
@@ -160,4 +156,8 @@
 #superdoc__container::-webkit-scrollbar-thumb {
   background-color: var(--secondary);
   border-radius: 10px;
+}
+
+.tools[data-v-29e35f23] {
+  z-index: 3 !important;
 }
