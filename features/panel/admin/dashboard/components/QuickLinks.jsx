@@ -25,7 +25,7 @@ const quickLinks = [
     title: "Verification Requests",
     description: "Review submissions",
     icon: CheckCircle,
-    href: "/admin/submissions",
+    href: "/admin/verification-requests",
     color:
       "from-amber-500/20 to-amber-600/20 dark:from-amber-500/10 dark:to-amber-600/10",
     iconBg: "bg-amber-500/20 dark:bg-amber-500/10",

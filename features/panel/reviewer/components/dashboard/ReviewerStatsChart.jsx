@@ -2,19 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { BarChart, PieChart } from "@/features/shared";
 
 const COLORS = {
   pending: "var(--chart-1)",
@@ -23,7 +11,11 @@ const COLORS = {
   declined: "var(--chart-4)",
 };
 
-export default function ReviewerStatsChart({ reviewerStats, isLoading }) {
+export default function ReviewerStatsChart({
+  reviewerStats,
+  isLoading,
+  isError,
+}) {
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
@@ -47,24 +39,7 @@ export default function ReviewerStatsChart({ reviewerStats, isLoading }) {
     );
   }
 
-  const data = reviewerStats;
-  if (!data) return null;
-
-  const barChartData = [
-    { name: "Pending", value: data.pending || 0 },
-    { name: "Accepted", value: data.accepted || 0 },
-    { name: "Completed", value: data.completed || 0 },
-    { name: "Declined", value: data.declined || 0 },
-  ];
-
-  const pieChartData = [
-    { name: "Pending", value: data.pending, color: COLORS.pending },
-    { name: "Accepted", value: data.accepted, color: COLORS.accepted },
-    { name: "Completed", value: data.completed, color: COLORS.completed },
-    { name: "Declined", value: data.declined, color: COLORS.declined },
-  ].filter((item) => item.value > 0);
-
-  if (data.total_assignments === 0) {
+  if (reviewerStats?.total_assignments === 0) {
     return (
       <Card>
         <CardHeader>
@@ -77,63 +52,70 @@ export default function ReviewerStatsChart({ reviewerStats, isLoading }) {
     );
   }
 
+  const barChartData = [
+    {
+      name: "Pending",
+      value: reviewerStats?.pending || 0,
+      color: COLORS.pending,
+    },
+    {
+      name: "Accepted",
+      value: reviewerStats?.accepted || 0,
+      color: COLORS.accepted,
+    },
+    {
+      name: "Completed",
+      value: reviewerStats?.completed || 0,
+      color: COLORS.completed,
+    },
+    {
+      name: "Declined",
+      value: reviewerStats?.declined || 0,
+      color: COLORS.declined,
+    },
+  ];
+
+  const pieChartData = [
+    {
+      name: "Pending",
+      value: reviewerStats?.pending || 0,
+      color: COLORS.pending,
+    },
+    {
+      name: "Accepted",
+      value: reviewerStats?.accepted || 0,
+      color: COLORS.accepted,
+    },
+    {
+      name: "Completed",
+      value: reviewerStats?.completed || 0,
+      color: COLORS.completed,
+    },
+    {
+      name: "Declined",
+      value: reviewerStats?.declined || 0,
+      color: COLORS.declined,
+    },
+  ];
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      {/* Bar Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Assignments by Status</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                {barChartData.map((entry, index) => (
-                  <Cell
-                    key={"cell-" + index}
-                    fill={Object.values(COLORS)[index]}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <BarChart
+        title="Assignments by Status"
+        data={barChartData}
+        isLoading={false}
+        isError={isError}
+        emptyMessage="No review assignments yet"
+      />
 
-      {/* Pie Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Status Distribution</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieChartData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={(entry) =>
-                  entry.name + ": " + (entry.percent * 100).toFixed(0) + "%"
-                }
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {pieChartData.map((entry, index) => (
-                  <Cell key={"cell-" + index} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <PieChart
+        title="Status Distribution"
+        data={pieChartData}
+        isLoading={false}
+        isError={isError}
+        emptyMessage="No review assignments yet"
+        showLegend={true}
+      />
     </div>
   );
 }

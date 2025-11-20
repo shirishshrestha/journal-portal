@@ -18,9 +18,12 @@ import {
   loadDocument,
   downloadDocx,
 } from "@/features/panel/author/api/superdocApi";
-import { LoadingScreen, SuperDocEditor } from "@/features";
+import {
+  LoadingScreen,
+  SuperDocEditor,
+  useSubmitUpdatedDocument,
+} from "@/features";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useSubmitUpdatedDocument } from "@/features/panel/author/hooks/mutation/useSubmitUpdatedDocument";
 
 export default function SuperDocEditorPage() {
   const params = useParams();

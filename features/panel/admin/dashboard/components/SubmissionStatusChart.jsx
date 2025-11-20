@@ -1,74 +1,31 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+import { BarChart } from "@/features/shared/components/charts";
 
-export function SubmissionStatusChart({ data, isPending }) {
+const COLORS = [
+  "var(--chart-4)",
+  "var(--chart-3)",
+  "var(--chart-2)",
+  "var(--chart-1)",
+];
+
+export function SubmissionStatusChart({ data, isPending, isError }) {
   const chartData = [
-    { name: "Pending", value: data?.pending || 0 },
-    { name: "Accepted", value: data?.accepted || 0 },
-    { name: "Rejected", value: data?.rejected || 0 },
-    { name: "Under Review", value: data?.under_review || 0 },
+    { name: "Pending", value: data?.pending || 0, color: COLORS[0] },
+    { name: "Accepted", value: data?.accepted || 0, color: COLORS[1] },
+    { name: "Rejected", value: data?.rejected || 0, color: COLORS[2] },
+    { name: "Under Review", value: data?.under_review || 0, color: COLORS[3] },
   ];
-
-  const COLORS = [
-    "var(--chart-4)",
-    "var(--chart-3)",
-    "var(--chart-2)",
-    "var(--chart-1)",
-  ];
-
-  const allZero = chartData.every((d) => d.value === 0);
 
   return (
-    <Card className="shadow-new">
-      <CardHeader>
-        <CardTitle>Submission Status Distribution</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isPending ? (
-          <div className="flex items-center justify-center h-[260px] text-muted-foreground animate-pulse">
-            Loading chart...
-          </div>
-        ) : allZero ? (
-          <div className="flex items-center justify-center h-[260px] text-muted-foreground">
-            No submission status data to display at this time.
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="name" stroke="var(--muted-foreground)" />
-              <YAxis stroke="var(--muted-foreground)" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--card)",
-                  border: "1px solid var(--border)",
-                }}
-                itemStyle={{ color: "var(--popover-foreground)" }}
-              />
-              <Bar
-                dataKey="value"
-                radius={[8, 8, 0, 0]}
-                name="Submission Status"
-              >
-                {chartData.map((entry, index) => (
-                  <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-      </CardContent>
-    </Card>
+    <BarChart
+      title="Submission Status Distribution"
+      data={chartData}
+      isLoading={isPending}
+      isError={isError}
+      emptyMessage="No submission status data to display at this time."
+      className="shadow-new"
+      height={260}
+    />
   );
 }

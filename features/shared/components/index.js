@@ -14,6 +14,8 @@ import StatsCard from "./StatsCard";
 import CardSkeleton from "./CardSkeleton";
 import StatsErrorCard from "./StatsErrorCard";
 import { FilterToolbar } from "./FilterToolbar";
+import SuperDocEditor from "./SuperDoc/SuperDocEditor";
+export * from "./charts";
 
 export {
   FormInputField,
@@ -32,4 +34,5 @@ export {
   CardSkeleton,
   StatsErrorCard,
   FilterToolbar,
+  SuperDocEditor,
 };

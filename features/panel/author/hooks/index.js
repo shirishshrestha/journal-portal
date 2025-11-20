@@ -5,3 +5,4 @@ export { useGetUnassignedSubmissions } from "./query/useGetUnassignedSubmissions
 export { useGetActiveSubmissions } from "./query/useGetActiveSubmissions";
 export { useGetArchivedSubmissions } from "./query/useGetArchivedSubmissions";
 export { useCategorizedSubmissions } from "./useCategorizedSubmissions";
+export { useSubmitUpdatedDocument } from "./mutation/useSubmitUpdatedDocument";

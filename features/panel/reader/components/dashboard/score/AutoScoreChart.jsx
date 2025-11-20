@@ -1,9 +1,14 @@
 "use client";
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { DoughnutChart } from "@/features/shared";
 import { useMemo } from "react";
 
-export function AutoScoreChart({ scoreBreakdown, totalScore }) {
+export function AutoScoreChart({
+  scoreBreakdown,
+  totalScore,
+  isLoading,
+  isError,
+}) {
   // Compute chart data efficiently
   const chartData = useMemo(() => {
     if (!scoreBreakdown || scoreBreakdown.length === 0) {
@@ -47,52 +52,35 @@ export function AutoScoreChart({ scoreBreakdown, totalScore }) {
     "hsl(221, 83%, 53%)",
   ];
 
-  // Get color for a segment
-  const getColor = (index) => COLORS[index % COLORS.length];
+  // Center label component
+  const centerContent = (
+    <div className="text-center">
+      <div className="text-4xl font-bold text-foreground tabular-nums">
+        {totalScore}
+      </div>
+      <div className="text-sm text-muted-foreground font-medium">
+        out of {maxPossibleScore}
+      </div>
+    </div>
+  );
 
   return (
     <div className="relative w-full h-[300px]">
-      {/* Recharts Doughnut */}
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            innerRadius="65%"
-            outerRadius="90%"
-            paddingAngle={0}
-            dataKey="value"
-            stroke="none"
-            isAnimationActive={true}
-            activeShape={null}
-          >
-            {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={getColor(index)} />
-            ))}
-          </Pie>
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "var(--card)",
-              border: "1px solid var(--border)",
-            }}
-            itemStyle={{ color: "var(--popover-foreground)" }}
-            labelStyle={{ color: "var(--muted-foreground)" }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
-
-      {/* Center label */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="text-center">
-          <div className="text-4xl font-bold text-foreground tabular-nums">
-            {totalScore}
-          </div>
-          <div className="text-sm text-muted-foreground font-medium">
-            out of {maxPossibleScore}
-          </div>
-        </div>
-      </div>
+      <DoughnutChart
+        title=""
+        data={chartData}
+        colors={COLORS}
+        isLoading={isLoading}
+        isError={isError}
+        emptyMessage="No score data available"
+        innerRadius={65}
+        outerRadius={90}
+        labelFormatter={false}
+        showLegend={false}
+        height={300}
+        centerContent={centerContent}
+        className="border-0 shadow-none"
+      />
     </div>
   );
 }

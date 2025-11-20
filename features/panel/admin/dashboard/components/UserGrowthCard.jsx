@@ -1,15 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { LineChart } from "recharts";
 
 const data = {
   "7d": [
@@ -27,34 +18,17 @@ const data = {
   })),
 };
 
-export function UserGrowthChart({ dateRange }) {
+export function UserGrowthChart({ dateRange, isLoading, isError }) {
   return (
-    <Card className={"shadow-new"}>
-      <CardHeader>
-        <CardTitle>User Growth</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data[dateRange]}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-            <XAxis dataKey="date" stroke="var(--muted-foreground)" />
-            <YAxis stroke="var(--muted-foreground)" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="users"
-              stroke="var(--primary)"
-              dot={false}
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+    <LineChart
+      title="User Growth"
+      data={data[dateRange]}
+      lines={[{ dataKey: "users", color: "var(--primary)" }]}
+      xAxisKey="date"
+      isLoading={isLoading}
+      isError={isError}
+      emptyMessage="No user growth data available"
+      className="shadow-new"
+    />
   );
 }
