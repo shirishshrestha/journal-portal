@@ -19,6 +19,7 @@ import {
   useGetAdminSubmissionById,
   useGetReviewerRecommendations,
   useUpdateSubmissionStatus,
+  useAssignReviewer,
 } from "@/features/panel/admin/submission";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,6 +67,9 @@ export default function AdminSubmissionDetailPage() {
   // Update status mutation
   const updateStatusMutation = useUpdateSubmissionStatus();
 
+  // Assign reviewer mutation
+  const assignReviewerMutation = useAssignReviewer();
+
   // Set initial status when submission loads
   React.useEffect(() => {
     if (submission?.status) {
@@ -85,6 +89,36 @@ export default function AdminSubmissionDetailPage() {
           console.error("Failed to update status:", error);
           alert("Failed to update status");
           setSelectedStatus(submission.status); // Reset on error
+        },
+      }
+    );
+  };
+
+  const handleAssignReviewer = (reviewerId) => {
+    // Get review deadline days from journal settings, default to 30 days
+    const reviewDeadlineDays = submission?.journal_details?.settings?.review_deadline_days || 30;
+    
+    // Calculate due date based on journal settings
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + reviewDeadlineDays);
+
+    assignReviewerMutation.mutate(
+      {
+        submission: submissionId,
+        reviewer: reviewerId,
+        due_date: dueDate.toISOString().split("T")[0],
+        invitation_message: `You have been invited to review the manuscript "${submission.title}". Please review and provide your feedback within ${reviewDeadlineDays} days.`,
+      },
+      {
+        onSuccess: () => {
+          alert("Reviewer assigned successfully");
+        },
+        onError: (error) => {
+          console.error("Failed to assign reviewer:", error);
+          const errorMessage = error.response?.data?.detail || 
+                               error.response?.data?.non_field_errors?.[0] ||
+                               "Failed to assign reviewer";
+          alert(errorMessage);
         },
       }
     );
@@ -493,8 +527,20 @@ export default function AdminSubmissionDetailPage() {
                             )}
                         </div>
 
-                        <Button variant="outline" size="sm">
-                          Assign
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleAssignReviewer(reviewer.reviewer_id)}
+                          disabled={assignReviewerMutation.isPending}
+                        >
+                          {assignReviewerMutation.isPending ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Assigning...
+                            </>
+                          ) : (
+                            "Assign"
+                          )}
                         </Button>
                       </div>
                     </div>

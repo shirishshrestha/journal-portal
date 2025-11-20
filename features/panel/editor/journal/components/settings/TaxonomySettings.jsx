@@ -984,8 +984,8 @@ function TaxonomyFormDialog({ isOpen, onClose, title, onSubmit, fields, initialD
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
-                  {staffMembers.map((staff) => (
-                    <SelectItem key={staff.id} value={staff.profile?.id || staff.id}>
+                  {staffMembers.map((staff, index) => (
+                    <SelectItem key={`${index}${staff.id}`} value={staff.profile?.id || staff.id}>
                       {staff.profile?.display_name || staff.profile?.user_name || "Unknown User"}
                       {staff.profile?.affiliation_name && ` (${staff.profile.affiliation_name})`}
                     </SelectItem>
