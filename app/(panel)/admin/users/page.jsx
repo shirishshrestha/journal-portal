@@ -22,7 +22,7 @@ export default function UserManagementPage() {
     data: users,
     isPending: isUsersDataPending,
     error: UserDataError,
-  } = useGetUsers();
+  } = useGetUsers({ userRole: "" });
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);

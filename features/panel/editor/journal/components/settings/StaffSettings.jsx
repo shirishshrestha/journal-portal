@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,10 +26,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
 import { toast } from "sonner";
-import { Plus, Edit, Trash2, Mail, User, Loader2 } from "lucide-react";
-import { useGetJournalStaff, useAddJournalStaff, useRemoveJournalStaff, useGetUsers } from "@/features";
-import { DataTable } from "@/features/shared";
+import { Plus, Edit, Trash2, Mail, User } from "lucide-react";
+
+import {
+  useGetJournalStaff,
+  useAddJournalStaff,
+  useRemoveJournalStaff,
+  useGetUsers,
+} from "@/features";
+import { DataTable, SearchableSelect } from "@/features/shared";
 
 const STAFF_ROLES = [
   { value: "EDITOR_IN_CHIEF", label: "Editor-in-Chief" },
@@ -50,7 +62,11 @@ export function StaffSettings({ journalId }) {
   const [selectedStaff, setSelectedStaff] = useState(null);
 
   // Fetch staff data from backend
-  const { data: staffData = [], isPending, error } = useGetJournalStaff(journalId);
+  const {
+    data: staffData = [],
+    isPending,
+    error,
+  } = useGetJournalStaff(journalId);
   const addStaffMutation = useAddJournalStaff();
   const removeStaffMutation = useRemoveJournalStaff();
 
@@ -61,14 +77,17 @@ export function StaffSettings({ journalId }) {
 
   const handleAddStaff = (data) => {
     console.log("Adding staff with data:", data);
-    addStaffMutation.mutate({
-      journalId,
-      ...data,
-    }, {
-      onSuccess: () => {
-        setIsAddStaffOpen(false);
+    addStaffMutation.mutate(
+      {
+        journalId,
+        ...data,
       },
-    });
+      {
+        onSuccess: () => {
+          setIsAddStaffOpen(false);
+        },
+      }
+    );
   };
 
   const handleEditStaff = (data) => {
@@ -80,7 +99,11 @@ export function StaffSettings({ journalId }) {
   };
 
   const handleRemoveStaff = (staff) => {
-    if (confirm(`Are you sure you want to remove ${staff.profile?.first_name} ${staff.profile?.last_name}?`)) {
+    if (
+      confirm(
+        `Are you sure you want to remove ${staff.profile?.first_name} ${staff.profile?.last_name}?`
+      )
+    ) {
       removeStaffMutation.mutate({
         journalId,
         userId: staff.profile?.id,
@@ -102,7 +125,9 @@ export function StaffSettings({ journalId }) {
             <User className="h-4 w-4 text-gray-600" />
           </div>
           <span className="font-medium">
-            {staff.profile?.display_name || staff.profile?.user_name || 'No name'}
+            {staff.profile?.display_name ||
+              staff.profile?.user_name ||
+              "No name"}
           </span>
         </div>
       ),
@@ -113,14 +138,18 @@ export function StaffSettings({ journalId }) {
       render: (staff) => (
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
           <Mail className="h-3 w-3" />
-          {staff.profile?.user_email || 'N/A'}
+          {staff.profile?.user_email || "N/A"}
         </div>
       ),
     },
     {
       key: "affiliation",
       header: "Affiliation",
-      render: (staff) => <span className="text-sm">{staff.profile?.affiliation_name || 'N/A'}</span>,
+      render: (staff) => (
+        <span className="text-sm">
+          {staff.profile?.affiliation_name || "N/A"}
+        </span>
+      ),
     },
     {
       key: "role",
@@ -224,21 +253,52 @@ function AddStaffDialog({ isOpen, onClose, onSubmit }) {
     profile_id: "",
     role: "",
   });
+  // Remove open state for Popover, not needed for SearchableSelect
 
-  // Fetch real user profiles from API
-  const { data: usersData, isPending: loadingUsers, error: usersError } = useGetUsers();
+  // Map staff roles to user roles
+  const getRoleForQuery = (staffRole) => {
+    const roleMapping = {
+      EDITOR_IN_CHIEF: "EDITOR",
+      MANAGING_EDITOR: "EDITOR",
+      ASSOCIATE_EDITOR: "EDITOR",
+      SECTION_EDITOR: "EDITOR",
+      REVIEWER: "REVIEWER",
+      GUEST_EDITOR: "EDITOR",
+    };
+    return roleMapping[staffRole];
+  };
+
+  // Fetch real user profiles from API, filtered by role if selected
+  const userRole = formData.role ? getRoleForQuery(formData.role) : null;
+  const {
+    data: usersData,
+    isPending: loadingUsers,
+    error: usersError,
+  } = useGetUsers(
+    { userRole },
+    {
+      enabled: !!userRole,
+    }
+  );
   const profiles = usersData?.results || usersData || [];
-
-  console.log("AddStaffDialog - usersData:", usersData);
-  console.log("AddStaffDialog - profiles:", profiles);
-  console.log("AddStaffDialog - loadingUsers:", loadingUsers);
-  console.log("AddStaffDialog - usersError:", usersError);
-
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
     setFormData({ profile_id: "", role: "" });
   };
+
+  const handleRoleChange = (value) => {
+    // Reset profile selection when role changes
+    setFormData({ profile_id: "", role: value });
+  };
+
+  // Prepare options for SearchableSelect
+  const userOptions = profiles.map((profile) => ({
+    value: profile.profile.id,
+    label: `${
+      profile.profile.display_name || profile.profile.user_name || "No name"
+    } (${profile.profile.user_email})`,
+  }));
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -246,55 +306,15 @@ function AddStaffDialog({ isOpen, onClose, onSubmit }) {
         <DialogHeader>
           <DialogTitle>Add Staff Member</DialogTitle>
           <DialogDescription>
-            Select a user profile and assign a role to add them to the editorial team
+            First select a role, then choose a user with that role from the list
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="profile">User Profile</Label>
-            <Select
-              value={formData.profile_id}
-              onValueChange={(value) => setFormData({ ...formData, profile_id: value })}
-              required
-              disabled={loadingUsers}
-            >
-              <SelectTrigger id="profile">
-                <SelectValue placeholder={loadingUsers ? "Loading users..." : "Select a user"} />
-              </SelectTrigger>
-              <SelectContent>
-                {loadingUsers ? (
-                  <SelectItem value="loading" disabled>
-                    Loading users...
-                  </SelectItem>
-                ) : usersError ? (
-                  <SelectItem value="error" disabled>
-                    Error loading users
-                  </SelectItem>
-                ) : profiles.length === 0 ? (
-                  <SelectItem value="empty" disabled>
-                    No users found
-                  </SelectItem>
-                ) : (
-                  profiles.map((profile) => (
-                    <SelectItem key={profile.profile.id} value={profile.profile.id}>
-                      <div>
-                        <p className="font-medium">
-                          {profile.profile.display_name || profile.profile.user_name || 'No name'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{profile.profile.user_email}</p>
-                      </div>
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="role">Role</Label>
             <Select
               value={formData.role}
-              onValueChange={(value) => setFormData({ ...formData, role: value })}
+              onValueChange={handleRoleChange}
               required
             >
               <SelectTrigger id="role">
@@ -310,11 +330,45 @@ function AddStaffDialog({ isOpen, onClose, onSubmit }) {
             </Select>
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="profile">User Profile</Label>
+            <SearchableSelect
+              options={userOptions}
+              value={formData.profile_id}
+              onChange={(value) =>
+                setFormData({ ...formData, profile_id: value })
+              }
+              placeholder={
+                !formData.role
+                  ? "Select a role first"
+                  : loadingUsers
+                  ? "Loading users..."
+                  : "Select a user"
+              }
+              emptyText={
+                !formData.role
+                  ? "Please select a role first"
+                  : usersError
+                  ? "Error loading users"
+                  : userOptions.length === 0
+                  ? `No users found with ${getRoleForQuery(formData.role)} role`
+                  : "No user found."
+              }
+              searchPlaceholder="Search users by name or email..."
+              disabled={!formData.role || loadingUsers}
+            />
+          </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Add Staff</Button>
+            <Button
+              type="submit"
+              disabled={!formData.profile_id || !formData.role}
+            >
+              Add Staff
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -338,7 +392,8 @@ function EditStaffDialog({ isOpen, onClose, onSubmit, staff }) {
         <DialogHeader>
           <DialogTitle>Edit Staff Member</DialogTitle>
           <DialogDescription>
-            Update the role for {staff?.profile?.display_name || staff?.profile?.user_name}
+            Update the role for{" "}
+            {staff?.profile?.display_name || staff?.profile?.user_name}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -352,7 +407,9 @@ function EditStaffDialog({ isOpen, onClose, onSubmit, staff }) {
                 <p className="font-medium">
                   {staff?.profile?.display_name || staff?.profile?.user_name}
                 </p>
-                <p className="text-sm text-muted-foreground">{staff?.profile?.user_email}</p>
+                <p className="text-sm text-muted-foreground">
+                  {staff?.profile?.user_email}
+                </p>
               </div>
             </div>
           </div>
@@ -361,7 +418,9 @@ function EditStaffDialog({ isOpen, onClose, onSubmit, staff }) {
             <Label htmlFor="role">Role</Label>
             <Select
               value={formData.role}
-              onValueChange={(value) => setFormData({ ...formData, role: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, role: value })
+              }
               required
             >
               <SelectTrigger id="role">

@@ -55,9 +55,14 @@ export const SearchableSelect = ({
             {options.map((option) => (
               <CommandItem
                 key={option.value}
-                value={option.value}
-                onSelect={(currentValue) => {
-                  onChange(currentValue === value ? "" : currentValue);
+                value={option.label}
+                data-id={option.value}
+                onSelect={(selectedLabel) => {
+                  // Find the option by label, then set value to its ID
+                  const selected = options.find(
+                    (opt) => opt.label === selectedLabel
+                  );
+                  onChange(selected ? selected.value : "");
                   setOpen(false);
                 }}
                 className="capitalize"
