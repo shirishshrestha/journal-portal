@@ -19,6 +19,7 @@ import {
   Calendar,
   User,
   Edit,
+  Send,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -28,6 +29,17 @@ import {
   useGetSubmissionById,
 } from "@/features";
 import Link from "next/link";
+import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
+import { statusConfig } from "@/features/panel/author/utils/status-color";
+
+function StatusBadge({ status }) {
+  const config = statusConfig[status] || statusConfig.DRAFT;
+  return (
+    <Badge className={`${config.bg} ${config.text} border-0`}>
+      {config.label}
+    </Badge>
+  );
+}
 
 export default function ActiveDetailPage() {
   const params = useParams();
@@ -42,6 +54,15 @@ export default function ActiveDetailPage() {
     error,
   } = useGetSubmissionById(submissionId);
 
+  const submitForReviewMutation = useSubmitForReview();
+  const handleSubmitForReview = () => {
+    submitForReviewMutation.mutate(submissionId, {
+      onSuccess: () => {
+        router.push("/author/submissions/active");
+      },
+    });
+  };
+
   if (isSubmissionPending) {
     return <LoadingScreen />;
   }
@@ -53,10 +74,10 @@ export default function ActiveDetailPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push("/author/submissions/drafts")}
+            onClick={() => router.push("/author/submissions/active")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Drafts
+            Back to Active Submissions
           </Button>
         </div>
         <Card>
@@ -77,13 +98,31 @@ export default function ActiveDetailPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push("/author/submissions/drafts")}
+              onClick={() => router.push("/author/submissions/active")}
               className={"hover:text-primary-foreground"}
             >
               <ArrowLeft className="h-4 w-4 mr-1" />
-              Back to Drafts
+              Back to Active Submissions
             </Button>
           </div>
+          {submission?.status === "REVISION_REQUIRED" && (
+            <div>
+              <Button
+                onClick={handleSubmitForReview}
+                disabled={
+                  !submission?.documents ||
+                  submission.documents.length === 0 ||
+                  submitForReviewMutation.isPending
+                }
+                className="gap-2"
+              >
+                <Send className="h-4 w-4" />
+                {submitForReviewMutation.isPending
+                  ? "Submitting..."
+                  : "Submit for Review"}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Submission Details */}
@@ -103,7 +142,7 @@ export default function ActiveDetailPage() {
                   </div>
                 </div>
               </div>
-              <Badge variant="secondary">{submission?.status_display}</Badge>
+              <StatusBadge status={submission?.status} />
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -151,13 +190,15 @@ export default function ActiveDetailPage() {
                   Manage manuscript files and supporting documents
                 </CardDescription>
               </div>
-              <Button
-                onClick={() => setUploadModalOpen(true)}
-                className="gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                Upload Document
-              </Button>
+              {submission?.status === "REVISION_REQUIRED" && (
+                <Button
+                  onClick={() => setUploadModalOpen(true)}
+                  className="gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  Upload Document
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -203,20 +244,22 @@ export default function ActiveDetailPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Link
-                        href={`/author/submissions/drafts/${submissionId}/editor/${doc.id}`}
-                      >
-                        <Button
-                          variant="outline"
-                          className={"font-medium"}
-                          size="sm"
+                    {submission?.status === "REVISION_REQUIRED" && (
+                      <div className="flex gap-2">
+                        <Link
+                          href={`/author/submissions/active/${submissionId}/editor/${doc.id}`}
                         >
-                          <Edit className="h-4 w-4 mr-1 stroke-[1.5px]" />
-                          Edit
-                        </Button>
-                      </Link>
-                    </div>
+                          <Button
+                            variant="outline"
+                            className={"font-medium"}
+                            size="sm"
+                          >
+                            <Edit className="h-4 w-4 mr-1 stroke-[1.5px]" />
+                            Edit
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

@@ -11,6 +11,7 @@ import {
   ErrorCard,
   LoadingScreen,
   RoleBasedRoute,
+  FilterToolbar,
 } from "@/features/shared";
 import { format } from "date-fns";
 import {
@@ -23,6 +24,7 @@ export default function JournalSubmissionsPage() {
   const router = useRouter();
   const journalId = params.id;
   const [statusFilter, setStatusFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch journal details using custom hook
   const {
@@ -41,6 +43,16 @@ export default function JournalSubmissionsPage() {
   });
 
   const submissions = submissionsData?.results || [];
+
+  // Filter submissions by search term
+  const filteredSubmissions = submissions.filter((submission) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      submission.title?.toLowerCase().includes(searchLower) ||
+      submission.submission_number?.toLowerCase().includes(searchLower) ||
+      submission.corresponding_author_name?.toLowerCase().includes(searchLower)
+    );
+  });
 
   // Status badge colors
   const statusColors = {
@@ -76,7 +88,9 @@ export default function JournalSubmissionsPage() {
       render: (row) => (
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">{row.corresponding_author_name}</span>
+          <span className="text-sm">
+            {row.corresponding_author_name || "-"}
+          </span>
         </div>
       ),
     },
@@ -96,9 +110,8 @@ export default function JournalSubmissionsPage() {
     {
       key: "status",
       header: "Status",
-      align: "center",
       render: (row) => (
-        <Badge className={statusColors[row.status] || ""}>
+        <Badge className={statusColors[row.status] || "-"}>
           {row.status_display}
         </Badge>
       ),
@@ -106,8 +119,7 @@ export default function JournalSubmissionsPage() {
     {
       key: "review_count",
       header: "Reviews",
-      align: "center",
-      cellClassName: "text-center",
+      render: (row) => <p>{row.review_count || "-"}</p>,
     },
     {
       key: "actions",
@@ -165,7 +177,7 @@ export default function JournalSubmissionsPage() {
         </div>
 
         {/* Journal Info Card */}
-        <Card>
+        <Card className={"gap-3"}>
           <CardHeader>
             <CardTitle>Journal Information</CardTitle>
           </CardHeader>
@@ -183,7 +195,9 @@ export default function JournalSubmissionsPage() {
                 <p className="text-sm text-muted-foreground">
                   Total Submissions
                 </p>
-                <p className="font-medium text-2xl">{submissions.length}</p>
+                <p className="font-medium text-2xl">
+                  {filteredSubmissions.length}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Status</p>
@@ -201,54 +215,44 @@ export default function JournalSubmissionsPage() {
           </CardContent>
         </Card>
 
-        {/* Filters */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <label className="text-sm font-medium">Filter by Status:</label>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { value: "all", label: "All" },
-                  { value: "SUBMITTED", label: "Submitted" },
-                  { value: "UNDER_REVIEW", label: "Under Review" },
-                  { value: "REVISION_REQUESTED", label: "Revision Requested" },
-                  { value: "ACCEPTED", label: "Accepted" },
-                  { value: "REJECTED", label: "Rejected" },
-                  { value: "PUBLISHED", label: "Published" },
-                ].map((status) => (
-                  <Button
-                    key={status.value}
-                    variant={
-                      statusFilter === status.value ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => setStatusFilter(status.value)}
-                  >
-                    {status.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Submissions Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Submissions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DataTable
-              data={submissions}
-              columns={columns}
-              emptyMessage="No submissions found for this journal"
-              isPending={isSubmissionsPending}
-              error={submissionsError}
-              errorMessage="Error loading submissions"
-              hoverable={true}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-foreground ">
+            Submissions
+          </h2>
+          {/* Filters */}
+          <FilterToolbar>
+            <FilterToolbar.Search
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="Search by title, number, or author..."
+              label="Search Submissions"
             />
-          </CardContent>
-        </Card>
+            <FilterToolbar.Select
+              value={statusFilter}
+              onChange={setStatusFilter}
+              label="Status"
+              options={[
+                { value: "all", label: "All Status" },
+                { value: "SUBMITTED", label: "Submitted" },
+                { value: "UNDER_REVIEW", label: "Under Review" },
+                { value: "REVISION_REQUESTED", label: "Revision Requested" },
+                { value: "ACCEPTED", label: "Accepted" },
+                { value: "REJECTED", label: "Rejected" },
+                { value: "PUBLISHED", label: "Published" },
+              ]}
+            />
+          </FilterToolbar>
+          <DataTable
+            data={filteredSubmissions}
+            columns={columns}
+            emptyMessage="No submissions found for this journal"
+            isPending={isSubmissionsPending}
+            error={submissionsError}
+            errorMessage="Error loading submissions"
+            hoverable={true}
+            tableClassName="bg-card border flex justify-center"
+          />
+        </div>
       </div>
     </RoleBasedRoute>
   );

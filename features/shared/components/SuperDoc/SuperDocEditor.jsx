@@ -5,9 +5,11 @@ import { toast } from "sonner";
 import { useSaveSuperdocDocument } from "../../hooks/mutation/useSaveSuperdocDocument";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Save } from "lucide-react";
+import { FileText, Loader2, Save, Send } from "lucide-react";
 import "@harbour-enterprises/superdoc/style.css";
 import { useCurrentRole } from "../../hooks";
+import { useSubmitUpdatedDocument } from "@/features/panel";
+import { ConfirmationInputPopup } from "..";
 
 /**
  * SuperDoc Editor Component - Self-contained with save functionality
@@ -23,6 +25,28 @@ export default function SuperDocEditor({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { currentRole } = useCurrentRole();
+  const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
+
+  // Submit mutation
+  const submitMutation = useSubmitUpdatedDocument({
+    documentId: documentData.id,
+    onSuccess: () => {
+      toast.success("Document version created successfully");
+      router.push(`/author/submissions/active/${submissionId}`);
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.detail || "Failed to create document version"
+      );
+    },
+  });
+  const handleSubmitClick = () => {
+    setIsSubmitDialogOpen(true);
+  };
+
+  const handleSubmitConfirm = (changeSummary) => {
+    submitMutation.mutate(changeSummary);
+  };
 
   // Save mutation using custom hook
   const saveMutation = useSaveSuperdocDocument({
@@ -160,20 +184,58 @@ export default function SuperDocEditor({
             </Badge>
           )}
         </div>
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleSave}
-          disabled={saveMutation.isPending || !hasUnsavedChanges}
-        >
-          {saveMutation.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <Save className="h-4 w-4 mr-2" />
+        <div>
+          <Button
+            variant="default"
+            size="sm"
+            className={"mr-2"}
+            onClick={handleSave}
+            disabled={saveMutation.isPending || !hasUnsavedChanges}
+          >
+            {saveMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Save className="h-4 w-4 mr-2" />
+            )}
+            Save Document
+          </Button>
+          {documentData.can_edit && currentRole === "AUTHOR" && (
+            <Button
+              size="sm"
+              variant={"secondary"}
+              onClick={handleSubmitClick}
+              disabled={submitMutation.isPending || hasUnsavedChanges}
+            >
+              {submitMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-4" />
+              ) : (
+                <FileText className="h-4 w-4 mr-1" />
+              )}
+              Confirm Document
+            </Button>
           )}
-          Save Document
-        </Button>
+        </div>
       </div>
+
+      {/* Submit Confirmation Dialog */}
+      <ConfirmationInputPopup
+        open={isSubmitDialogOpen}
+        onOpenChange={setIsSubmitDialogOpen}
+        title="Ready to Create a New Version?"
+        description="Confirming this document will create a new version. You won’t be able to edit it again until you submit it for a new review and the reviewer completes their evaluation."
+        inputLabel="Change Summary"
+        inputPlaceholder="Describe the changes made in this version..."
+        confirmText="Submit"
+        cancelText="Cancel"
+        variant="primary"
+        required={true}
+        onConfirm={handleSubmitConfirm}
+        isPending={submitMutation.isPending}
+        isSuccess={submitMutation.isSuccess}
+        loadingText="Submitting..."
+        icon={<Send className="h-8 w-8 text-primary" />}
+      />
+
       <div
         className={`${className} bg-white flex overflow-y-auto max-h-[95vh] flex-col`}
         id="superdoc__container"
