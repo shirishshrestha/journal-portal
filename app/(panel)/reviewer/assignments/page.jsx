@@ -7,7 +7,6 @@ import {
   Calendar,
   FileText,
   Mail,
-  Building2,
   Eye,
   CheckCircle2,
   XCircle,
@@ -419,7 +418,7 @@ export default function ReviewerAssignmentsPage() {
                   <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-semibold mb-2">No assignments yet</h3>
                   <p className="text-sm text-muted-foreground">
-                    You haven't been assigned any reviews yet
+                    You haven&apos;t been assigned any reviews yet
                   </p>
                 </CardContent>
               </Card>
