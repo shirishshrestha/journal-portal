@@ -12,10 +12,9 @@ export const useCreateEditorialDecision = () => {
     mutationFn: createEditorialDecision,
     onSuccess: (data) => {
       toast.success("Editorial decision created successfully");
-      
+
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["submissionDecisions"] });
-      queryClient.invalidateQueries({ queryKey: ["adminSubmission"] });
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
     },
     onError: (error) => {

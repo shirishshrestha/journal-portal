@@ -36,7 +36,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAssignReviewers, useGetAdminSubmissionById, useGetReviewerRecommendations, useUpdateSubmissionStatus } from "@/features/panel/editor/submission";
+import {
+  useAssignReviewers,
+  useGetAdminSubmissionById,
+  useGetReviewerRecommendations,
+  useUpdateSubmissionStatus,
+} from "@/features/panel/editor/submission";
 
 export default function AdminSubmissionDetailPage() {
   const params = useParams();
@@ -63,16 +68,12 @@ export default function AdminSubmissionDetailPage() {
   } = useGetReviewerRecommendations(submissionId, !!submission);
 
   // Fetch submitted reviews
-  const {
-    data: reviewsData,
-    isLoading: isReviewsLoading,
-  } = useGetSubmissionReviews(submissionId);
+  const { data: reviewsData, isLoading: isReviewsLoading } =
+    useGetSubmissionReviews(submissionId);
 
   // Fetch editorial decisions
-  const {
-    data: decisionsData,
-    isLoading: isDecisionsLoading,
-  } = useGetSubmissionDecisions(submissionId);
+  const { data: decisionsData, isLoading: isDecisionsLoading } =
+    useGetSubmissionDecisions(submissionId);
 
   const reviews = reviewsData?.results || [];
   const decisions = decisionsData?.results || [];
@@ -111,8 +112,9 @@ export default function AdminSubmissionDetailPage() {
 
   const handleAssignReviewer = (reviewerId) => {
     // Get review deadline days from journal settings, default to 30 days
-    const reviewDeadlineDays = submission?.journal_details?.settings?.review_deadline_days || 30;
-    
+    const reviewDeadlineDays =
+      submission?.journal_details?.settings?.review_deadline_days || 30;
+
     // Calculate due date based on journal settings
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + reviewDeadlineDays);
@@ -130,9 +132,10 @@ export default function AdminSubmissionDetailPage() {
         },
         onError: (error) => {
           console.error("Failed to assign reviewer:", error);
-          const errorMessage = error.response?.data?.detail || 
-                               error.response?.data?.non_field_errors?.[0] ||
-                               "Failed to assign reviewer";
+          const errorMessage =
+            error.response?.data?.detail ||
+            error.response?.data?.non_field_errors?.[0] ||
+            "Failed to assign reviewer";
           alert(errorMessage);
         },
       }
@@ -441,8 +444,8 @@ export default function AdminSubmissionDetailPage() {
                 No recommendations available
               </h3>
               <p className="text-sm text-muted-foreground">
-                The system couldn't find suitable reviewer recommendations for
-                this submission
+                The system couldn&apos;t find suitable reviewer recommendations
+                for this submission
               </p>
             </div>
           ) : (
@@ -542,10 +545,12 @@ export default function AdminSubmissionDetailPage() {
                             )}
                         </div>
 
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
-                          onClick={() => handleAssignReviewer(reviewer.reviewer_id)}
+                          onClick={() =>
+                            handleAssignReviewer(reviewer.reviewer_id)
+                          }
                           disabled={assignReviewerMutation.isPending}
                         >
                           {assignReviewerMutation.isPending ? (
@@ -567,112 +572,141 @@ export default function AdminSubmissionDetailPage() {
       </Card>
 
       {/* Invited Reviewers Section */}
-      {submission.review_assignments && submission.review_assignments.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Invited Reviewers</CardTitle>
-            <CardDescription>
-              Reviewers who have been invited to review this submission
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {submission.review_assignments.map((assignment) => (
-                <div
-                  key={assignment.id}
-                  className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold">
-                          {assignment.reviewer_name}
-                        </h4>
-                        <Badge 
-                          variant={
-                            assignment.status === 'ACCEPTED' ? 'default' :
-                            assignment.status === 'DECLINED' ? 'destructive' :
-                            assignment.status === 'COMPLETED' ? 'secondary' :
-                            'outline'
-                          }
-                        >
-                          {assignment.status_display}
-                        </Badge>
-                        {assignment.is_overdue && assignment.status === 'ACCEPTED' && (
-                          <Badge variant="destructive">Overdue</Badge>
-                        )}
-                      </div>
+      {submission.review_assignments &&
+        submission.review_assignments.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Invited Reviewers</CardTitle>
+              <CardDescription>
+                Reviewers who have been invited to review this submission
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {submission.review_assignments.map((assignment) => (
+                  <div
+                    key={assignment.id}
+                    className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold">
+                            {assignment.reviewer_name}
+                          </h4>
+                          <Badge
+                            variant={
+                              assignment.status === "ACCEPTED"
+                                ? "default"
+                                : assignment.status === "DECLINED"
+                                ? "destructive"
+                                : assignment.status === "COMPLETED"
+                                ? "secondary"
+                                : "outline"
+                            }
+                          >
+                            {assignment.status_display}
+                          </Badge>
+                          {assignment.is_overdue &&
+                            assignment.status === "ACCEPTED" && (
+                              <Badge variant="destructive">Overdue</Badge>
+                            )}
+                        </div>
 
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Mail className="h-4 w-4" />
-                        {assignment.reviewer_email}
-                      </div>
-
-                      {assignment.reviewer_affiliation && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Building2 className="h-4 w-4" />
-                          {assignment.reviewer_affiliation}
+                          <Mail className="h-4 w-4" />
+                          {assignment.reviewer_email}
                         </div>
-                      )}
 
-                      <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>Invited: {format(new Date(assignment.invited_at), "PPP")}</span>
-                        </div>
-                        <span>•</span>
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>Due: {format(new Date(assignment.due_date), "PPP")}</span>
-                        </div>
-                        {assignment.status === 'ACCEPTED' && assignment.days_remaining != null && (
-                          <>
-                            <span>•</span>
-                            <span className={assignment.days_remaining < 0 ? 'text-destructive font-medium' : ''}>
-                              {assignment.days_remaining < 0 
-                                ? `${Math.abs(assignment.days_remaining)} days overdue` 
-                                : `${assignment.days_remaining} days remaining`}
-                            </span>
-                          </>
+                        {assignment.reviewer_affiliation && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Building2 className="h-4 w-4" />
+                            {assignment.reviewer_affiliation}
+                          </div>
                         )}
-                      </div>
 
-                      {assignment.status === 'ACCEPTED' && assignment.accepted_at && (
-                        <p className="text-xs text-muted-foreground">
-                          Accepted on {format(new Date(assignment.accepted_at), "PPP")}
-                        </p>
-                      )}
+                        <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>
+                              Invited:{" "}
+                              {format(new Date(assignment.invited_at), "PPP")}
+                            </span>
+                          </div>
+                          <span>•</span>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>
+                              Due:{" "}
+                              {format(new Date(assignment.due_date), "PPP")}
+                            </span>
+                          </div>
+                          {assignment.status === "ACCEPTED" &&
+                            assignment.days_remaining != null && (
+                              <>
+                                <span>•</span>
+                                <span
+                                  className={
+                                    assignment.days_remaining < 0
+                                      ? "text-destructive font-medium"
+                                      : ""
+                                  }
+                                >
+                                  {assignment.days_remaining < 0
+                                    ? `${Math.abs(
+                                        assignment.days_remaining
+                                      )} days overdue`
+                                    : `${assignment.days_remaining} days remaining`}
+                                </span>
+                              </>
+                            )}
+                        </div>
 
-                      {assignment.status === 'DECLINED' && assignment.declined_at && (
-                        <div className="text-xs">
-                          <p className="text-muted-foreground">
-                            Declined on {format(new Date(assignment.declined_at), "PPP")}
-                          </p>
-                          {assignment.decline_reason && (
-                            <p className="mt-1 text-destructive">
-                              Reason: {assignment.decline_reason}
+                        {assignment.status === "ACCEPTED" &&
+                          assignment.accepted_at && (
+                            <p className="text-xs text-muted-foreground">
+                              Accepted on{" "}
+                              {format(new Date(assignment.accepted_at), "PPP")}
                             </p>
                           )}
-                        </div>
-                      )}
 
-                      {assignment.status === 'COMPLETED' && assignment.completed_at && (
+                        {assignment.status === "DECLINED" &&
+                          assignment.declined_at && (
+                            <div className="text-xs">
+                              <p className="text-muted-foreground">
+                                Declined on{" "}
+                                {format(
+                                  new Date(assignment.declined_at),
+                                  "PPP"
+                                )}
+                              </p>
+                              {assignment.decline_reason && (
+                                <p className="mt-1 text-destructive">
+                                  Reason: {assignment.decline_reason}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                        {assignment.status === "COMPLETED" &&
+                          assignment.completed_at && (
+                            <p className="text-xs text-muted-foreground">
+                              Completed on{" "}
+                              {format(new Date(assignment.completed_at), "PPP")}
+                            </p>
+                          )}
+
                         <p className="text-xs text-muted-foreground">
-                          Completed on {format(new Date(assignment.completed_at), "PPP")}
+                          Assigned by: {assignment.assigned_by_name}
                         </p>
-                      )}
-
-                      <p className="text-xs text-muted-foreground">
-                        Assigned by: {assignment.assigned_by_name}
-                      </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
       {/* Submitted Reviews Section */}
       {reviews.length > 0 && (
@@ -701,7 +735,8 @@ export default function AdminSubmissionDetailPage() {
                     <div>
                       <h4 className="font-semibold">Review {index + 1}</h4>
                       <p className="text-sm text-muted-foreground">
-                        Submitted on {format(new Date(review.submitted_at), "PPP")}
+                        Submitted on{" "}
+                        {format(new Date(review.submitted_at), "PPP")}
                       </p>
                     </div>
                     <div className="text-right">
@@ -730,27 +765,49 @@ export default function AdminSubmissionDetailPage() {
                   {/* Quality Scores */}
                   {review.quality_scores && (
                     <div>
-                      <h5 className="text-sm font-semibold mb-2">Quality Assessment</h5>
+                      <h5 className="text-sm font-semibold mb-2">
+                        Quality Assessment
+                      </h5>
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                         <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">Novelty</p>
-                          <p className="text-lg font-semibold">{review.quality_scores.novelty}/10</p>
+                          <p className="text-xs text-muted-foreground">
+                            Novelty
+                          </p>
+                          <p className="text-lg font-semibold">
+                            {review.quality_scores.novelty}/10
+                          </p>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">Methodology</p>
-                          <p className="text-lg font-semibold">{review.quality_scores.methodology}/10</p>
+                          <p className="text-xs text-muted-foreground">
+                            Methodology
+                          </p>
+                          <p className="text-lg font-semibold">
+                            {review.quality_scores.methodology}/10
+                          </p>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">Clarity</p>
-                          <p className="text-lg font-semibold">{review.quality_scores.clarity}/10</p>
+                          <p className="text-xs text-muted-foreground">
+                            Clarity
+                          </p>
+                          <p className="text-lg font-semibold">
+                            {review.quality_scores.clarity}/10
+                          </p>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">Significance</p>
-                          <p className="text-lg font-semibold">{review.quality_scores.significance}/10</p>
+                          <p className="text-xs text-muted-foreground">
+                            Significance
+                          </p>
+                          <p className="text-lg font-semibold">
+                            {review.quality_scores.significance}/10
+                          </p>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">Originality</p>
-                          <p className="text-lg font-semibold">{review.quality_scores.originality}/10</p>
+                          <p className="text-xs text-muted-foreground">
+                            Originality
+                          </p>
+                          <p className="text-lg font-semibold">
+                            {review.quality_scores.originality}/10
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -760,7 +817,9 @@ export default function AdminSubmissionDetailPage() {
 
                   {/* Review Text */}
                   <div>
-                    <h5 className="text-sm font-semibold mb-2">Detailed Review</h5>
+                    <h5 className="text-sm font-semibold mb-2">
+                      Detailed Review
+                    </h5>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                       {review.review_text}
                     </p>
@@ -788,7 +847,7 @@ export default function AdminSubmissionDetailPage() {
       )}
 
       {/* Editorial Decision Section - Only for final publishing after reviewers accept */}
-      {reviews.length > 0 && submission.status === 'ACCEPTED' && (
+      {reviews.length > 0 && submission.status === "ACCEPTED" && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -813,7 +872,8 @@ export default function AdminSubmissionDetailPage() {
                     <div>
                       <h4 className="font-semibold">Decision</h4>
                       <p className="text-sm text-muted-foreground">
-                        Made on {format(new Date(latestDecision.created_at), "PPP")}
+                        Made on{" "}
+                        {format(new Date(latestDecision.created_at), "PPP")}
                       </p>
                     </div>
                     <Badge
@@ -832,7 +892,9 @@ export default function AdminSubmissionDetailPage() {
                   <Separator className="my-3" />
 
                   <div>
-                    <h5 className="text-sm font-semibold mb-2">Decision Letter</h5>
+                    <h5 className="text-sm font-semibold mb-2">
+                      Decision Letter
+                    </h5>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                       {latestDecision.decision_letter}
                     </p>
@@ -845,7 +907,10 @@ export default function AdminSubmissionDetailPage() {
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">Revision Deadline:</span>
                         <span className="text-muted-foreground">
-                          {format(new Date(latestDecision.revision_deadline), "PPP")}
+                          {format(
+                            new Date(latestDecision.revision_deadline),
+                            "PPP"
+                          )}
                         </span>
                       </div>
                     </>
@@ -867,14 +932,17 @@ export default function AdminSubmissionDetailPage() {
                 </div>
               </div>
             ) : (
-              <EditorialDecisionForm submissionId={submissionId} reviews={reviews} />
+              <EditorialDecisionForm
+                submissionId={submissionId}
+                reviews={reviews}
+              />
             )}
           </CardContent>
         </Card>
       )}
 
       {/* Status Information for Other Cases */}
-      {reviews.length > 0 && submission.status !== 'ACCEPTED' && (
+      {reviews.length > 0 && submission.status !== "ACCEPTED" && (
         <Card>
           <CardHeader>
             <CardTitle>Current Status</CardTitle>
@@ -884,42 +952,50 @@ export default function AdminSubmissionDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="p-4 border rounded-lg bg-muted/30">
-              {submission.status === 'REVISION_REQUIRED' && (
+              {submission.status === "REVISION_REQUIRED" && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-orange-100 text-orange-700">
+                    <Badge
+                      variant="outline"
+                      className="bg-orange-100 text-orange-700"
+                    >
                       Revision Required
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Reviewers have requested revisions. The author has been notified and can upload a revised manuscript. 
-                    Once the author submits revisions, you can assign the same or new reviewers for re-evaluation.
-                  </p>
-                </div>
-              )}
-              
-              {submission.status === 'REJECTED' && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="destructive">
-                      Rejected
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    This submission has been rejected based on reviewer recommendations. The author has been notified.
+                    Reviewers have requested revisions. The author has been
+                    notified and can upload a revised manuscript. Once the
+                    author submits revisions, you can assign the same or new
+                    reviewers for re-evaluation.
                   </p>
                 </div>
               )}
 
-              {submission.status === 'UNDER_REVIEW' && (
+              {submission.status === "REJECTED" && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-yellow-100 text-yellow-700">
+                    <Badge variant="destructive">Rejected</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    This submission has been rejected based on reviewer
+                    recommendations. The author has been notified.
+                  </p>
+                </div>
+              )}
+
+              {submission.status === "UNDER_REVIEW" && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className="bg-yellow-100 text-yellow-700"
+                    >
                       Under Review
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Waiting for all reviewers to complete their reviews. Status will automatically update once all reviews are submitted.
+                    Waiting for all reviewers to complete their reviews. Status
+                    will automatically update once all reviews are submitted.
                   </p>
                 </div>
               )}
