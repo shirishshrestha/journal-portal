@@ -11,6 +11,7 @@ import {
   FileText,
   Send,
   ArrowLeft,
+  File,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
@@ -72,7 +73,7 @@ export default function SuperDocEditorPage() {
   };
 
   const handleBack = () => {
-    router.push(`/author/submissions/drafts/${submissionId}`);
+    router.push(`/author/submissions/active/${submissionId}`);
   };
 
   if (loadError) {
