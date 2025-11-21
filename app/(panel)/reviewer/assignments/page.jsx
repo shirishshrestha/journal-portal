@@ -14,7 +14,7 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
-import { RoleBasedRoute } from "@/features";
+import { RoleBasedRoute, StatusBadge, statusConfig } from "@/features";
 import { useGetReviewAssignments } from "@/features/panel/reviewer/hooks/useGetReviewAssignments";
 import { useAcceptReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useAcceptReviewAssignment";
 import { useDeclineReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useDeclineReviewAssignment";
@@ -59,8 +59,8 @@ export default function ReviewerAssignmentsPage() {
   const declineMutation = useDeclineReviewAssignment();
 
   // Extract assignments array from response (handle both array and paginated object)
-  const assignments = Array.isArray(assignmentsData) 
-    ? assignmentsData 
+  const assignments = Array.isArray(assignmentsData)
+    ? assignmentsData
     : assignmentsData?.results || [];
 
   // Filter assignments by status
@@ -128,11 +128,17 @@ export default function ReviewerAssignmentsPage() {
 
   const getStatusBadge = (status) => {
     const variants = {
-      PENDING: { variant: "outline", className: "border-yellow-500 text-yellow-600" },
+      PENDING: {
+        variant: "outline",
+        className: "border-yellow-500 text-yellow-600",
+      },
       ACCEPTED: { variant: "default", className: "bg-blue-600" },
       DECLINED: { variant: "destructive", className: "" },
       COMPLETED: { variant: "secondary", className: "bg-green-600 text-white" },
-      CANCELLED: { variant: "outline", className: "border-gray-500 text-gray-600" },
+      CANCELLED: {
+        variant: "outline",
+        className: "border-gray-500 text-gray-600",
+      },
     };
 
     return variants[status] || variants.PENDING;
@@ -154,7 +160,10 @@ export default function ReviewerAssignmentsPage() {
                 {assignment.submission_number || "N/A"}
               </CardDescription>
             </div>
-            <Badge {...badgeProps}>{assignment?.submission_details?.status || ""}</Badge>
+            <StatusBadge
+              status={assignment?.submission_details.status}
+              statusConfig={statusConfig}
+            />
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -162,7 +171,9 @@ export default function ReviewerAssignmentsPage() {
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span>Invited: {format(new Date(assignment.invited_at), "PPP")}</span>
+              <span>
+                Invited: {format(new Date(assignment.invited_at), "PPP")}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Clock className="h-4 w-4" />
@@ -190,7 +201,9 @@ export default function ReviewerAssignmentsPage() {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="h-4 w-4" />
                 <span>
-                  Assigned by: {assignment.assigned_by_info.display_name || assignment.assigned_by_info.full_name}
+                  Assigned by:{" "}
+                  {assignment.assigned_by_info.display_name ||
+                    assignment.assigned_by_info.full_name}
                 </span>
               </div>
             )}
@@ -252,7 +265,7 @@ export default function ReviewerAssignmentsPage() {
                 </Button>
               </>
             )}
-            {assignment.status === "ACCEPTED" && (
+            {assignment?.submission_details.status !== "REVISION_REQUIRED" && (
               <Button
                 size="sm"
                 onClick={() => handleViewSubmission(assignment)}
@@ -316,7 +329,9 @@ export default function ReviewerAssignmentsPage() {
           <Card className="w-full max-w-md">
             <CardHeader>
               <CardTitle className="text-destructive">Error</CardTitle>
-              <CardDescription>Failed to load review assignments</CardDescription>
+              <CardDescription>
+                Failed to load review assignments
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
@@ -346,25 +361,33 @@ export default function ReviewerAssignmentsPage() {
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Pending</CardDescription>
-              <CardTitle className="text-3xl">{pendingAssignments.length}</CardTitle>
+              <CardTitle className="text-3xl">
+                {pendingAssignments.length}
+              </CardTitle>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Accepted</CardDescription>
-              <CardTitle className="text-3xl">{acceptedAssignments.length}</CardTitle>
+              <CardTitle className="text-3xl">
+                {acceptedAssignments.length}
+              </CardTitle>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Completed</CardDescription>
-              <CardTitle className="text-3xl">{completedAssignments.length}</CardTitle>
+              <CardTitle className="text-3xl">
+                {completedAssignments.length}
+              </CardTitle>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Total</CardDescription>
-              <CardTitle className="text-3xl">{assignments?.length || 0}</CardTitle>
+              <CardTitle className="text-3xl">
+                {assignments?.length || 0}
+              </CardTitle>
             </CardHeader>
           </Card>
         </div>
@@ -456,7 +479,7 @@ export default function ReviewerAssignmentsPage() {
                   <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-semibold mb-2">No completed reviews</h3>
                   <p className="text-sm text-muted-foreground">
-                    You haven't completed any reviews yet
+                    You haven&apos;t completed any reviews yet
                   </p>
                 </CardContent>
               </Card>
@@ -476,7 +499,7 @@ export default function ReviewerAssignmentsPage() {
                   <XCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-semibold mb-2">No declined reviews</h3>
                   <p className="text-sm text-muted-foreground">
-                    You haven't declined any review invitations
+                    You haven&apos;t declined any review invitations
                   </p>
                 </CardContent>
               </Card>

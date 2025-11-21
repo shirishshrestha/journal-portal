@@ -170,12 +170,6 @@ export const sidebarConfig = {
       icon: Book,
     },
     {
-      name: "Reviewers",
-      path: "/editor/reviewers",
-      icon: Users,
-    },
-
-    {
       name: "Settings",
       path: "/settings",
       icon: Settings,

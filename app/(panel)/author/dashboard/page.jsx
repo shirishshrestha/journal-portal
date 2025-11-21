@@ -2,17 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import {
+  AuthorDashboardStats,
   AuthorDashboardTable,
+  AuthorDoughnutChart,
+  AuthorSubmissionsChart,
+  ErrorCard,
   LoadingScreen,
   RoleBasedRoute,
+  useGetMyAnalytics,
+  useGetSubmissions,
 } from "@/features";
-import AuthorSubmissionsChart from "@/features/panel/author/components/dashboard/AuthorSubmissionsChart";
-import { useGetMyAnalytics } from "@/features/shared/hooks";
-import { useGetSubmissions } from "@/features/panel/author/hooks/query/useGetSubmissions";
-import StatsCard from "@/features/shared/components/StatsCard";
-import { Plus, FileText, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
-import ErrorCard from "@/features/shared/components/ErrorCard";
 
 export default function AuthorDashboard() {
   const {
@@ -56,44 +57,23 @@ export default function AuthorDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            icon={FileText}
-            title="Total Submissions"
-            value={authorStats.total_submissions || 0}
-            iconClass="text-blue-500"
-            valueClass="text-foreground"
-            isLoading={isLoading}
-          />
-          <StatsCard
-            icon={Clock}
-            title="Under Review"
-            value={authorStats.under_review || 0}
-            iconClass="text-amber-500"
-            valueClass="text-foreground"
-            isLoading={isLoading}
-          />
-          <StatsCard
-            icon={CheckCircle}
-            title="Accepted"
-            value={authorStats.accepted || 0}
-            iconClass="text-green-500"
-            valueClass="text-foreground"
-            isLoading={isLoading}
-          />
-          <StatsCard
-            icon={XCircle}
-            title="Rejected"
-            value={authorStats.rejected || 0}
-            iconClass="text-red-500"
-            valueClass="text-foreground"
-            isLoading={isLoading}
-          />
-        </div>
+        <AuthorDashboardStats
+          counts={{
+            draft: authorStats.draft || 0,
+            underReview: authorStats.under_review || 0,
+            rejected: authorStats.rejected || 0,
+            accepted: authorStats.accepted || 0,
+            pending: authorStats.pending || 0,
+          }}
+          isLoading={isLoading}
+          isError={hasError}
+          error={analyticsError}
+        />
 
         {/* Charts Section */}
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           <AuthorSubmissionsChart data={authorStats} isLoading={isLoading} />
+          <AuthorDoughnutChart data={authorStats} isLoading={isLoading} />
         </div>
 
         {/* Submissions Table Section */}
@@ -115,7 +95,7 @@ export default function AuthorDashboard() {
           />
 
           <Link href="/author/submissions/drafts/">
-            <Button variant="secondary" size="lg" className="">
+            <Button variant="secondary" size="md" className="">
               View All Submissions
             </Button>
           </Link>

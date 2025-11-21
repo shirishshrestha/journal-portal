@@ -13,7 +13,7 @@ import {
 import { DataTable } from "@/features/shared";
 import { BookOpen, MoreVertical, Trash2, Eye } from "lucide-react";
 import Link from "next/link";
-import { statusConfig } from "../../utils/status-color";
+import { statusConfig } from "../../../../shared/utils/submission-status-color";
 
 function StatusBadge({ status }) {
   const config = statusConfig[status] || statusConfig.DRAFT;

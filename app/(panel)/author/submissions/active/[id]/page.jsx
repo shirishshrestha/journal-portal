@@ -27,19 +27,11 @@ import {
   LoadingScreen,
   DocumentUploadModal,
   useGetSubmissionById,
+  statusConfig,
+  StatusBadge,
+  useSubmitForReview,
 } from "@/features";
 import Link from "next/link";
-import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
-import { statusConfig } from "@/features/panel/author/utils/status-color";
-
-function StatusBadge({ status }) {
-  const config = statusConfig[status] || statusConfig.DRAFT;
-  return (
-    <Badge className={`${config.bg} ${config.text} border-0`}>
-      {config.label}
-    </Badge>
-  );
-}
 
 export default function ActiveDetailPage() {
   const params = useParams();
@@ -142,7 +134,10 @@ export default function ActiveDetailPage() {
                   </div>
                 </div>
               </div>
-              <StatusBadge status={submission?.status} />
+              <StatusBadge
+                status={submission?.status}
+                statusConfig={statusConfig}
+              />
             </div>
           </CardHeader>
           <CardContent className="space-y-4">

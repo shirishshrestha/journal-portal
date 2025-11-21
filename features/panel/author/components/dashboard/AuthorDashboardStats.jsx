@@ -1,6 +1,6 @@
 import React from "react";
 import StatsCard from "@/features/shared/components/StatsCard";
-import { FileText, Clock, AlertCircle, CheckCircle } from "lucide-react";
+import { FileText, Clock, CheckCircle, XCircle } from "lucide-react";
 import { StatsErrorCard } from "@/features/shared";
 
 /**
@@ -24,20 +24,27 @@ export default function AuthorDashboardStats({
     {
       icon: Clock,
       title: "Under Review",
-      value: counts?.underReview,
+      value: counts?.underReview ?? counts?.under_review,
       iconClass: "text-blue-500",
-    },
-    {
-      icon: AlertCircle,
-      title: "Revision Required",
-      value: counts?.revisionRequired,
-      iconClass: "text-amber-500",
     },
     {
       icon: CheckCircle,
       title: "Accepted",
       value: counts?.accepted,
       iconClass: "text-green-500",
+    },
+    {
+      icon: XCircle,
+      title: "Rejected",
+      value: counts?.rejected,
+      iconClass: "text-red-500",
+    },
+
+    {
+      icon: Clock,
+      title: "Pending",
+      value: counts?.pending,
+      iconClass: "text-yellow-500",
     },
   ];
 
@@ -48,10 +55,10 @@ export default function AuthorDashboardStats({
         message={error?.message || "Unknown error"}
       />
     );
-  }
+  } 
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 ">
       {cards.map((card, i) => (
         <StatsCard
           key={card.title}
