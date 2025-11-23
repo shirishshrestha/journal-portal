@@ -19,6 +19,8 @@ import {
   LoadingScreen,
   RoleBasedRoute,
   FilterToolbar,
+  StatusBadge,
+  statusConfig,
 } from "@/features/shared";
 import { format } from "date-fns";
 import {
@@ -118,9 +120,7 @@ export default function JournalSubmissionsPage() {
       key: "status",
       header: "Status",
       render: (row) => (
-        <Badge className={statusColors[row.status] || "-"}>
-          {row.status_display}
-        </Badge>
+        <StatusBadge status={row.status} statusConfig={statusConfig} />
       ),
     },
     {

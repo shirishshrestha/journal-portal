@@ -84,9 +84,6 @@ export default function AdminSubmissionDetailPage() {
   const hasDecision = decisions.length > 0;
   const latestDecision = decisions[0]; // Assuming sorted by created_at desc
 
-  // Update status mutation
-  const updateStatusMutation = useUpdateSubmissionStatus();
-
   // Assign reviewer mutation
   const assignReviewerMutation = useAssignReviewers();
 
@@ -96,23 +93,6 @@ export default function AdminSubmissionDetailPage() {
       setSelectedStatus(submission.status);
     }
   }, [submission?.status]);
-
-  const handleStatusChange = (newStatus) => {
-    setSelectedStatus(newStatus);
-    updateStatusMutation.mutate(
-      { id: submissionId, status: newStatus },
-      {
-        onSuccess: () => {
-          alert("Status updated successfully");
-        },
-        onError: (error) => {
-          console.error("Failed to update status:", error);
-          alert("Failed to update status");
-          setSelectedStatus(submission.status); // Reset on error
-        },
-      }
-    );
-  };
 
   const handleAssignReviewer = (reviewerId) => {
     console.log("Assigning reviewer ID:", reviewerId);
@@ -224,7 +204,7 @@ export default function AdminSubmissionDetailPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 grid grid-cols-1 md:grid-cols-2">
           <div>
             <h3 className="font-semibold mb-2">Submission Number</h3>
             <p className="text-muted-foreground">
@@ -232,37 +212,10 @@ export default function AdminSubmissionDetailPage() {
             </p>
           </div>
 
-          <Separator />
-
           <div>
             <h3 className="font-semibold mb-2">Journal</h3>
-            <p className="text-muted-foreground">{submission.journal_name}</p>
+            <p className="text-muted-foreground">{submission.journal.title}</p>
           </div>
-
-          <Separator />
-
-          <div>
-            <h3 className="font-semibold mb-2">Status Management</h3>
-            <div className="flex items-center gap-3">
-              <Select value={selectedStatus} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-64">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {updateStatusMutation.isPending && (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              )}
-            </div>
-          </div>
-
-          <Separator />
 
           <div>
             <h3 className="font-semibold mb-2">Abstract</h3>
@@ -273,7 +226,6 @@ export default function AdminSubmissionDetailPage() {
 
           {submission.metadata_json?.keywords && (
             <>
-              <Separator />
               <div>
                 <h3 className="font-semibold mb-2">Keywords</h3>
                 <div className="flex flex-wrap gap-2">
@@ -572,7 +524,7 @@ export default function AdminSubmissionDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 lg:grid-cols-2">
                 {submission.review_assignments.map((assignment) => (
                   <div
                     key={assignment.id}
@@ -755,7 +707,7 @@ export default function AdminSubmissionDetailPage() {
                   <Separator />
 
                   {/* Quality Scores */}
-                  {review.quality_scores && (
+                  {review.scores && (
                     <div>
                       <h5 className="text-sm font-semibold mb-2">
                         Quality Assessment
@@ -766,7 +718,7 @@ export default function AdminSubmissionDetailPage() {
                             Novelty
                           </p>
                           <p className="text-lg font-semibold">
-                            {review.quality_scores.novelty}/10
+                            {review.scores.novelty}/10
                           </p>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded">
@@ -774,7 +726,7 @@ export default function AdminSubmissionDetailPage() {
                             Methodology
                           </p>
                           <p className="text-lg font-semibold">
-                            {review.quality_scores.methodology}/10
+                            {review.scores.methodology}/10
                           </p>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded">
@@ -782,7 +734,7 @@ export default function AdminSubmissionDetailPage() {
                             Clarity
                           </p>
                           <p className="text-lg font-semibold">
-                            {review.quality_scores.clarity}/10
+                            {review.scores.clarity}/10
                           </p>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded">
@@ -790,7 +742,7 @@ export default function AdminSubmissionDetailPage() {
                             Significance
                           </p>
                           <p className="text-lg font-semibold">
-                            {review.quality_scores.significance}/10
+                            {review.scores.significance}/10
                           </p>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded">
@@ -798,7 +750,7 @@ export default function AdminSubmissionDetailPage() {
                             Originality
                           </p>
                           <p className="text-lg font-semibold">
-                            {review.quality_scores.originality}/10
+                            {review.scores.originality}/10
                           </p>
                         </div>
                       </div>

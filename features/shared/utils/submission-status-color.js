@@ -1,6 +1,6 @@
 export const statusConfig = {
   DRAFT: {
-    bg: "bg-slate-100 dark:bg-slate-800",
+    bg: "bg-slate-100 dark:bg-gray-600",
     text: "text-slate-700 dark:text-primary-foreground",
     label: "Draft",
   },
