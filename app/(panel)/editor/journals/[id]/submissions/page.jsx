@@ -5,7 +5,14 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, FileText, Calendar, User, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  FileText,
+  Calendar,
+  User,
+  Loader2,
+  Eye,
+} from "lucide-react";
 import {
   DataTable,
   ErrorCard,
@@ -119,7 +126,17 @@ export default function JournalSubmissionsPage() {
     {
       key: "review_count",
       header: "Reviews",
-      render: (row) => <p>{row.review_count || "-"}</p>,
+      render: (row) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push(`/editor/submissions/${row.id}/reviews`)}
+          disabled={!row.review_count || row.review_count === 0}
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          {row.review_count || 0}
+        </Button>
+      ),
     },
     {
       key: "actions",

@@ -8,7 +8,19 @@ import { instance } from "@/lib/instance";
  * @returns {Promise} API response
  */
 export const getSubmissionReviews = async (submissionId) => {
-  const response = await instance.get(`reviews/?submission_id=${submissionId}`);
+  const response = await instance.get(
+    `reviews/reviews/?submission_id=${submissionId}`
+  );
+  return response.data;
+};
+
+/**
+ * Get a specific review by ID
+ * @param {string} reviewId - Review ID
+ * @returns {Promise} API response
+ */
+export const getReviewById = async (reviewId) => {
+  const response = await instance.get(`reviews/${reviewId}/`);
   return response.data;
 };
 
@@ -20,7 +32,9 @@ export const getSubmissionReviews = async (submissionId) => {
  * @returns {Promise} API response
  */
 export const getSubmissionDecisions = async (submissionId) => {
-  const response = await instance.get(`reviews/decisions/submission_decisions/?submission_id=${submissionId}`);
+  const response = await instance.get(
+    `reviews/decisions/submission_decisions/?submission_id=${submissionId}`
+  );
   return response.data;
 };
 
@@ -40,7 +54,9 @@ export const createEditorialDecision = async (data) => {
  * @returns {Promise} API response
  */
 export const sendDecisionLetter = async (decisionId) => {
-  const response = await instance.post(`reviews/decisions/${decisionId}/send_letter/`);
+  const response = await instance.post(
+    `reviews/decisions/${decisionId}/send_letter/`
+  );
   return response.data;
 };
 
@@ -51,6 +67,8 @@ export const sendDecisionLetter = async (decisionId) => {
  */
 export const getDecisionLetterTemplates = async (params = {}) => {
   const queryString = new URLSearchParams(params).toString();
-  const response = await instance.get(`reviews/decision-templates/?${queryString}`);
+  const response = await instance.get(
+    `reviews/decision-templates/?${queryString}`
+  );
   return response.data;
 };

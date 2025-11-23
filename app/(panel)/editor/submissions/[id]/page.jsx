@@ -120,16 +120,12 @@ export default function AdminSubmissionDetailPage() {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + reviewDeadlineDays);
 
-    assignReviewerMutation.mutate(
-           { 
-        submission: submissionId,
-        reviewer: reviewerId,
-        due_date: dueDate.toISOString().split("T")[0],
-        invitation_message: `You have been invited to review the manuscript "${submission.title}". Please review and provide your feedback within ${reviewDeadlineDays} days.`,
-      
-           }
-      
-    );
+    assignReviewerMutation.mutate({
+      submission: submissionId,
+      reviewer: reviewerId,
+      due_date: dueDate.toISOString().split("T")[0],
+      invitation_message: `You have been invited to review the manuscript "${submission.title}". Please review and provide your feedback within ${reviewDeadlineDays} days.`,
+    });
   };
 
   if (isSubmissionLoading) {
