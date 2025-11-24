@@ -21,7 +21,13 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { RoleBasedRoute, LoadingScreen, ErrorCard } from "@/features/shared";
+import {
+  RoleBasedRoute,
+  LoadingScreen,
+  ErrorCard,
+  DecisionBadge,
+} from "@/features/shared";
+import { reviewRecommendationConfig } from "@/features";
 import { useGetSubmissionReviews } from "@/features/panel/editor/submission/hooks/useGetSubmissionReviews";
 import { useGetAdminSubmissionById } from "@/features/panel/editor/submission";
 
@@ -183,8 +189,7 @@ export default function SubmissionReviewsPage() {
             {reviews.map((review, index) => (
               <Card
                 key={review.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => router.push(`/editor/reviews/${review.id}`)}
+                className="hover:shadow-md transition-shadow"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -204,14 +209,11 @@ export default function SubmissionReviewsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {getRecommendationIcon(review.recommendation)}
-                      <Badge
-                        variant={getRecommendationVariant(
-                          review.recommendation
-                        )}
-                      >
-                        {review.recommendation_display ||
-                          review.recommendation.replace("_", " ")}
-                      </Badge>
+                      <DecisionBadge
+                        decisionType={review.recommendation}
+                        config={reviewRecommendationConfig}
+                        displayLabel={review.recommendation_display}
+                      />
                     </div>
                   </div>
                 </CardHeader>

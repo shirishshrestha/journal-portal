@@ -25,7 +25,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RoleBasedRoute, LoadingScreen, ErrorCard } from "@/features/shared";
+import {
+  RoleBasedRoute,
+  LoadingScreen,
+  ErrorCard,
+  DecisionBadge,
+} from "@/features/shared";
+import { reviewRecommendationConfig } from "@/features";
 import { useGetReviewById } from "@/features/panel/editor/submission/hooks/useGetReviewById";
 
 export default function ReviewDetailPage() {
@@ -129,13 +135,12 @@ export default function ReviewDetailPage() {
               </div>
               <div className="flex items-center gap-2">
                 {getRecommendationIcon(review.recommendation)}
-                <Badge
-                  variant={getRecommendationVariant(review.recommendation)}
+                <DecisionBadge
+                  decisionType={review.recommendation}
+                  config={reviewRecommendationConfig}
+                  displayLabel={review.recommendation_display}
                   className="text-sm"
-                >
-                  {review.recommendation_display ||
-                    review.recommendation.replace("_", " ")}
-                </Badge>
+                />
               </div>
             </div>
           </CardHeader>

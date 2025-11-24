@@ -18,6 +18,7 @@ import { FilterToolbar } from "./FilterToolbar";
 import SuperDocEditor from "./SuperDoc/SuperDocEditor";
 import StatusBadge from "./StatusBadge";
 import DecisionBadge from "./DecisionBadge";
+import { RichTextEditor } from "./RichTextEditor";
 export * from "./charts";
 
 export {
@@ -41,4 +42,5 @@ export {
   SuperDocEditor,
   StatusBadge,
   DecisionBadge,
+  RichTextEditor,
 };
