@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useGetReviewAssignments } from "@/features/panel/reviewer/hooks/useGetReviewAssignments";
+import { useGetDeclinedAssignments } from "@/features/panel/reviewer/hooks/useGetDeclinedAssignments";
 import { useAcceptReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useAcceptReviewAssignment";
 import { useDeclineReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useDeclineReviewAssignment";
 import { AssignmentCard } from "../_components/AssignmentCard";
@@ -23,16 +23,17 @@ export default function DeclinedAssignmentsPage() {
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
 
-  const { data: assignmentsData, isLoading, error } = useGetReviewAssignments();
+  const {
+    data: assignmentsData,
+    isLoading,
+    error,
+  } = useGetDeclinedAssignments();
   const acceptMutation = useAcceptReviewAssignment();
   const declineMutation = useDeclineReviewAssignment();
 
-  const assignments = Array.isArray(assignmentsData)
+  const declinedAssignments = Array.isArray(assignmentsData)
     ? assignmentsData
     : assignmentsData?.results || [];
-  const declinedAssignments = assignments.filter(
-    (a) => a.status === "DECLINED"
-  );
 
   const handleAccept = (assignment) => {
     acceptMutation.mutate(assignment.id, {

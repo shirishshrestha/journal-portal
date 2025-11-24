@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useGetReviewAssignments } from "@/features/panel/reviewer/hooks/useGetReviewAssignments";
+import { useGetCompletedAssignments } from "@/features/panel/reviewer/hooks/useGetCompletedAssignments";
 import { useAcceptReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useAcceptReviewAssignment";
 import { useDeclineReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useDeclineReviewAssignment";
 import { AssignmentCard } from "../_components/AssignmentCard";
@@ -23,16 +23,17 @@ export default function CompletedAssignmentsPage() {
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
 
-  const { data: assignmentsData, isLoading, error } = useGetReviewAssignments();
+  const {
+    data: assignmentsData,
+    isLoading,
+    error,
+  } = useGetCompletedAssignments();
   const acceptMutation = useAcceptReviewAssignment();
   const declineMutation = useDeclineReviewAssignment();
 
-  const assignments = Array.isArray(assignmentsData)
+  const completedAssignments = Array.isArray(assignmentsData)
     ? assignmentsData
     : assignmentsData?.results || [];
-  const completedAssignments = assignments.filter(
-    (a) => a.status === "COMPLETED"
-  );
 
   const handleAccept = (assignment) => {
     acceptMutation.mutate(assignment.id, {

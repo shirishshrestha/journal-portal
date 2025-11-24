@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { RoleBasedRoute } from "@/features";
 import {
   Card,
   CardContent,
@@ -15,7 +14,8 @@ import { useGetReviewAssignments } from "@/features/panel/reviewer/hooks/useGetR
 
 export default function AssignmentsLayout({ children }) {
   const pathname = usePathname();
-  const { data: assignmentsData, isLoading } = useGetReviewAssignments();
+  const { data: assignmentsData, isPending: isAssignmentDataPending } =
+    useGetReviewAssignments();
 
   // Extract assignments array
   const assignments = Array.isArray(assignmentsData)
@@ -42,92 +42,90 @@ export default function AssignmentsLayout({ children }) {
   };
 
   return (
-    <RoleBasedRoute allowedRoles={["REVIEWER"]}>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Review Assignments</h1>
-          <p className="text-muted-foreground">
-            Manage your peer review invitations and assignments
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold">Review Assignments</h1>
+        <p className="text-muted-foreground">
+          Manage your peer review invitations and assignments
+        </p>
+      </div>
 
-        {/* Stats Summary */}
-        <div className="grid gap-4 md:grid-cols-4">
+      {/* Stats Summary */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Link href="/reviewer/assignments/pending">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="pb-3">
+              <CardDescription>Pending</CardDescription>
+              <CardTitle className="text-3xl">
+                {isAssignmentDataPending ? "..." : pendingCount}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href="/reviewer/assignments/accepted">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="pb-3">
+              <CardDescription>Accepted</CardDescription>
+              <CardTitle className="text-3xl">
+                {isAssignmentDataPending ? "..." : acceptedCount}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href="/reviewer/assignments/completed">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="pb-3">
+              <CardDescription>Completed</CardDescription>
+              <CardTitle className="text-3xl">
+                {isAssignmentDataPending ? "..." : completedCount}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href="/reviewer/assignments/declined">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="pb-3">
+              <CardDescription>Declined</CardDescription>
+              <CardTitle className="text-3xl">
+                {isAssignmentDataPending ? "..." : declinedCount}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </Link>
+      </div>
+
+      {/* Navigation Tabs */}
+      <Tabs value={getActiveTab()} className="w-full">
+        <TabsList>
+          <Link href="/reviewer/assignments">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+          </Link>
           <Link href="/reviewer/assignments/pending">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardDescription>Pending</CardDescription>
-                <CardTitle className="text-3xl">
-                  {isLoading ? "..." : pendingCount}
-                </CardTitle>
-              </CardHeader>
-            </Card>
+            <TabsTrigger value="pending">
+              Pending ({isAssignmentDataPending ? "..." : pendingCount})
+            </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/accepted">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardDescription>Accepted</CardDescription>
-                <CardTitle className="text-3xl">
-                  {isLoading ? "..." : acceptedCount}
-                </CardTitle>
-              </CardHeader>
-            </Card>
+            <TabsTrigger value="accepted">
+              Accepted ({isAssignmentDataPending ? "..." : acceptedCount})
+            </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/completed">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardDescription>Completed</CardDescription>
-                <CardTitle className="text-3xl">
-                  {isLoading ? "..." : completedCount}
-                </CardTitle>
-              </CardHeader>
-            </Card>
+            <TabsTrigger value="completed">
+              Completed ({isAssignmentDataPending ? "..." : completedCount})
+            </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/declined">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardDescription>Declined</CardDescription>
-                <CardTitle className="text-3xl">
-                  {isLoading ? "..." : declinedCount}
-                </CardTitle>
-              </CardHeader>
-            </Card>
+            <TabsTrigger value="declined">
+              Declined ({isAssignmentDataPending ? "..." : declinedCount})
+            </TabsTrigger>
           </Link>
-        </div>
+        </TabsList>
+      </Tabs>
 
-        {/* Navigation Tabs */}
-        <Tabs value={getActiveTab()} className="w-full">
-          <TabsList>
-            <Link href="/reviewer/assignments">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-            </Link>
-            <Link href="/reviewer/assignments/pending">
-              <TabsTrigger value="pending">
-                Pending ({isLoading ? "..." : pendingCount})
-              </TabsTrigger>
-            </Link>
-            <Link href="/reviewer/assignments/accepted">
-              <TabsTrigger value="accepted">
-                Accepted ({isLoading ? "..." : acceptedCount})
-              </TabsTrigger>
-            </Link>
-            <Link href="/reviewer/assignments/completed">
-              <TabsTrigger value="completed">
-                Completed ({isLoading ? "..." : completedCount})
-              </TabsTrigger>
-            </Link>
-            <Link href="/reviewer/assignments/declined">
-              <TabsTrigger value="declined">
-                Declined ({isLoading ? "..." : declinedCount})
-              </TabsTrigger>
-            </Link>
-          </TabsList>
-        </Tabs>
-
-        {/* Page Content */}
-        {children}
-      </div>
-    </RoleBasedRoute>
+      {/* Page Content */}
+      {children}
+    </div>
   );
 }

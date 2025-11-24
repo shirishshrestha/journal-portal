@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useGetReviewAssignments } from "@/features/panel/reviewer/hooks/useGetReviewAssignments";
+import { useGetPendingAssignments } from "@/features/panel/reviewer/hooks/useGetPendingAssignments";
 import { useAcceptReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useAcceptReviewAssignment";
 import { useDeclineReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useDeclineReviewAssignment";
 import { AssignmentCard } from "../_components/AssignmentCard";
@@ -23,18 +23,21 @@ export default function PendingAssignmentsPage() {
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
 
-  // Fetch assignments
-  const { data: assignmentsData, isLoading, error } = useGetReviewAssignments();
+  // Fetch pending assignments
+  const {
+    data: assignmentsData,
+    isLoading,
+    error,
+  } = useGetPendingAssignments();
 
   // Mutations
   const acceptMutation = useAcceptReviewAssignment();
   const declineMutation = useDeclineReviewAssignment();
 
-  // Extract and filter assignments
-  const assignments = Array.isArray(assignmentsData)
+  // Extract assignments
+  const pendingAssignments = Array.isArray(assignmentsData)
     ? assignmentsData
     : assignmentsData?.results || [];
-  const pendingAssignments = assignments.filter((a) => a.status === "PENDING");
 
   // Handlers
   const handleAccept = (assignment) => {

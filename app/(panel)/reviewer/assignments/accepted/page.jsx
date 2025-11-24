@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useGetReviewAssignments } from "@/features/panel/reviewer/hooks/useGetReviewAssignments";
+import { useGetAcceptedAssignments } from "@/features/panel/reviewer/hooks/useGetAcceptedAssignments";
 import { useAcceptReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useAcceptReviewAssignment";
 import { useDeclineReviewAssignment } from "@/features/panel/reviewer/hooks/mutation/useDeclineReviewAssignment";
 import { AssignmentCard } from "../_components/AssignmentCard";
@@ -23,20 +23,21 @@ export default function AcceptedAssignmentsPage() {
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
 
-  // Fetch assignments
-  const { data: assignmentsData, isLoading, error } = useGetReviewAssignments();
+  // Fetch accepted assignments
+  const {
+    data: assignmentsData,
+    isLoading,
+    error,
+  } = useGetAcceptedAssignments();
 
   // Mutations
   const acceptMutation = useAcceptReviewAssignment();
   const declineMutation = useDeclineReviewAssignment();
 
-  // Extract and filter assignments
-  const assignments = Array.isArray(assignmentsData)
+  // Extract assignments
+  const acceptedAssignments = Array.isArray(assignmentsData)
     ? assignmentsData
     : assignmentsData?.results || [];
-  const acceptedAssignments = assignments.filter(
-    (a) => a.status === "ACCEPTED"
-  );
 
   // Handlers
   const handleAccept = (assignment) => {
