@@ -8,11 +8,21 @@ export const roleRequestSchema = z.object({
   affiliation_email: z.string().email("Invalid email address"),
   research_interests: z
     .string()
-    .min(10, "Please describe your research interests (min 10 characters)"),
+    .min(50, "Please describe your research interests (min 50 characters)")
+    .refine((val) => {
+      // Remove HTML tags to get plain text length
+      const plainText = val.replace(/<[^>]*>/g, "").trim();
+      return plainText.length >= 50;
+    }, "Research interests must contain at least 50 characters of text"),
   academic_position: z.string().min(2, "Academic position is required"),
   supporting_letter: z
     .string()
-    .min(20, "Please provide a supporting letter (min 20 characters)"),
+    .min(100, "Please provide a supporting letter (min 100 characters)")
+    .refine((val) => {
+      // Remove HTML tags to get plain text length
+      const plainText = val.replace(/<[^>]*>/g, "").trim();
+      return plainText.length >= 100;
+    }, "Supporting letter must contain at least 100 characters of text"),
 });
 
 export const profileSchema = z.object({

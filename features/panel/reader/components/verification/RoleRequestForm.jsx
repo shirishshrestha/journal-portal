@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import {
   FormInputField,
-  FormTextareaField,
+  FormRichTextEditor,
   MultiSelect,
   useGetRoleList,
 } from "@/features/shared";
@@ -38,6 +38,7 @@ import {
   LoadingScreen,
   ErrorCard,
   CardSkeleton,
+  FormTextareaField,
 } from "@/features/shared/components";
 
 const RoleRequestForm = () => {
@@ -203,12 +204,12 @@ const RoleRequestForm = () => {
                   form_classname="lg:col-span-2"
                 />
 
-                <FormTextareaField
+                <FormRichTextEditor
                   control={roleForm.control}
                   name="supporting_letter"
                   label="Supporting Letter"
                   placeholder="Provide a supporting letter explaining why you should be approved for this role..."
-                  description="Help admins make an informed decision about your request"
+                  description="Help admins make an informed decision about your request (minimum 100 characters)"
                   form_classname="lg:col-span-2"
                 />
 
