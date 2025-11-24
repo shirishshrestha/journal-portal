@@ -10,6 +10,42 @@ export const getReviewAssignments = async () => {
 };
 
 /**
+ * Get pending review assignments for the current user
+ * @returns {Promise} API response
+ */
+export const getPendingReviewAssignments = async () => {
+  const response = await instance.get("/reviews/assignments/pending/");
+  return response.data;
+};
+
+/**
+ * Get accepted review assignments for the current user
+ * @returns {Promise} API response
+ */
+export const getAcceptedReviewAssignments = async () => {
+  const response = await instance.get("/reviews/assignments/accepted/");
+  return response.data;
+};
+
+/**
+ * Get completed review assignments for the current user
+ * @returns {Promise} API response
+ */
+export const getCompletedReviewAssignments = async () => {
+  const response = await instance.get("/reviews/assignments/completed/");
+  return response.data;
+};
+
+/**
+ * Get declined review assignments for the current user
+ * @returns {Promise} API response
+ */
+export const getDeclinedReviewAssignments = async () => {
+  const response = await instance.get("/reviews/assignments/declined/");
+  return response.data;
+};
+
+/**
  * Get review assignment by ID
  * @param {string} id - Assignment ID
  * @returns {Promise} API response
