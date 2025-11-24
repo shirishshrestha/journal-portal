@@ -143,7 +143,7 @@ export default function RichTextEditor({
       <LexicalComposer initialConfig={editorConfig}>
         <div className="editor-inner">
           <ToolbarPlugin />
-          <div className="editor-wrapper">
+          <div className="editor-wrapper bg-input/30">
             <RichTextPlugin
               contentEditable={<ContentEditable className="editor-input" />}
               placeholder={<Placeholder placeholder={placeholder} />}

@@ -19,6 +19,7 @@ import SuperDocEditor from "./SuperDoc/SuperDocEditor";
 import StatusBadge from "./StatusBadge";
 import DecisionBadge from "./DecisionBadge";
 import { RichTextEditor } from "./RichTextEditor";
+import FormRichTextEditor from "./FormRichTextEditor";
 export * from "./charts";
 
 export {
@@ -43,4 +44,5 @@ export {
   StatusBadge,
   DecisionBadge,
   RichTextEditor,
+  FormRichTextEditor,
 };
