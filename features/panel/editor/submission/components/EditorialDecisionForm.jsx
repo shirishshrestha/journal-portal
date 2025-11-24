@@ -77,7 +77,6 @@ const DECISION_OPTIONS = [
 
 export default function EditorialDecisionForm({ submissionId, reviews = [] }) {
   const router = useRouter();
-  const [showSuccess, setShowSuccess] = useState(false);
   const { mutate: createDecision, isPending } = useCreateEditorialDecision();
   const { data: templates, isLoading: templatesLoading } =
     useGetDecisionLetterTemplates();
@@ -125,44 +124,21 @@ export default function EditorialDecisionForm({ submissionId, reviews = [] }) {
 
     createDecision(payload, {
       onSuccess: () => {
-        setShowSuccess(true);
         toast.success("Editorial decision submitted successfully");
       },
     });
   };
 
-  if (showSuccess) {
-    return (
-      <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
-        <CardContent className="pt-6">
-          <div className="text-center">
-            <CheckCircle2 className="mx-auto h-16 w-16 text-green-600 dark:text-green-400 mb-4" />
-            <h3 className="text-xl font-semibold text-green-800 dark:text-green-300 mb-2">
-              Editorial Decision Submitted Successfully!
-            </h3>
-            <p className="text-green-600 dark:text-green-400">
-              The decision has been recorded and the submission status has been
-              updated.
-            </p>
-            <p className="text-sm text-green-600 dark:text-green-400 mt-2">
-              Redirecting to submissions list...
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Reviews Summary */}
       {reviews.length > 0 && (
-        <Card className={"gap-4"}>
-          <CardHeader className={"gap-0"}>
+        <Card className={"gap-4 p-0 border-none"}>
+          <CardHeader className={"gap-0 px-0"}>
             <CardTitle className="text-lg">Reviews Summary</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <CardContent className={"p-0"}>
+            <div className="">
               {/* Only show the first review if reviews exist, with full details */}
               <div
                 key={reviews[0].id}
