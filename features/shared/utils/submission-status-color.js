@@ -19,6 +19,11 @@ export const statusConfig = {
     text: "text-amber-700 dark:text-primary-foreground",
     label: "Revision Required",
   },
+  REVISION_REQUESTED: {
+    bg: "bg-yellow-100 dark:bg-yellow-600",
+    text: "text-yellow-700 dark:text-primary-foreground",
+    label: "Revision Requested",
+  },
   REVISED: {
     bg: "bg-indigo-100 dark:bg-indigo-600",
     text: "text-indigo-700 dark:text-primary-foreground",

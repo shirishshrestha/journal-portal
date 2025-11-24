@@ -163,32 +163,106 @@ export default function EditorialDecisionForm({ submissionId, reviews = [] }) {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {reviews.map((review, index) => (
-                <div
-                  key={review.id}
-                  className="flex items-center justify-between p-3 border border-border rounded-lg"
-                >
+              {/* Only show the first review if reviews exist, with full details */}
+              <div
+                key={reviews[0].id}
+                className="p-4 border rounded-lg space-y-3"
+              >
+                <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-medium">
-                      Review {index + 1} {index + 1 === 1 ? "(Latest)" : ""}
-                    </p>
-                    <p className="text-sm ">
-                      Submitted:{" "}
-                      {new Date(review.submitted_at).toLocaleDateString()}
+                    <h4 className="font-semibold">Review 1 (Latest)</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Submitted on{" "}
+                      {new Date(reviews[0].submitted_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
                     <DecisionBadge
-                      decisionType={review.recommendation}
+                      decisionType={reviews[0].recommendation}
                       config={reviewRecommendationConfig}
                       className="mb-1"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Confidence: {review.confidence_level}/5
+                    <p className="text-xs text-muted-foreground">
+                      Confidence: {reviews[0].confidence_level}/5
                     </p>
                   </div>
                 </div>
-              ))}
+
+                {/* Separator */}
+                <div className="border-t my-2" />
+
+                {reviews[0].scores && (
+                  <div>
+                    <h5 className="text-sm font-semibold mb-2">
+                      Quality Assessment
+                    </h5>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                      <div className="text-center p-2 bg-muted/50 rounded">
+                        <p className="text-xs text-muted-foreground">Novelty</p>
+                        <p className="text-lg font-semibold">
+                          {reviews[0].scores.novelty}/10
+                        </p>
+                      </div>
+                      <div className="text-center p-2 bg-muted/50 rounded">
+                        <p className="text-xs text-muted-foreground">
+                          Methodology
+                        </p>
+                        <p className="text-lg font-semibold">
+                          {reviews[0].scores.methodology}/10
+                        </p>
+                      </div>
+                      <div className="text-center p-2 bg-muted/50 rounded">
+                        <p className="text-xs text-muted-foreground">Clarity</p>
+                        <p className="text-lg font-semibold">
+                          {reviews[0].scores.clarity}/10
+                        </p>
+                      </div>
+                      <div className="text-center p-2 bg-muted/50 rounded">
+                        <p className="text-xs text-muted-foreground">
+                          Significance
+                        </p>
+                        <p className="text-lg font-semibold">
+                          {reviews[0].scores.significance}/10
+                        </p>
+                      </div>
+                      <div className="text-center p-2 bg-muted/50 rounded">
+                        <p className="text-xs text-muted-foreground">
+                          Originality
+                        </p>
+                        <p className="text-lg font-semibold">
+                          {reviews[0].scores.originality}/10
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Separator */}
+                <div className="border-t my-2" />
+
+                <div>
+                  <h5 className="text-sm font-semibold mb-2">
+                    Detailed Review
+                  </h5>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {reviews[0].review_text}
+                  </p>
+                </div>
+
+                {reviews[0].confidential_comments && (
+                  <>
+                    <div className="border-t my-2" />
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                      <h5 className="text-sm font-semibold mb-2 text-yellow-800 dark:text-yellow-300">
+                        Confidential Comments (For Editor Only)
+                      </h5>
+                      <p className="text-sm text-yellow-900 dark:text-yellow-200 whitespace-pre-wrap">
+                        {reviews[0].confidential_comments}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

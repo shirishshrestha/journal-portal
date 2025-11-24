@@ -77,8 +77,6 @@ export default function AdminSubmissionDetailPage() {
       : reviewsData?.results || [];
   }, [reviewsData]);
 
-  console.log(reviews);
-
   const decisions = React.useMemo(() => {
     return Array.isArray(decisionsData)
       ? decisionsData
@@ -652,8 +650,7 @@ export default function AdminSubmissionDetailPage() {
           </Card>
         )}
 
-      {/* Submitted Reviews Section */}
-      {reviews.length > 0 && (
+      {/* {reviews.length > 0 && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -699,7 +696,6 @@ export default function AdminSubmissionDetailPage() {
 
                   <Separator />
 
-                  {/* Quality Scores */}
                   {review.scores && (
                     <div>
                       <h5 className="text-sm font-semibold mb-2">
@@ -752,7 +748,6 @@ export default function AdminSubmissionDetailPage() {
 
                   <Separator />
 
-                  {/* Review Text */}
                   <div>
                     <h5 className="text-sm font-semibold mb-2">
                       Detailed Review
@@ -762,7 +757,6 @@ export default function AdminSubmissionDetailPage() {
                     </p>
                   </div>
 
-                  {/* Confidential Comments (for editor only) */}
                   {review.confidential_comments && (
                     <>
                       <Separator />
@@ -781,7 +775,7 @@ export default function AdminSubmissionDetailPage() {
             </div>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Editorial Decision Section - Only for final publishing after reviewers accept */}
       {reviews.length > 0 && (
@@ -802,7 +796,9 @@ export default function AdminSubmissionDetailPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {hasDecision && latestDecision ? (
+            {hasDecision &&
+            latestDecision &&
+            submission?.status !== "REVISION_REQUESTED" ? (
               <div className="space-y-4">
                 <div className="p-4 border rounded-lg bg-muted/30">
                   <div className="flex items-start justify-between mb-3">
