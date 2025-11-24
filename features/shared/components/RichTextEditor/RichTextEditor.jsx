@@ -118,10 +118,11 @@ const editorConfig = {
  * RichTextEditor - A feature-rich text editor component using Lexical
  * @param {Object} props
  * @param {string} [props.placeholder="Enter some text..."] - Placeholder text
- * @param {Function} [props.onChange] - Callback when editor content changes
+ * @param {Function} [props.onChange] - Callback when editor content changes (debounced)
  * @param {string} [props.initialValue] - Initial HTML content
  * @param {string} [props.className] - Additional className for the editor container
  * @param {boolean} [props.autoFocus=false] - Whether to auto-focus on mount
+ * @param {number} [props.debounceMs=300] - Debounce delay in milliseconds for onChange callback
  */
 export default function RichTextEditor({
   placeholder = "Enter some text...",
@@ -129,6 +130,7 @@ export default function RichTextEditor({
   initialValue,
   className = "",
   autoFocus = false,
+  debounceMs = 500,
 }) {
   const { theme: currentTheme } = useTheme();
 
@@ -153,7 +155,9 @@ export default function RichTextEditor({
             <LinkPlugin />
             <AutoLinkPlugin />
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-            {onChange && <OnChangePlugin onChange={onChange} />}
+            {onChange && (
+              <OnChangePlugin onChange={onChange} debounceMs={debounceMs} />
+            )}
           </div>
         </div>
       </LexicalComposer>

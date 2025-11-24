@@ -23,6 +23,8 @@ export default function RichTextEditorDemo() {
     setPreview(content);
   };
 
+  console.log(preview);
+
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div>

@@ -24,7 +24,7 @@
   gap: 0.25rem;
   padding: 0.5rem;
   border-bottom: 1px solid hsl(var(--border));
-  background: hsl(var(--muted) / 0.3);
+  background: var(--background);
   border-radius: 0.5rem 0.5rem 0 0;
   flex-wrap: wrap;
 }
@@ -70,7 +70,7 @@
 /* Placeholder */
 .editor-placeholder {
   position: absolute;
-  top: 1rem;
+  top: 1.3rem;
   left: 1rem;
   color: hsl(var(--muted-foreground));
   pointer-events: none;

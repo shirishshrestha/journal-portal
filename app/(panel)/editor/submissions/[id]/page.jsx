@@ -650,133 +650,6 @@ export default function AdminSubmissionDetailPage() {
           </Card>
         )}
 
-      {/* {reviews.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Submitted Reviews</CardTitle>
-                <CardDescription>
-                  Reviews completed by assigned reviewers
-                </CardDescription>
-              </div>
-              {isReviewsPending && (
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {reviews.map((review, index) => (
-                <div
-                  key={review.id}
-                  className="p-4 border rounded-lg space-y-3"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="font-semibold">
-                        Review {index + 1} {index + 1 === 1 ? "(Latest)" : ""}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Submitted on{" "}
-                        {format(new Date(review.submitted_at), "PPP")}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <DecisionBadge
-                        decisionType={review.recommendation}
-                        config={reviewRecommendationConfig}
-                        className="mb-1"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Confidence: {review.confidence_level}/5
-                      </p>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {review.scores && (
-                    <div>
-                      <h5 className="text-sm font-semibold mb-2">
-                        Quality Assessment
-                      </h5>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                        <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">
-                            Novelty
-                          </p>
-                          <p className="text-lg font-semibold">
-                            {review.scores.novelty}/10
-                          </p>
-                        </div>
-                        <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">
-                            Methodology
-                          </p>
-                          <p className="text-lg font-semibold">
-                            {review.scores.methodology}/10
-                          </p>
-                        </div>
-                        <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">
-                            Clarity
-                          </p>
-                          <p className="text-lg font-semibold">
-                            {review.scores.clarity}/10
-                          </p>
-                        </div>
-                        <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">
-                            Significance
-                          </p>
-                          <p className="text-lg font-semibold">
-                            {review.scores.significance}/10
-                          </p>
-                        </div>
-                        <div className="text-center p-2 bg-muted/50 rounded">
-                          <p className="text-xs text-muted-foreground">
-                            Originality
-                          </p>
-                          <p className="text-lg font-semibold">
-                            {review.scores.originality}/10
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <Separator />
-
-                  <div>
-                    <h5 className="text-sm font-semibold mb-2">
-                      Detailed Review
-                    </h5>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {review.review_text}
-                    </p>
-                  </div>
-
-                  {review.confidential_comments && (
-                    <>
-                      <Separator />
-                      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
-                        <h5 className="text-sm font-semibold mb-2 text-yellow-800 dark:text-yellow-300">
-                          Confidential Comments (For Editor Only)
-                        </h5>
-                        <p className="text-sm text-yellow-900 dark:text-yellow-200 whitespace-pre-wrap">
-                          {review.confidential_comments}
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )} */}
-
       {/* Editorial Decision Section - Only for final publishing after reviewers accept */}
       {reviews.length > 0 && (
         <Card>
@@ -796,99 +669,73 @@ export default function AdminSubmissionDetailPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {hasDecision &&
-            latestDecision &&
-            submission?.status !== "REVISION_REQUESTED" ? (
-              <div className="space-y-4">
-                <div className="p-4 border rounded-lg bg-muted/30">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="space-y-1">
-                      <h4 className="font-semibold">Editorial Decision</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Made on{" "}
+            <div className="space-y-4 mb-6">
+              <div className="p-4 border rounded-lg bg-muted/30">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="space-y-1">
+                    <h4 className="font-semibold">Editorial Decision</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Made on{" "}
+                      {format(
+                        new Date(
+                          latestDecision.decision_date ||
+                            latestDecision.created_at
+                        ),
+                        "PPP"
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Decided by: {latestDecision.decided_by_name || "Unknown"}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <DecisionBadge
+                      decisionType={latestDecision.decision_type}
+                      config={decisionTypeConfig}
+                      displayLabel={latestDecision.decision_type_display}
+                    />
+                  </div>
+                </div>
+
+                <Separator className="my-3" />
+
+                {latestDecision.revision_deadline && (
+                  <>
+                    <div className="flex items-center gap-2 text-sm p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <span className="font-medium text-blue-900 dark:text-blue-300">
+                        Revision Deadline:
+                      </span>
+                      <span className="text-blue-700 dark:text-blue-400">
                         {format(
-                          new Date(
-                            latestDecision.decision_date ||
-                              latestDecision.created_at
-                          ),
+                          new Date(latestDecision.revision_deadline),
                           "PPP"
                         )}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Decided by:{" "}
-                        {latestDecision.decided_by_name || "Unknown"}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {latestDecision.confidential_notes && (
+                  <>
+                    <Separator className="my-3" />
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                      <h5 className="text-sm font-semibold mb-2 text-yellow-800 dark:text-yellow-300">
+                        Confidential Notes (Internal Only)
+                      </h5>
+                      <p className="text-sm text-yellow-900 dark:text-yellow-200 whitespace-pre-wrap">
+                        {latestDecision.confidential_notes}
                       </p>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <DecisionBadge
-                        decisionType={latestDecision.decision_type}
-                        config={decisionTypeConfig}
-                        displayLabel={latestDecision.decision_type_display}
-                      />
-                      {latestDecision.notification_sent !== undefined && (
-                        <Badge variant="outline" className="text-xs">
-                          {latestDecision.notification_sent
-                            ? "Notification Sent"
-                            : "Notification Pending"}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <Separator className="my-3" />
-
-                  {latestDecision.decision_letter && (
-                    <>
-                      <div>
-                        <h5 className="text-sm font-semibold mb-2">
-                          Decision Letter
-                        </h5>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {latestDecision.decision_letter}
-                        </p>
-                      </div>
-                      <Separator className="my-3" />
-                    </>
-                  )}
-
-                  {latestDecision.revision_deadline && (
-                    <>
-                      <div className="flex items-center gap-2 text-sm p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <span className="font-medium text-blue-900 dark:text-blue-300">
-                          Revision Deadline:
-                        </span>
-                        <span className="text-blue-700 dark:text-blue-400">
-                          {format(
-                            new Date(latestDecision.revision_deadline),
-                            "PPP"
-                          )}
-                        </span>
-                      </div>
-                    </>
-                  )}
-
-                  {latestDecision.confidential_notes && (
-                    <>
-                      <Separator className="my-3" />
-                      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
-                        <h5 className="text-sm font-semibold mb-2 text-yellow-800 dark:text-yellow-300">
-                          Confidential Notes (Internal Only)
-                        </h5>
-                        <p className="text-sm text-yellow-900 dark:text-yellow-200 whitespace-pre-wrap">
-                          {latestDecision.confidential_notes}
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
-            ) : (
-              <EditorialDecisionForm
-                submissionId={submissionId}
-                reviews={reviews}
-              />
-            )}
+            </div>
+
+            <EditorialDecisionForm
+              submissionId={submissionId}
+              reviews={reviews}
+            />
           </CardContent>
         </Card>
       )}
