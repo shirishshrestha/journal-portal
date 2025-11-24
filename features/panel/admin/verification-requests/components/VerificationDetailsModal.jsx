@@ -207,10 +207,15 @@ export function VerificationDetailsModal({
                     Supporting Letter
                   </h3>
                 </div>
-                <ScrollArea className="h-40 w-full rounded border bg-muted/30 p-4">
-                  <p className="text-sm leading-relaxed whitespace-pre-line">
+                <ScrollArea className="min-h-80 max-h-[500px] w-full rounded border bg-muted/30 p-4">
+                  {/* <p className="text-sm leading-relaxed whitespace-pre-line">
                     {verification.supporting_letter}
-                  </p>
+                  </p> */}
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: verification.supporting_letter,
+                    }}
+                  />
                 </ScrollArea>
               </CardContent>
             </Card>
