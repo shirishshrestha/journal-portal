@@ -574,14 +574,14 @@ function AnomalyCard({ anomaly, type, getSeverityColor, getSeverityIcon }) {
                   )}
 
                   {/* Raw Data */}
-                  <div className="border-t pt-4">
+                  {/* <div className="border-t pt-4">
                     <h4 className="font-semibold mb-3">Raw Data</h4>
                     <div className="bg-muted p-4 rounded-md">
                       <pre className="text-xs overflow-auto">
                         {JSON.stringify(anomaly, null, 2)}
                       </pre>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </ScrollArea>
             </DialogContent>
