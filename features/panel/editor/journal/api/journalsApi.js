@@ -43,6 +43,16 @@ export const getJournalById = async (id) => {
   return response.data;
 };
 
+/**
+ * Delete a journal
+ * @param {string} id - Journal ID
+ * @returns {Promise} API response
+ */
+export const deleteJournal = async (id) => {
+  const response = await instance.delete(`journals/journals/${id}/`);
+  return response.data;
+};
+
 // ==================== TAXONOMY APIs ====================
 
 /**
@@ -373,7 +383,9 @@ export const getSubmissionSettings = async (journalId) => {
  * @returns {Promise} API response
  */
 export const updateSubmissionSettings = async ({ journalId, settings }) => {
-  const response = await instance.patch(`journals/journals/${journalId}/`, { settings });
+  const response = await instance.patch(`journals/journals/${journalId}/`, {
+    settings,
+  });
   return response.data;
 };
 
@@ -401,6 +413,8 @@ export const getJournalSubmissions = async (journalId, params = {}) => {
  * @returns {Promise} API response
  */
 export const getJournalStatistics = async (journalId) => {
-  const response = await instance.get(`journals/journals/${journalId}/statistics/`);
+  const response = await instance.get(
+    `journals/journals/${journalId}/statistics/`
+  );
   return response.data;
 };

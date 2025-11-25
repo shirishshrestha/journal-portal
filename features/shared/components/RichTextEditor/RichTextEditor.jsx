@@ -89,8 +89,8 @@ const theme = {
   },
 };
 
-function Placeholder({ placeholder }) {
-  return <div className="editor-placeholder">{placeholder}</div>;
+function Placeholder({ placeholder, className }) {
+  return <div className={`editor-placeholder ${className}`}>{placeholder}</div>;
 }
 
 const editorConfig = {
@@ -147,7 +147,12 @@ export default function RichTextEditor({
           <div className={`editor-wrapper bg-input/30 ${editor_classname}`}>
             <RichTextPlugin
               contentEditable={<ContentEditable className="editor-input" />}
-              placeholder={<Placeholder placeholder={placeholder} />}
+              placeholder={
+                <Placeholder
+                  className="text-muted-foreground"
+                  placeholder={placeholder}
+                />
+              }
               ErrorBoundary={LexicalErrorBoundary}
             />
             <HistoryPlugin />

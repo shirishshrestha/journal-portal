@@ -97,14 +97,18 @@ const columns = [
               </DropdownMenuItem>
             </Link>
 
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => row.onDelete?.(row)}
-              className="text-destructive group hover:text-primary-foreground"
-            >
-              <Trash2 className=" h-4 w-4 text-destructive group-hover:text-primary-foreground" />
-              Delete
-            </DropdownMenuItem>
+            {row.onDelete && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => row.onDelete(row)}
+                  className="text-destructive group hover:text-primary-foreground"
+                >
+                  <Trash2 className=" h-4 w-4 text-destructive group-hover:text-primary-foreground" />
+                  Delete
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -79,12 +79,14 @@ export default function UserManagementPage() {
       {/* Toolbar */}
       <FilterToolbar>
         <FilterToolbar.Search
+          paramName="search"
           value={searchTerm}
           onChange={setSearchTerm}
           placeholder="Search by name or email..."
           label="Search"
         />
         <FilterToolbar.Select
+          paramName={"verification_status"}
           label="Verification Status"
           value={verificationFilter}
           onChange={setVerificationFilter}
@@ -96,6 +98,7 @@ export default function UserManagementPage() {
           ]}
         />
         <FilterToolbar.Select
+          paramName="account_status"
           label="Account Status"
           value={statusFilter}
           onChange={setStatusFilter}

@@ -1,6 +1,8 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "use-debounce";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,6 +32,7 @@ const useFilterToolbarContext = () => {
  * @example
  * <FilterToolbar>
  *   <FilterToolbar.Search
+ *     paramName="search"
  *     value={searchTerm}
  *     onChange={setSearchTerm}
  *     placeholder="Search..."
@@ -60,7 +63,7 @@ export function FilterToolbar({ children, className = "" }) {
 }
 
 /**
- * FilterToolbar.Search - Search input component
+ * FilterToolbar.Search - Search input component with debounced URL params
  */
 FilterToolbar.Search = function FilterToolbarSearch({
   value,
@@ -68,8 +71,40 @@ FilterToolbar.Search = function FilterToolbarSearch({
   placeholder = "Search...",
   label = "Search",
   className = "",
+  paramName = "search",
+  debounceMs = 500,
 }) {
   useFilterToolbarContext(); // Validate context
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [localValue, setLocalValue] = useState(
+    value || searchParams.get(paramName) || ""
+  );
+
+  // Debounce the local value using use-debounce hook
+  const [debouncedValue] = useDebounce(localValue, debounceMs);
+
+  // Update URL when debouncedValue changes
+  useEffect(() => {
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+
+    if (debouncedValue) {
+      params.set(paramName, debouncedValue);
+    } else {
+      params.delete(paramName);
+    }
+
+    router.push(`?${params.toString()}`, { scroll: false });
+
+    onChange?.(debouncedValue);
+  }, [debouncedValue, paramName, router]);
+
+  // Sync external controlled value → local state
+  useEffect(() => {
+    if (value !== undefined && value !== localValue) {
+      setLocalValue(value);
+    }
+  }, [value]);
 
   return (
     <div className={`flex-1 ${className}`}>
@@ -80,8 +115,8 @@ FilterToolbar.Search = function FilterToolbarSearch({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
           className="pl-10"
         />
       </div>
@@ -90,7 +125,7 @@ FilterToolbar.Search = function FilterToolbarSearch({
 };
 
 /**
- * FilterToolbar.Select - Select dropdown component
+ * FilterToolbar.Select - Select dropdown component with URL params
  */
 FilterToolbar.Select = function FilterToolbarSelect({
   value,
@@ -99,8 +134,25 @@ FilterToolbar.Select = function FilterToolbarSelect({
   label,
   placeholder = "Select...",
   className = "",
+  paramName,
 }) {
   useFilterToolbarContext(); // Validate context
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentValue = value || searchParams.get(paramName) || "";
+
+  const handleChange = (newValue) => {
+    if (paramName) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (newValue && newValue !== "all") {
+        params.set(paramName, newValue);
+      } else {
+        params.delete(paramName);
+      }
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
+    if (onChange) onChange(newValue);
+  };
 
   return (
     <div className={`w-full lg:w-40 ${className}`}>
@@ -109,7 +161,7 @@ FilterToolbar.Select = function FilterToolbarSelect({
           {label}
         </label>
       )}
-      <Select value={value} onValueChange={onChange}>
+      <Select value={currentValue} onValueChange={handleChange}>
         <SelectTrigger>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -126,15 +178,32 @@ FilterToolbar.Select = function FilterToolbarSelect({
 };
 
 /**
- * FilterToolbar.DateInput - Date input component
+ * FilterToolbar.DateInput - Date input component with URL params
  */
 FilterToolbar.DateInput = function FilterToolbarDateInput({
   value,
   onChange,
   label = "Date",
   className = "",
+  paramName,
 }) {
   useFilterToolbarContext(); // Validate context
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentValue = value || searchParams.get(paramName) || "";
+
+  const handleChange = (newValue) => {
+    if (paramName) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (newValue) {
+        params.set(paramName, newValue);
+      } else {
+        params.delete(paramName);
+      }
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
+    if (onChange) onChange(newValue);
+  };
 
   return (
     <div className={`w-full lg:w-48 ${className}`}>
@@ -143,15 +212,15 @@ FilterToolbar.DateInput = function FilterToolbarDateInput({
       </label>
       <Input
         type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={currentValue}
+        onChange={(e) => handleChange(e.target.value)}
       />
     </div>
   );
 };
 
 /**
- * FilterToolbar.Input - Generic text input component
+ * FilterToolbar.Input - Generic text input component with URL params
  */
 FilterToolbar.Input = function FilterToolbarInput({
   value,
@@ -160,8 +229,25 @@ FilterToolbar.Input = function FilterToolbarInput({
   placeholder = "",
   type = "text",
   className = "",
+  paramName,
 }) {
   useFilterToolbarContext(); // Validate context
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentValue = value || searchParams.get(paramName) || "";
+
+  const handleChange = (newValue) => {
+    if (paramName) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (newValue) {
+        params.set(paramName, newValue);
+      } else {
+        params.delete(paramName);
+      }
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
+    if (onChange) onChange(newValue);
+  };
 
   return (
     <div className={`w-full lg:w-48 ${className}`}>
@@ -173,8 +259,8 @@ FilterToolbar.Input = function FilterToolbarInput({
       <Input
         type={type}
         placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={currentValue}
+        onChange={(e) => handleChange(e.target.value)}
       />
     </div>
   );

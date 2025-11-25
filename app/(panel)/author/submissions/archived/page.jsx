@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import {
   AuthorSubmissionsTable,
   LoadingScreen,
@@ -13,16 +14,7 @@ import DocumentUploadModal from "@/features/panel/author/components/submission/D
 import DocumentViewModal from "@/features/panel/author/components/submission/DocumentViewModal";
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
 import { useDeleteSubmission } from "@/features/panel/author/hooks/mutation/useDeleteSubmission";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmationPopup } from "@/features/shared";
 
 export default function ArchivedPage() {
   const router = useRouter();
@@ -85,8 +77,9 @@ export default function ArchivedPage() {
           onAddDocuments={handleAddDocuments}
           onViewDocuments={handleViewDocuments}
           onSubmit={handleSubmit}
-          viewUrl={(submission) => `/author/submissions/archived/${submission.id}`}
-          onDelete={handleDelete}
+          viewUrl={(submission) =>
+            `/author/submissions/archived/${submission.id}`
+          }
         />
       </SubmissionsLayout>
 
@@ -103,28 +96,6 @@ export default function ArchivedPage() {
         onOpenChange={setViewModalOpen}
         submissionId={selectedSubmissionId}
       />
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete your submission &quot;
-              {submissionToDelete?.title}&quot;. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </RoleBasedRoute>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import {
   AuthorSubmissionsTable,
   LoadingScreen,
@@ -13,16 +14,7 @@ import DocumentUploadModal from "@/features/panel/author/components/submission/D
 import DocumentViewModal from "@/features/panel/author/components/submission/DocumentViewModal";
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
 import { useDeleteSubmission } from "@/features/panel/author/hooks/mutation/useDeleteSubmission";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmationPopup } from "@/features/shared";
 import { useSubmissionById } from "@/features/panel/author/hooks/query/useGetSubmissionById";
 
 export default function DraftsPage() {
@@ -108,27 +100,20 @@ export default function DraftsPage() {
         submissionId={selectedSubmissionId}
       />
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete your submission &quot;
-              {submissionToDelete?.title}&quot;. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Confirmation Popup */}
+      <ConfirmationPopup
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Submission"
+        description={`Are you sure you want to delete "${submissionToDelete?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={confirmDelete}
+        isPending={deleteSubmissionMutation.isPending}
+        isSuccess={deleteSubmissionMutation.isSuccess}
+        icon={<Trash2 className="h-6 w-6 text-destructive" />}
+      />
     </RoleBasedRoute>
   );
 }

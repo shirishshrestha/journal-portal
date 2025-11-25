@@ -153,7 +153,7 @@ export default function JournalsTable({
               <Settings className="h-4 w-4" /> Settings
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => onDelete(row.id)}
+              onClick={() => onDelete(row)}
               className="gap-2 text-destructive"
             >
               <Trash2 className="h-4 w-4" /> Delete

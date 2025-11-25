@@ -82,6 +82,7 @@ export default function JournalsPage() {
         {/* Toolbar */}
         <FilterToolbar>
           <FilterToolbar.Search
+            paramName="search"
             value={searchTerm}
             onChange={setSearchTerm}
             placeholder="Search by title, short name, or publisher..."
@@ -90,6 +91,7 @@ export default function JournalsPage() {
 
           <FilterToolbar.Select
             label="Status"
+            paramName="status"
             value={activeFilter}
             onChange={setActiveFilter}
             options={[
@@ -101,6 +103,7 @@ export default function JournalsPage() {
 
           <FilterToolbar.Select
             label="Submissions"
+            paramName="submissions"
             value={acceptingFilter}
             onChange={setAcceptingFilter}
             options={[

@@ -14,7 +14,7 @@ export const useAssignReviewers = () => {
     onSuccess: (data) => {
       toast.success("Reviewer assigned successfully!");
       queryClient.invalidateQueries({
-        queryKey: ["admin-submission"],
+        queryKey: ["editor-submission"],
       });
       queryClient.invalidateQueries({
         queryKey: ["journal-submissions"],

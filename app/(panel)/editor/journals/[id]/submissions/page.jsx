@@ -239,12 +239,14 @@ export default function JournalSubmissionsPage() {
           {/* Filters */}
           <FilterToolbar>
             <FilterToolbar.Search
+              paramName="search"
               value={searchTerm}
               onChange={setSearchTerm}
               placeholder="Search by title, number, or author..."
               label="Search Submissions"
             />
             <FilterToolbar.Select
+              paramName="status"
               value={statusFilter}
               onChange={setStatusFilter}
               label="Status"

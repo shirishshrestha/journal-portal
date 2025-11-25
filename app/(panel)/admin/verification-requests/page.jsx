@@ -140,12 +140,14 @@ export default function VerificationsPage() {
       {/* Filters and Search */}
       <FilterToolbar>
         <FilterToolbar.Search
+          paramName="search"
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder="Search by name or email..."
           label="Search"
         />
         <FilterToolbar.Select
+          paramName="status"
           label="Status"
           value={statusFilter}
           onChange={setStatusFilter}

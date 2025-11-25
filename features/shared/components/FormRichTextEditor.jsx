@@ -39,7 +39,7 @@ export default function FormRichTextEditor({
       name={name}
       render={({ field, fieldState }) => (
         <FormItem className={form_classname}>
-          <FormLabel>{label}</FormLabel>
+          {label && <FormLabel>{label}</FormLabel>}
           <FormControl>
             <RichTextEditor
               placeholder={placeholder}

@@ -31,17 +31,8 @@ import {
   DocumentUploadModal,
   useGetSubmissionById,
   DocumentVersionsModal,
+  ConfirmationPopup,
 } from "@/features";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import Link from "next/link";
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -171,7 +162,7 @@ export default function DraftDetailPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-lg border bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 p-6">
+            <div className="rounded-lg border bg-linear-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 p-6">
               <div className="flex items-center gap-3 mb-5">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <FileText className="h-5 w-5 text-primary" />
@@ -516,27 +507,20 @@ export default function DraftDetailPage() {
         documentId={selectedDocumentId}
       />
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete your submission &quot;
-              {submission?.title}&quot;. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteSubmissionMutation.isPending ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Confirmation Popup */}
+      <ConfirmationPopup
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Submission"
+        description={`Are you sure you want to delete "${submission?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleDelete}
+        isPending={deleteSubmissionMutation.isPending}
+        isSuccess={deleteSubmissionMutation.isSuccess}
+        icon={<Trash2 className="h-6 w-6 text-destructive" />}
+      />
     </RoleBasedRoute>
   );
 }
