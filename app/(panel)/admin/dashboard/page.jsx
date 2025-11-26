@@ -20,6 +20,7 @@ import {
   RoleBasedRoute,
   StatsCard,
   StatsErrorCard,
+  SystemHealth,
 } from "@/features";
 import {
   SubmissionStatusChart,
@@ -158,10 +159,13 @@ export default function AdminDashboard() {
       {isPending && <LoadingScreen />}
       <div className="space-y-5 ">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">
-            Admin Dashboard
-          </h1>
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-foreground">
+              Admin Dashboard
+            </h1>
+          </div>
+          <SystemHealth />
         </div>
 
         {/* KPI Cards */}
