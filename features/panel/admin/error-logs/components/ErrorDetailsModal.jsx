@@ -63,9 +63,16 @@ export function ErrorDetailsModal({ issue, open, onOpenChange }) {
                 {getLevelIcon(issue.level)}
                 {issue.level.toUpperCase()}
               </Badge>
-              <Badge variant="outline" className="font-mono">
-                {issue.type}
-              </Badge>
+              {issue.short_id && (
+                <Badge variant="outline" className="font-mono">
+                  {issue.short_id}
+                </Badge>
+              )}
+              {(issue.metadata?.type || issue.type) && (
+                <Badge variant="outline" className="font-mono">
+                  {issue.metadata?.type || issue.type}
+                </Badge>
+              )}
               <Badge
                 variant={issue.status === "resolved" ? "default" : "secondary"}
               >
@@ -81,26 +88,58 @@ export function ErrorDetailsModal({ issue, open, onOpenChange }) {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="font-medium">Type:</span>
-                  <p className="text-muted-foreground">{issue.type}</p>
+                  <p className="text-muted-foreground">
+                    {issue.metadata?.type || issue.type || "N/A"}
+                  </p>
                 </div>
                 <div>
                   <span className="font-medium">Status:</span>
-                  <p className="text-muted-foreground">{issue.status}</p>
+                  <p className="text-muted-foreground">
+                    {issue.status || "unknown"}
+                  </p>
                 </div>
                 <div>
                   <span className="font-medium">Event Count:</span>
-                  <p className="text-muted-foreground">{issue.count}</p>
+                  <p className="text-muted-foreground">{issue.count || 0}</p>
                 </div>
                 <div>
                   <span className="font-medium">Users Affected:</span>
-                  <p className="text-muted-foreground">{issue.userCount}</p>
+                  <p className="text-muted-foreground">
+                    {issue.user_count || issue.userCount || "N/A"}
+                  </p>
                 </div>
-                <div className="col-span-2">
-                  <span className="font-medium">Location:</span>
-                  <code className="block mt-1 bg-muted px-3 py-2 rounded text-xs">
-                    {issue.culprit}
-                  </code>
-                </div>
+                {issue.culprit && (
+                  <div className="col-span-2">
+                    <span className="font-medium">Location:</span>
+                    <code className="block mt-1 bg-muted px-3 py-2 rounded text-xs">
+                      {issue.culprit}
+                    </code>
+                  </div>
+                )}
+                {issue.metadata?.filename && (
+                  <div className="col-span-2">
+                    <span className="font-medium">Filename:</span>
+                    <code className="block mt-1 bg-muted px-3 py-2 rounded text-xs break-all">
+                      {issue.metadata.filename}
+                    </code>
+                  </div>
+                )}
+                {issue.metadata?.function && (
+                  <div className="col-span-2">
+                    <span className="font-medium">Function:</span>
+                    <code className="block mt-1 bg-muted px-3 py-2 rounded text-xs">
+                      {issue.metadata.function}
+                    </code>
+                  </div>
+                )}
+                {issue.project && (
+                  <div className="col-span-2">
+                    <span className="font-medium">Project:</span>
+                    <p className="text-muted-foreground mt-1">
+                      {issue.project.name} ({issue.project.platform})
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -114,14 +153,20 @@ export function ErrorDetailsModal({ issue, open, onOpenChange }) {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">First Seen:</span>
                   <span className="text-muted-foreground">
-                    {format(new Date(issue.firstSeen), "PPpp")}
+                    {format(
+                      new Date(issue.first_seen || issue.firstSeen),
+                      "PPpp"
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">Last Seen:</span>
                   <span className="text-muted-foreground">
-                    {format(new Date(issue.lastSeen), "PPpp")}
+                    {format(
+                      new Date(issue.last_seen || issue.lastSeen),
+                      "PPpp"
+                    )}
                   </span>
                 </div>
               </div>

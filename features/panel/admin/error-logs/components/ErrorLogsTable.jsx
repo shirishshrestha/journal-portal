@@ -198,7 +198,7 @@ export function ErrorLogsTable({ issues, onViewDetails, isPending, error }) {
           variant="ghost"
           size="sm"
           onClick={() => onViewDetails(row)}
-          className="text-primary hover:text-primary/80"
+          className=""
         >
           <Eye className="h-4 w-4 mr-1" />
           View

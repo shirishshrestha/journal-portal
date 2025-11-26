@@ -142,7 +142,7 @@ export default function ReviewerAssignmentsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 ">
               {recentAssignments.map((assignment) => (
                 <div
                   key={assignment.id}
@@ -151,7 +151,7 @@ export default function ReviewerAssignmentsPage() {
                     if (assignment.status === "PENDING") {
                       router.push("/reviewer/assignments/pending");
                     } else if (assignment.status === "ACCEPTED") {
-                      router.push(`/reviewer/review/${assignment.id}`);
+                      router.push(`/reviewer/assignments/accepted`);
                     } else if (assignment.status === "COMPLETED") {
                       router.push("/reviewer/assignments/completed");
                     } else {
@@ -203,6 +203,7 @@ export default function ReviewerAssignmentsPage() {
                         Overdue
                       </span>
                     )}
+                    <p className="text-sm text-muted-foreground">View All</p>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>
