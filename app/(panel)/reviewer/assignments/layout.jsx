@@ -11,26 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetReviewAssignments } from "@/features/panel/reviewer/hooks/query/useGetReviewAssignments";
+import { StatsCard, useGetMyAnalytics } from "@/features";
+import { AlertCircle, CheckCircle2, Clock } from "lucide-react";
 
 export default function AssignmentsLayout({ children }) {
   const pathname = usePathname();
-  const { data: assignmentsData, isPending: isAssignmentDataPending } =
-    useGetReviewAssignments();
 
-  // Extract assignments array
-  const assignments = Array.isArray(assignmentsData)
-    ? assignmentsData
-    : assignmentsData?.results || [];
-
-  // Filter assignments by status
-  const pendingCount =
-    assignments?.filter((a) => a.status === "PENDING").length || 0;
-  const acceptedCount =
-    assignments?.filter((a) => a.status === "ACCEPTED").length || 0;
-  const completedCount =
-    assignments?.filter((a) => a.status === "COMPLETED").length || 0;
-  const declinedCount =
-    assignments?.filter((a) => a.status === "DECLINED").length || 0;
+  const { data: analytics, isPending, error, refetch } = useGetMyAnalytics();
+  const reviewerStats = analytics?.reviewer_stats || {};
 
   // Determine active tab from pathname
   const getActiveTab = () => {
@@ -53,46 +41,39 @@ export default function AssignmentsLayout({ children }) {
 
       {/* Stats Summary */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Link href="/reviewer/assignments/pending">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardDescription>Pending</CardDescription>
-              <CardTitle className="text-3xl">
-                {isAssignmentDataPending ? "..." : pendingCount}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </Link>
-        <Link href="/reviewer/assignments/accepted">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardDescription>Accepted</CardDescription>
-              <CardTitle className="text-3xl">
-                {isAssignmentDataPending ? "..." : acceptedCount}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </Link>
-        <Link href="/reviewer/assignments/completed">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardDescription>Completed</CardDescription>
-              <CardTitle className="text-3xl">
-                {isAssignmentDataPending ? "..." : completedCount}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </Link>
-        <Link href="/reviewer/assignments/declined">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardDescription>Declined</CardDescription>
-              <CardTitle className="text-3xl">
-                {isAssignmentDataPending ? "..." : declinedCount}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </Link>
+        {/* Stats Cards */}
+        <StatsCard
+          icon={Clock}
+          title="Pending Invitations"
+          value={reviewerStats.pending || 0}
+          iconClass="text-yellow-500"
+          valueClass="text-foreground"
+          isLoading={isPending}
+        />
+        <StatsCard
+          icon={CheckCircle2}
+          title="Accepted Reviews"
+          value={reviewerStats.accepted || 0}
+          iconClass="text-blue-500"
+          valueClass="text-foreground"
+          isLoading={isPending}
+        />
+        <StatsCard
+          icon={Clock}
+          title="Completed Reviews"
+          value={reviewerStats.completed || 0}
+          iconClass="text-green-500"
+          valueClass="text-foreground"
+          isLoading={isPending}
+        />
+        <StatsCard
+          icon={AlertCircle}
+          title="Overdue Reviews"
+          value={reviewerStats.overdue || 0}
+          iconClass="text-red-500"
+          valueClass="text-foreground"
+          isLoading={isPending}
+        />
       </div>
 
       {/* Navigation Tabs */}
@@ -103,22 +84,22 @@ export default function AssignmentsLayout({ children }) {
           </Link>
           <Link href="/reviewer/assignments/pending">
             <TabsTrigger value="pending">
-              Pending ({isAssignmentDataPending ? "..." : pendingCount})
+              Pending ({isPending ? "..." : reviewerStats.pending})
             </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/accepted">
             <TabsTrigger value="accepted">
-              Accepted ({isAssignmentDataPending ? "..." : acceptedCount})
+              Accepted ({isPending ? "..." : reviewerStats.accepted})
             </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/completed">
             <TabsTrigger value="completed">
-              Completed ({isAssignmentDataPending ? "..." : completedCount})
+              Completed ({isPending ? "..." : reviewerStats.completed})
             </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/declined">
             <TabsTrigger value="declined">
-              Declined ({isAssignmentDataPending ? "..." : declinedCount})
+              Declined ({isPending ? "..." : reviewerStats.declined})
             </TabsTrigger>
           </Link>
         </TabsList>

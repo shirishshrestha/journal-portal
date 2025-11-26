@@ -207,7 +207,7 @@ export function VerificationDetailsModal({
                     Supporting Letter
                   </h3>
                 </div>
-                <ScrollArea className="min-h-80 max-h-[500px] overflow-y-auto  w-full rounded border bg-muted/30 p-4">
+                <ScrollArea className="min-h-80 max-h-[500px] overflow-y-auto w-full rounded border bg-muted/30 p-4">
                   {/* <p className="text-sm leading-relaxed whitespace-pre-line">
                     {verification.supporting_letter}
                   </p> */}

@@ -10,6 +10,7 @@ export const useSubmitForReview = () => {
     onSuccess: (data) => {
       toast.success("Submission submitted for review successfully!");
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["submission"] });
       queryClient.invalidateQueries({ queryKey: ["my-analytics"] });
     },
     onError: (error) => {

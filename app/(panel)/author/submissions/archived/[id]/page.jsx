@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useGetReviewerRecommendations } from "@/features/panel/author/hooks/query/useGetReviewerRecommendations";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -12,15 +11,13 @@ import {
   SubmissionDetailsCard,
   SubmissionDocumentsCard,
   CoAuthorsCard,
-  ReviewerRecommendationsCard,
   DocumentVersionsModal,
 } from "@/features";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter as useNextRouter } from "next/navigation";
 
-export default function UnassignedDetailPage() {
+export default function ArchivedDetailPage() {
   const params = useParams();
-  const router = useNextRouter();
+  const router = useRouter();
   const submissionId = params.id;
 
   const [versionsDialogOpen, setVersionsDialogOpen] = useState(false);
@@ -31,16 +28,6 @@ export default function UnassignedDetailPage() {
     isPending,
     error,
   } = useGetSubmissionById(submissionId);
-
-  // Get review type from journal settings, fallback to submission review_type
-  const reviewType =
-    submission?.journal?.settings?.review_type || submission?.review_type;
-
-  const {
-    data: recommendations,
-    isPending: isRecommendationsPending,
-    error: recommendationsError,
-  } = useGetReviewerRecommendations(submissionId);
 
   const handleViewVersions = (documentId) => {
     setSelectedDocumentId(documentId);
@@ -58,10 +45,10 @@ export default function UnassignedDetailPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push("/author/submissions/unassigned")}
+            onClick={() => router.push("/author/submissions/archived")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Unassigned
+            Back to Archived Submissions
           </Button>
         </div>
         <Card>
@@ -82,10 +69,10 @@ export default function UnassignedDetailPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push("/author/submissions/unassigned")}
+              onClick={() => router.push("/author/submissions/archived")}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Unassigned
+              Back to Archived Submissions
             </Button>
           </div>
         </div>
@@ -93,7 +80,7 @@ export default function UnassignedDetailPage() {
         {/* Submission Details Card */}
         <SubmissionDetailsCard submission={submission} />
 
-        {/* Documents Card */}
+        {/* Documents Card - Read-only */}
         <SubmissionDocumentsCard
           submission={submission}
           onViewVersions={handleViewVersions}
@@ -102,14 +89,6 @@ export default function UnassignedDetailPage() {
 
         {/* Co-authors Card */}
         <CoAuthorsCard authorContributions={submission?.author_contributions} />
-
-        {/* Recommended Reviewers Card */}
-        <ReviewerRecommendationsCard
-          recommendations={recommendations}
-          isLoading={isRecommendationsPending}
-          error={recommendationsError}
-          reviewType={reviewType}
-        />
       </div>
 
       {/* Document Versions Modal */}

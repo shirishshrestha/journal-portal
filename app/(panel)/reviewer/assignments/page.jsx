@@ -10,7 +10,6 @@ import {
   ArrowRight,
   AlertCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -18,41 +17,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ErrorCard } from "@/features";
+import {
+  ErrorCard,
+  useGetMyAnalytics,
+  useGetReviewAssignments,
+} from "@/features";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetReviewAssignments } from "@/features/panel/reviewer/hooks/query/useGetReviewAssignments";
+import { Button } from "@/components/ui/button";
 
 export default function ReviewerAssignmentsPage() {
   const router = useRouter();
 
-  // Fetch assignments
   const {
     data: assignmentsData,
-    isPending,
+    isPending: isAssignmentDataPending,
     error,
-    refetch,
   } = useGetReviewAssignments();
 
-  // Extract and filter assignments
+  // Extract assignments array
   const assignments = Array.isArray(assignmentsData)
     ? assignmentsData
     : assignmentsData?.results || [];
 
-  const pendingCount = assignments.filter((a) => a.status === "PENDING").length;
-  const acceptedCount = assignments.filter(
-    (a) => a.status === "ACCEPTED"
-  ).length;
-  const completedCount = assignments.filter(
-    (a) => a.status === "COMPLETED"
-  ).length;
-  const declinedCount = assignments.filter(
-    (a) => a.status === "DECLINED"
-  ).length;
+  const recentAssignments = assignments.slice(0, 10); // Show up to 10
 
-  // Get recent assignments (last 6)
-  const recentAssignments = assignments.slice(0, 6);
+  const {
+    data: analytics,
+    isPending,
+    error: analyticsError,
+    refetch,
+  } = useGetMyAnalytics();
+  const reviewerStats = analytics?.reviewer_stats || {};
 
-  if (isPending) {
+  if (isAssignmentDataPending) {
     return (
       <div className="space-y-4 mt-6">
         <Skeleton className="h-40 w-full" />
@@ -79,10 +76,12 @@ export default function ReviewerAssignmentsPage() {
 
   return (
     <div className="space-y-6 mt-6">
-      {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader>
+      {/* Recent Assignments */}
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {" "}
+        <Card className="hover:shadow-md transition-shadow flex justify-between gap-4 flex-col md:flex-row">
+          <CardHeader className={"flex-1 gap-0"}>
             <div className="flex items-center gap-3">
               <div className="p-2 bg-amber-100 dark:bg-amber-900 rounded-lg">
                 <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
@@ -90,24 +89,24 @@ export default function ReviewerAssignmentsPage() {
               <div>
                 <CardTitle>Pending Invitations</CardTitle>
                 <CardDescription>
-                  {pendingCount} invitation{pendingCount !== 1 ? "s" : ""}{" "}
-                  awaiting your response
+                  {reviewerStats?.pending} invitation
+                  {reviewerStats?.pending !== 1 ? "s" : ""} awaiting your
+                  response
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <Link href="/reviewer/assignments/pending">
-              <Button className="w-full">
+              <Button className="">
                 View Pending
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </CardContent>
         </Card>
-
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader>
+        <Card className="hover:shadow-md transition-shadow flex justify-between gap-4 flex-col md:flex-row">
+          <CardHeader className={"flex-1 gap-0"}>
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
                 <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -115,15 +114,15 @@ export default function ReviewerAssignmentsPage() {
               <div>
                 <CardTitle>Accepted Reviews</CardTitle>
                 <CardDescription>
-                  {acceptedCount} review{acceptedCount !== 1 ? "s" : ""} in
-                  progress
+                  {reviewerStats?.accepted} review
+                  {reviewerStats?.accepted !== 1 ? "s" : ""} in progress
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <Link href="/reviewer/assignments/accepted">
-              <Button className="w-full">
+              <Button className="">
                 Continue Reviews
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -131,16 +130,13 @@ export default function ReviewerAssignmentsPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Activity */}
-      {recentAssignments.length > 0 && (
+      {recentAssignments.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>Recent Assignments</CardTitle>
-            <CardDescription>
-              Your latest review assignments across all statuses
-            </CardDescription>
+            <CardDescription>Your latest review assignments</CardDescription>
           </CardHeader>
+
           <CardContent>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 ">
               {recentAssignments.map((assignment) => (
@@ -211,10 +207,7 @@ export default function ReviewerAssignmentsPage() {
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {/* Empty State */}
-      {assignments.length === 0 && (
+      ) : (
         <Card>
           <CardContent className="pt-6 text-center py-12">
             <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

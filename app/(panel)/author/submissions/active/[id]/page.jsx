@@ -2,26 +2,8 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  ArrowLeft,
-  FileText,
-  Upload,
-  Calendar,
-  User,
-  Edit,
-  Send,
-} from "lucide-react";
-import { format } from "date-fns";
+import { ArrowLeft, Send } from "lucide-react";
 import {
   RoleBasedRoute,
   LoadingScreen,
@@ -30,8 +12,12 @@ import {
   statusConfig,
   StatusBadge,
   useSubmitForReview,
+  SubmissionDetailsCard,
+  SubmissionDocumentsCard,
+  CoAuthorsCard,
+  DocumentVersionsModal,
 } from "@/features";
-import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function ActiveDetailPage() {
   const params = useParams();
@@ -39,6 +25,8 @@ export default function ActiveDetailPage() {
   const submissionId = params.id;
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [versionsDialogOpen, setVersionsDialogOpen] = useState(false);
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
 
   const {
     data: submission,
@@ -53,6 +41,15 @@ export default function ActiveDetailPage() {
         router.push("/author/submissions/active");
       },
     });
+  };
+
+  const handleUpload = () => {
+    setUploadModalOpen(true);
+  };
+
+  const handleViewVersions = (documentId) => {
+    setSelectedDocumentId(documentId);
+    setVersionsDialogOpen(true);
   };
 
   if (isSubmissionPending) {
@@ -117,182 +114,26 @@ export default function ActiveDetailPage() {
           )}
         </div>
 
-        {/* Submission Details */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <CardTitle className="text-2xl">{submission?.title}</CardTitle>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Created {format(new Date(submission?.created_at), "PPP")}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    {submission?.corresponding_author_name}
-                  </div>
-                </div>
-              </div>
-              <StatusBadge
-                status={submission?.status}
-                statusConfig={statusConfig}
-              />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Journal</h3>
-              <p className="text-muted-foreground">
-                {submission?.journal.title}
-              </p>
-            </div>
+        {/* Submission Details Card */}
+        <SubmissionDetailsCard submission={submission} />
 
-            <Separator />
+        {/* Documents Card */}
+        <SubmissionDocumentsCard
+          submission={submission}
+          onUpload={
+            submission?.status === "REVISION_REQUIRED" ? handleUpload : null
+          }
+          onViewVersions={handleViewVersions}
+          editBasePath={
+            submission?.status === "REVISION_REQUIRED"
+              ? "/author/submissions/active"
+              : null
+          }
+          isEditable={true}
+        />
 
-            <div>
-              <h3 className="font-semibold mb-2">Abstract</h3>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {submission?.abstract}
-              </p>
-            </div>
-
-            {submission?.metadata_json?.keywords && (
-              <>
-                <Separator />
-                <div>
-                  <h3 className="font-semibold mb-2">Keywords</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {submission.metadata_json.keywords.map((keyword, index) => (
-                      <Badge key={index} variant="outline">
-                        {keyword}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Documents Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Documents</CardTitle>
-                <CardDescription>
-                  Manage manuscript files and supporting documents
-                </CardDescription>
-              </div>
-              {submission?.status === "REVISION_REQUIRED" && (
-                <Button
-                  onClick={() => setUploadModalOpen(true)}
-                  className="gap-2"
-                >
-                  <Upload className="h-4 w-4" />
-                  Upload Document
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {!submission?.documents || submission.documents.length === 0 ? (
-              <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="font-semibold mb-2">No documents uploaded</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Upload your manuscript and supporting documents to submit for
-                  review
-                </p>
-                <Button
-                  onClick={() => setUploadModalOpen(true)}
-                  className="gap-2"
-                >
-                  <Upload className="h-4 w-4" />
-                  Upload First Document
-                </Button>
-              </div>
-            ) : (
-              <div className=" grid grid-cols-1 md:grid-cols-2  gap-4">
-                {submission.documents.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-6 w-6 text-primary stroke-[1.5px]" />
-                      <div>
-                        <p className="font-medium">{doc.title}</p>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <span>{doc.document_type_display}</span>
-                          <span>•</span>
-                          <span>{doc.file_name}</span>
-                          {doc.file_size && (
-                            <>
-                              <span>•</span>
-                              <span>
-                                {(doc.file_size / 1024 / 1024).toFixed(2)} MB
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {submission?.status === "REVISION_REQUIRED" && (
-                      <div className="flex gap-2">
-                        <Link
-                          href={`/author/submissions/active/${submissionId}/editor/${doc.id}`}
-                        >
-                          <Button
-                            variant="outline"
-                            className={"font-medium"}
-                            size="sm"
-                          >
-                            <Edit className="h-4 w-4 mr-1 stroke-[1.5px]" />
-                            Edit
-                          </Button>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Co-authors Section */}
-        {submission?.author_contributions &&
-          submission.author_contributions.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Co-authors</CardTitle>
-                <CardDescription>
-                  Authors contributing to this manuscript
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {submission.author_contributions.map((author, index) => (
-                    <div
-                      key={author.id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
-                    >
-                      <div>
-                        <p className="font-medium">
-                          {author.profile?.display_name || "Unknown Author"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {author.contrib_role_display} • Order: {author.order}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+        {/* Co-authors Card */}
+        <CoAuthorsCard authorContributions={submission?.author_contributions} />
       </div>
 
       {/* Document Upload Modal */}
@@ -300,6 +141,13 @@ export default function ActiveDetailPage() {
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         submissionId={submissionId}
+      />
+
+      {/* Document Versions Modal */}
+      <DocumentVersionsModal
+        open={versionsDialogOpen}
+        onOpenChange={setVersionsDialogOpen}
+        documentId={selectedDocumentId}
       />
     </RoleBasedRoute>
   );
