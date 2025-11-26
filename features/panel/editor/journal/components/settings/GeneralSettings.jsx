@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useQueryClient } from "@tanstack/react-query";
 
 const generalSettingsSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -73,6 +74,8 @@ export function GeneralSettings({ journal }) {
     },
   });
 
+  const queryClient = useQueryClient();
+
   // Update form when journal data changes
   useEffect(() => {
     if (journal) {
@@ -94,6 +97,7 @@ export function GeneralSettings({ journal }) {
   const updateJournalMutation = useUpdateJournal({
     onSuccess: () => {
       toast.success("General settings saved successfully");
+      queryClient.invalidateQueries({ queryKey: ["journals"] });
     },
     onError: (error) => {
       toast.error(`Failed to save settings: ${error.message}`);

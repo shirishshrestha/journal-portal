@@ -157,7 +157,8 @@ export function AssignmentCard({
           )}
           {(assignment?.status === "ACCEPTED" ||
             (assignment?.status === "COMPLETED" &&
-              assignment?.submission_details.status === "REVISED")) && (
+              (assignment?.submission_details.status === "REVISED" ||
+                assignment?.submission_details.status === "UNDER_REVIEW"))) && (
             <Button
               size="sm"
               onClick={() => handleViewSubmission(assignment)}

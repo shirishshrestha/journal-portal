@@ -21,10 +21,17 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { LoadingScreen, ErrorCard, DecisionBadge } from "@/features/shared";
+import {
+  LoadingScreen,
+  ErrorCard,
+  DecisionBadge,
+  StatusBadge,
+  statusConfig,
+} from "@/features/shared";
 import { reviewRecommendationConfig } from "@/features";
 import { useGetSubmissionReviews } from "@/features/panel/editor/submission/hooks/useGetSubmissionReviews";
 import { useGetEditorSubmissionById } from "@/features/panel/editor/submission";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function SubmissionReviewsPage() {
   const params = useParams();
@@ -142,7 +149,10 @@ export default function SubmissionReviewsPage() {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>
-              <Badge>{submission?.status_display || submission?.status}</Badge>
+              <StatusBadge
+                status={submission?.status}
+                statusConfig={statusConfig}
+              />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total Reviews</p>
@@ -307,9 +317,14 @@ export default function SubmissionReviewsPage() {
                 {/* Review Text Preview */}
                 <div>
                   <p className="text-sm font-semibold mb-2">Review Summary</p>
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {review.review_text || "No review text provided."}
-                  </p>
+                  <ScrollArea className="min-h-[100px] max-h-[500px] w-full rounded border bg-muted/30 p-4">
+                    <div
+                      className="text-sm text-muted-foreground line-clamp-3"
+                      dangerouslySetInnerHTML={{
+                        __html: review.review_text,
+                      }}
+                    />
+                  </ScrollArea>
                 </div>
 
                 {/* View Details Button */}

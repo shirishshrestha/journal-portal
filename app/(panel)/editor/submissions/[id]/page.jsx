@@ -43,6 +43,7 @@ import {
   decisionTypeConfig,
   reviewRecommendationConfig,
 } from "@/features";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 export default function AdminSubmissionDetailPage() {
   const params = useParams();
@@ -206,11 +207,15 @@ export default function AdminSubmissionDetailPage() {
             <p className="text-muted-foreground">{submission.journal.title}</p>
           </div>
 
-          <div>
+          {/* Abstract */}
+          <div className="col-span-2">
             <h3 className="font-semibold mb-2">Abstract</h3>
-            <p className="text-muted-foreground whitespace-pre-wrap">
-              {submission.abstract}
-            </p>
+            <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded border bg-muted/30 p-4">
+              <div
+                dangerouslySetInnerHTML={{ __html: submission?.abstract }}
+                className="text-muted-foreground whitespace-pre-wrap"
+              />
+            </ScrollArea>
           </div>
 
           {submission.metadata_json?.keywords && (

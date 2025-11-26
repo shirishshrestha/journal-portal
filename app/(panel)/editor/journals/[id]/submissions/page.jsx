@@ -27,6 +27,7 @@ import {
   useGetJournalById,
   useGetJournalSubmissions,
 } from "@/features/panel/admin/journal";
+import { JournalInfoCard } from "@/features";
 
 export default function JournalSubmissionsPage() {
   const params = useParams();
@@ -199,36 +200,7 @@ export default function JournalSubmissionsPage() {
             <CardTitle>Journal Information</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Short Name</p>
-                <p className="font-medium">{journal?.short_name}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Publisher</p>
-                <p className="font-medium">{journal?.publisher || "-"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Total Submissions
-                </p>
-                <p className="font-medium text-2xl">
-                  {filteredSubmissions.length}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Status</p>
-                <Badge
-                  className={
-                    journal?.is_active
-                      ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100"
-                      : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100"
-                  }
-                >
-                  {journal?.is_active ? "Active" : "Inactive"}
-                </Badge>
-              </div>
-            </div>
+            <JournalInfoCard journal={journal} />
           </CardContent>
         </Card>
 

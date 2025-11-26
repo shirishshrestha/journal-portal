@@ -389,17 +389,15 @@ export default function ToolbarPlugin() {
   const formatBulletList = () => {
     if (blockType !== "ul") {
       editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
-    } else {
-      editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
     }
+    // Don't remove list, allow switching between list types
   };
 
   const formatNumberedList = () => {
     if (blockType !== "ol") {
       editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
-    } else {
-      editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
     }
+    // Don't remove list, allow switching between list types
   };
 
   const formatQuote = () => {
@@ -459,6 +457,29 @@ export default function ToolbarPlugin() {
         aria-label="Redo"
       >
         <Redo className="h-4 w-4" />
+      </Button>
+      <Divider />
+      {/* Bullet List Button */}
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={formatBulletList}
+        className={`toolbar-item ${blockType === "ul" ? "active" : ""}`}
+        aria-label="Bullet List"
+      >
+        <List className="h-4 w-4" />
+      </Button>
+      {/* Numbered List Button */}
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={formatNumberedList}
+        className={`toolbar-item ${blockType === "ol" ? "active" : ""}`}
+        aria-label="Numbered List"
+      >
+        <ListOrdered className="h-4 w-4" />
       </Button>
       <Divider />
       <Select

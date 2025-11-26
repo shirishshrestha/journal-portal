@@ -31,6 +31,7 @@ import {
   reviewRecommendationConfig,
   FormRichTextEditor,
 } from "@/features";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const decisionSchema = z.object({
   decision_type: z.enum(
@@ -226,9 +227,16 @@ export default function EditorialDecisionForm({
                   <h5 className="text-sm font-semibold mb-2">
                     Detailed Review
                   </h5>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {reviews[0].review_text}
-                  </p>
+                  <div className="col-span-2">
+                    <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded border bg-muted/30 p-4">
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: reviews[0].review_text,
+                        }}
+                        className="text-muted-foreground whitespace-pre-wrap"
+                      />
+                    </ScrollArea>
+                  </div>
                 </div>
 
                 {reviews[0].confidential_comments && (
@@ -239,7 +247,14 @@ export default function EditorialDecisionForm({
                         Confidential Comments (For Editor Only)
                       </h5>
                       <p className="text-sm text-yellow-900 dark:text-yellow-200 whitespace-pre-wrap">
-                        {reviews[0].confidential_comments}
+                        <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded border border-yellow-200 dark:border-yellow-800 text-yellow-900 dark:text-yellow-200 p-4">
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: reviews[0].confidential_comments,
+                            }}
+                            className="text-muted-foreground whitespace-pre-wrap"
+                          />
+                        </ScrollArea>
                       </p>
                     </div>
                   </>

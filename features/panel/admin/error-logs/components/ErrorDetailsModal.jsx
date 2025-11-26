@@ -203,7 +203,7 @@ export function ErrorDetailsModal({ issue, open, onOpenChange }) {
 
             {/* Action Button */}
             <div className="pt-4">
-              <Button asChild className="gap-2">
+              <Button asChild size={"sm"} className="gap-2">
                 <a
                   href={issue.permalink}
                   target="_blank"

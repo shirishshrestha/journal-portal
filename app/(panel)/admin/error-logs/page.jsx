@@ -13,7 +13,6 @@ import {
 import {
   ErrorLogsTable,
   ErrorDetailsModal,
-  ErrorStatsCards,
   ErrorFilters,
 } from "@/features/panel/admin/error-logs";
 import {
@@ -21,6 +20,7 @@ import {
   useSentryIssues,
 } from "@/features/panel/admin/error-logs/hooks/useSentry";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoadingScreen } from "@/features";
 
 export default function ErrorLogsPage() {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -40,9 +40,14 @@ export default function ErrorLogsPage() {
   // Auto-select first project when projects load
   useEffect(() => {
     if (projectsData?.results?.length > 0 && !selectedProject) {
-      setSelectedProject(projectsData.results[0].slug);
+      // Use setTimeout to defer state update and avoid cascading renders
+      const timeoutId = setTimeout(() => {
+        setSelectedProject(projectsData.results[0].slug);
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
     }
-  }, [projectsData, selectedProject]);
+  }, [projectsData?.results, selectedProject]);
 
   // Fetch issues for selected project
   const {
@@ -55,7 +60,7 @@ export default function ErrorLogsPage() {
     limit: 100,
   });
 
-  const issues = issuesData?.results || [];
+  const issues = useMemo(() => issuesData?.results || [], [issuesData]);
 
   // Filter issues by level (client-side filtering)
   const filteredIssues = useMemo(() => {
@@ -85,6 +90,7 @@ export default function ErrorLogsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
+      {isLoading && <LoadingScreen />}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Error Monitoring</h1>

@@ -64,11 +64,8 @@ export default function ProfileInfoCard({
             <p className="text-sm font-medium text-muted-foreground">ORCID</p>
             <p className="text-sm">{profileData.orcid_id || "-"}</p>
           </div>
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">Bio</p>
-            <p className="text-sm">{profileData.bio || "-"}</p>
-          </div>
-          <div className="space-y-1">
+
+          <div className="space-y-1 col-span-1 md:col-span-2">
             <p className="text-sm font-medium text-muted-foreground">
               Expertise Areas
             </p>
@@ -78,6 +75,15 @@ export default function ProfileInfoCard({
                 ? profileData.expertise_areas.join(", ")
                 : "-"}
             </p>
+          </div>
+          <div className="space-y-1 col-span-1 md:col-span-2">
+            <p className="text-sm font-medium text-muted-foreground">Bio</p>
+            <p
+              className="text-sm"
+              dangerouslySetInnerHTML={{
+                __html: profileData.bio || "<p>No Bio</p>",
+              }}
+            />
           </div>
         </div>
       </CardContent>

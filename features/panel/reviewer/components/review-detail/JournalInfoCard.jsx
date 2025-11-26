@@ -1,12 +1,33 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { FileText } from "lucide-react";
 import { format } from "date-fns";
 
 export function JournalInfoCard({ journal }) {
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+
   if (!journal) return null;
+
+  // Helper to get plain text preview from HTML
+  const getDescriptionPreview = (html, maxLength = 150) => {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    const text = div.textContent || div.innerText || "";
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
+  };
 
   return (
     <>
@@ -163,12 +184,37 @@ export function JournalInfoCard({ journal }) {
           <span className="font-medium text-foreground/80 block mb-2">
             Description:
           </span>
-          <div
-            dangerouslySetInnerHTML={{ __html: journal.description }}
-            className="text-muted-foreground text-sm leading-relaxed pl-4 border-l-2 border-primary/30 italic"
-          />
+          <div className="flex flex-col gap-2">
+            <p className="text-muted-foreground text-sm leading-relaxed pl-4 border-l-2 border-primary/30 italic">
+              {getDescriptionPreview(journal.description)}
+            </p>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() => setShowDescriptionModal(true)}
+              className="self-start pl-4"
+            >
+              View More
+            </Button>
+          </div>
         </div>
       )}
+      {/* Description Modal */}
+      <Dialog
+        open={showDescriptionModal}
+        onOpenChange={setShowDescriptionModal}
+      >
+        <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Journal Description</DialogTitle>
+            <DialogDescription>{journal.title}</DialogDescription>
+          </DialogHeader>
+          <div
+            dangerouslySetInnerHTML={{ __html: journal.description }}
+            className="text-sm leading-relaxed mt-4"
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

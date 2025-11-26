@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useToggle } from "@/features/shared/hooks/useToggle";
+import { useSearchParams } from "next/navigation";
 import { FilterToolbar } from "@/features/shared";
 import {
   ConfirmationPopup,
@@ -18,6 +18,16 @@ import { toast } from "sonner";
 export default function UserManagementPage() {
   const queryClient = useQueryClient();
 
+  const searchParams = useSearchParams();
+  const statusParam = searchParams.get("account_status");
+  const verificationParam = searchParams.get("verification_status");
+  const searchParam = searchParams.get("search");
+  const is_active = statusParam === "active" ? true : false;
+  const params = {
+    is_active: is_active,
+  };
+  console.log("data", statusParam, verificationParam, searchParam);
+
   const {
     data: users,
     isPending: isUsersDataPending,
@@ -32,6 +42,7 @@ export default function UserManagementPage() {
   const [userIdToDelete, setUserIdToDelete] = useState(null);
   const [userNameToDelete, setUserNameToDelete] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   const toggleDeleteDialog = () =>
     setDeleteDialogOpen((prevState) => !prevState);
 
@@ -92,7 +103,7 @@ export default function UserManagementPage() {
           onChange={setVerificationFilter}
           options={[
             { value: "all", label: "All" },
-            { value: "VERIFIED", label: "Verified" },
+            { value: "GENUINE", label: "Genuine" },
             { value: "PENDING", label: "Pending" },
             { value: "REJECTED", label: "Rejected" },
           ]}
