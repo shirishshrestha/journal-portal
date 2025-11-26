@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { FormRichTextEditor, FormInputField } from "@/features";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
@@ -177,12 +178,11 @@ export function GeneralSettings({ journal }) {
                   <FormItem>
                     <FormLabel>ISSN Print</FormLabel>
                     <FormControl>
-                      <input
+                      <Input
                         {...field}
                         type="text"
                         placeholder="1234-5678"
                         maxLength={9}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         onChange={(e) => {
                           let value = e.target.value.replace(/[^0-9]/g, "");
                           if (value.length > 4) {
@@ -203,12 +203,11 @@ export function GeneralSettings({ journal }) {
                   <FormItem>
                     <FormLabel>ISSN Online</FormLabel>
                     <FormControl>
-                      <input
+                      <Input
                         {...field}
                         type="text"
                         placeholder="1234-5678"
                         maxLength={9}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         onChange={(e) => {
                           let value = e.target.value.replace(/[^0-9]/g, "");
                           if (value.length > 4) {
@@ -233,7 +232,7 @@ export function GeneralSettings({ journal }) {
               Journal&apos;s website and contact details
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <FormInputField
               control={form.control}
               name="website_url"

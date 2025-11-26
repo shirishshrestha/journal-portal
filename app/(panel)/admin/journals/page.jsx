@@ -3,13 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import {
   AdminJournalsTable,
   JournalDetailsDrawer,
   useGetJournals,
+  useDeleteJournal,
 } from "@/features";
-import { FilterToolbar, RoleBasedRoute } from "@/features/shared";
+import {
+  FilterToolbar,
+  RoleBasedRoute,
+  ConfirmationPopup,
+} from "@/features/shared";
 
 export default function JournalsPage() {
   const router = useRouter();
@@ -22,12 +27,16 @@ export default function JournalsPage() {
   const [selectedJournal, setSelectedJournal] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [journalToDelete, setJournalToDelete] = useState(null);
 
   const {
     data: JournalData,
     isPending: isJournalDataPending,
     error: JournalDataError,
   } = useGetJournals();
+
+  const deleteJournalMutation = useDeleteJournal();
 
   const itemsPerPage = 10;
 
@@ -44,9 +53,20 @@ export default function JournalsPage() {
     setIsFormOpen(false);
   };
 
-  const handleDelete = (id) => {
-    console.log("Delete journal:", id);
-    // TODO: Implement delete API call
+  const handleDelete = (journal) => {
+    setJournalToDelete(journal);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (journalToDelete) {
+      deleteJournalMutation.mutate(journalToDelete.id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setJournalToDelete(null);
+        },
+      });
+    }
   };
 
   const journals = JournalData?.results || [];
@@ -69,14 +89,6 @@ export default function JournalsPage() {
               Manage all academic journals and their submission settings.
             </p>
           </div>
-          <Button
-            variant="secondary"
-            onClick={() => setIsFormOpen(true)}
-            className="gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Create Journal
-          </Button>
         </div>
 
         {/* Toolbar */}
@@ -165,6 +177,21 @@ export default function JournalsPage() {
           journal={selectedJournal}
           isOpen={isDetailsOpen}
           onClose={() => setIsDetailsOpen(false)}
+        />
+
+        {/* Delete Confirmation Popup */}
+        <ConfirmationPopup
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          title="Delete Journal"
+          description={`Are you sure you want to delete "${journalToDelete?.title}"? This action cannot be undone and will remove all associated data.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+          onConfirm={confirmDelete}
+          isPending={deleteJournalMutation.isPending}
+          isSuccess={deleteJournalMutation.isSuccess}
+          icon={<Trash2 className="h-6 w-6 text-destructive" />}
         />
       </div>
     </RoleBasedRoute>
