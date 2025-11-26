@@ -17,7 +17,9 @@ import {
   Inbox,
   Book,
   AlertTriangle,
+  Bug,
 } from "lucide-react";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 
 // Sidebar configuration for each role
 export const sidebarConfig = {
@@ -231,6 +233,11 @@ export const sidebarConfig = {
       name: "Anomaly Detection",
       path: "/admin/anomaly-detection",
       icon: AlertTriangle,
+    },
+    {
+      name: "Error Logs",
+      path: "/admin/error-logs",
+      icon: Bug,
     },
     {
       name: "Settings",

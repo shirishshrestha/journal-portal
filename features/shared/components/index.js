@@ -20,6 +20,7 @@ import StatusBadge from "./StatusBadge";
 import DecisionBadge from "./DecisionBadge";
 import { RichTextEditor } from "./RichTextEditor";
 import FormRichTextEditor from "./FormRichTextEditor";
+import { SystemHealth } from "./SystemHealth";
 export * from "./charts";
 
 export {
@@ -45,4 +46,5 @@ export {
   DecisionBadge,
   RichTextEditor,
   FormRichTextEditor,
+  SystemHealth,
 };
