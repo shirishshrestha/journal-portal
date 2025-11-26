@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,23 +35,23 @@ export function SubmissionSettings({ journalId }) {
     // Submission Guidelines
     submission_guidelines: "",
     author_guidelines: "",
-    
+
     // Review Process
     review_type: "DOUBLE_BLIND",
     min_reviewers: 2,
     review_deadline_days: 21,
-    
+
     // File Requirements
     max_file_size_mb: 25,
     allowed_file_types: "pdf,docx,tex",
     require_cover_letter: true,
     require_conflict_of_interest: true,
-    
+
     // Publication
     publication_frequency: "MONTHLY",
     article_processing_charge: "",
     apc_currency: "USD",
-    
+
     // Additional Settings
     allow_preprints: true,
     require_data_availability: false,
@@ -55,7 +61,7 @@ export function SubmissionSettings({ journalId }) {
   // Update form when journal data loads
   useEffect(() => {
     if (journal?.settings) {
-      setFormData(prev => ({ ...prev, ...journal.settings }));
+      setFormData((prev) => ({ ...prev, ...journal.settings }));
     }
   }, [journal]);
 
@@ -113,12 +119,17 @@ export function SubmissionSettings({ journalId }) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="submission_guidelines">General Submission Guidelines</Label>
+            <Label htmlFor="submission_guidelines">
+              General Submission Guidelines
+            </Label>
             <Textarea
               id="submission_guidelines"
               value={formData.submission_guidelines}
               onChange={(e) =>
-                setFormData({ ...formData, submission_guidelines: e.target.value })
+                setFormData({
+                  ...formData,
+                  submission_guidelines: e.target.value,
+                })
               }
               rows={5}
               placeholder="Enter general guidelines for manuscript submission..."
@@ -138,6 +149,135 @@ export function SubmissionSettings({ journalId }) {
             />
           </div>
         </CardContent>
+        {/* Submission Requirements (Array) */}
+        <CardHeader>
+          <CardTitle>Submission Requirements</CardTitle>
+          <CardDescription>
+            List terms and conditions for submissions
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Label>Submission Requirements</Label>
+          <div className="space-y-2">
+            {formData.submission_requirements?.map((req, idx) => (
+              <div key={idx} className="flex gap-2 items-center">
+                <Input
+                  value={req}
+                  onChange={(e) => {
+                    const updated = [...formData.submission_requirements];
+                    updated[idx] = e.target.value;
+                    setFormData({
+                      ...formData,
+                      submission_requirements: updated,
+                    });
+                  }}
+                  placeholder={`Requirement #${idx + 1}`}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      submission_requirements:
+                        formData.submission_requirements.filter(
+                          (_, i) => i !== idx
+                        ),
+                    });
+                  }}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  submission_requirements: [
+                    ...(formData.submission_requirements || []),
+                    "",
+                  ],
+                })
+              }
+              className="w-full"
+            >
+              Add Requirement
+            </Button>
+          </div>
+        </CardContent>
+
+        {/* Author Guidelines (Array) */}
+        <CardHeader>
+          <CardTitle>Author Guidelines</CardTitle>
+          <CardDescription>Add multiple guidelines for authors</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Label>Author Guidelines</Label>
+          <div className="space-y-2">
+            {Array.isArray(formData.author_guidelines)
+              ? formData.author_guidelines.map((guide, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <Textarea
+                      value={guide}
+                      onChange={(e) => {
+                        const updated = [...formData.author_guidelines];
+                        updated[idx] = e.target.value;
+                        setFormData({
+                          ...formData,
+                          author_guidelines: updated,
+                        });
+                      }}
+                      rows={2}
+                      placeholder={`Guideline #${idx + 1}`}
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          author_guidelines: formData.author_guidelines.filter(
+                            (_, i) => i !== idx
+                          ),
+                        });
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))
+              : null}
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  author_guidelines: [
+                    ...(Array.isArray(formData.author_guidelines)
+                      ? formData.author_guidelines
+                      : []),
+                    "",
+                  ],
+                })
+              }
+              className="w-full"
+            >
+              Add Guideline
+            </Button>
+          </div>
+        </CardContent>
+
+        {/* Coauthor Roles (Array) */}
       </Card>
 
       {/* Review Process */}
@@ -152,7 +292,9 @@ export function SubmissionSettings({ journalId }) {
               <Label htmlFor="review_type">Review Type</Label>
               <Select
                 value={formData.review_type}
-                onValueChange={(value) => setFormData({ ...formData, review_type: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, review_type: value })
+                }
               >
                 <SelectTrigger id="review_type">
                   <SelectValue />
@@ -161,7 +303,9 @@ export function SubmissionSettings({ journalId }) {
                   <SelectItem value="SINGLE_BLIND">Single Blind</SelectItem>
                   <SelectItem value="DOUBLE_BLIND">Double Blind</SelectItem>
                   <SelectItem value="OPEN">Open Review</SelectItem>
-                  <SelectItem value="POST_PUBLICATION">Post-Publication Review</SelectItem>
+                  <SelectItem value="POST_PUBLICATION">
+                    Post-Publication Review
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -175,13 +319,18 @@ export function SubmissionSettings({ journalId }) {
                 max="10"
                 value={formData.min_reviewers}
                 onChange={(e) =>
-                  setFormData({ ...formData, min_reviewers: parseInt(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    min_reviewers: parseInt(e.target.value),
+                  })
                 }
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="review_deadline_days">Review Deadline (Days)</Label>
+              <Label htmlFor="review_deadline_days">
+                Review Deadline (Days)
+              </Label>
               <Input
                 id="review_deadline_days"
                 type="number"
@@ -189,7 +338,10 @@ export function SubmissionSettings({ journalId }) {
                 max="180"
                 value={formData.review_deadline_days}
                 onChange={(e) =>
-                  setFormData({ ...formData, review_deadline_days: parseInt(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    review_deadline_days: parseInt(e.target.value),
+                  })
                 }
               />
             </div>
@@ -201,7 +353,9 @@ export function SubmissionSettings({ journalId }) {
       <Card>
         <CardHeader>
           <CardTitle>File Requirements</CardTitle>
-          <CardDescription>Set constraints and requirements for uploaded files</CardDescription>
+          <CardDescription>
+            Set constraints and requirements for uploaded files
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -214,7 +368,10 @@ export function SubmissionSettings({ journalId }) {
                 max="100"
                 value={formData.max_file_size_mb}
                 onChange={(e) =>
-                  setFormData({ ...formData, max_file_size_mb: parseInt(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    max_file_size_mb: parseInt(e.target.value),
+                  })
                 }
               />
             </div>
@@ -225,18 +382,25 @@ export function SubmissionSettings({ journalId }) {
                 id="allowed_file_types"
                 value={formData.allowed_file_types}
                 onChange={(e) =>
-                  setFormData({ ...formData, allowed_file_types: e.target.value })
+                  setFormData({
+                    ...formData,
+                    allowed_file_types: e.target.value,
+                  })
                 }
                 placeholder="pdf,docx,tex"
               />
-              <p className="text-xs text-muted-foreground">Separate with commas</p>
+              <p className="text-xs text-muted-foreground">
+                Separate with commas
+              </p>
             </div>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="require_cover_letter">Require Cover Letter</Label>
+                <Label htmlFor="require_cover_letter">
+                  Require Cover Letter
+                </Label>
                 <p className="text-sm text-muted-foreground">
                   Authors must submit a cover letter with their manuscript
                 </p>
@@ -263,7 +427,10 @@ export function SubmissionSettings({ journalId }) {
                 id="require_conflict_of_interest"
                 checked={formData.require_conflict_of_interest}
                 onCheckedChange={(checked) =>
-                  setFormData({ ...formData, require_conflict_of_interest: checked })
+                  setFormData({
+                    ...formData,
+                    require_conflict_of_interest: checked,
+                  })
                 }
               />
             </div>
@@ -275,12 +442,16 @@ export function SubmissionSettings({ journalId }) {
       <Card>
         <CardHeader>
           <CardTitle>Publication Settings</CardTitle>
-          <CardDescription>Configure publication and pricing details</CardDescription>
+          <CardDescription>
+            Configure publication and pricing details
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="publication_frequency">Publication Frequency</Label>
+              <Label htmlFor="publication_frequency">
+                Publication Frequency
+              </Label>
               <Select
                 value={formData.publication_frequency}
                 onValueChange={(value) =>
@@ -306,7 +477,9 @@ export function SubmissionSettings({ journalId }) {
               <Label htmlFor="apc_currency">Currency</Label>
               <Select
                 value={formData.apc_currency}
-                onValueChange={(value) => setFormData({ ...formData, apc_currency: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, apc_currency: value })
+                }
               >
                 <SelectTrigger id="apc_currency">
                   <SelectValue />
@@ -331,12 +504,69 @@ export function SubmissionSettings({ journalId }) {
                 step="0.01"
                 value={formData.article_processing_charge}
                 onChange={(e) =>
-                  setFormData({ ...formData, article_processing_charge: e.target.value })
+                  setFormData({
+                    ...formData,
+                    article_processing_charge: e.target.value,
+                  })
                 }
                 placeholder="0.00"
               />
-              <p className="text-xs text-muted-foreground">Leave empty if no charge</p>
+              <p className="text-xs text-muted-foreground">
+                Leave empty if no charge
+              </p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+      {/* Coauthor Roles */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Coauthor Roles</CardTitle>
+          <CardDescription>
+            Specify allowed coauthor roles for submissions
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {formData.coauthor_roles?.map((role, idx) => (
+              <div key={idx} className="flex gap-2">
+                <Input
+                  value={role}
+                  onChange={(e) => {
+                    const updated = [...formData.coauthor_roles];
+                    updated[idx] = e.target.value;
+                    setFormData({ ...formData, coauthor_roles: updated });
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      coauthor_roles: formData.coauthor_roles.filter(
+                        (_, i) => i !== idx
+                      ),
+                    });
+                  }}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              size="sm"
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  coauthor_roles: [...(formData.coauthor_roles || []), ""],
+                })
+              }
+            >
+              Add Role
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -384,7 +614,9 @@ export function SubmissionSettings({ journalId }) {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="require_funding_info">Require Funding Information</Label>
+              <Label htmlFor="require_funding_info">
+                Require Funding Information
+              </Label>
               <p className="text-sm text-muted-foreground">
                 Authors must declare funding sources
               </p>
@@ -402,7 +634,10 @@ export function SubmissionSettings({ journalId }) {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={updateSettingsMutation.isPending}>
+        <Button
+          onClick={handleSave}
+          disabled={updateSettingsMutation.isPending}
+        >
           {updateSettingsMutation.isPending ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
