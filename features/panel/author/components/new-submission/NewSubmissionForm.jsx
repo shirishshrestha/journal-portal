@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import SubmissionGuidelines from "./submission-form-steps/SubmissionGuidelines";
 import ManuscriptInfoStep from "./submission-form-steps/ManuscriptInfoStep";
 import AuthorsStep from "./submission-form-steps/AuthorsStep";
-import { useCreateSubmission } from "../../hooks/mutation/useCreateSubmission";
+import { useCreateSubmission, useGetJournalById } from "../../hooks";
 import { useGetMe } from "@/features/shared";
 
 const fullFormSchema = z.object({
@@ -46,7 +46,7 @@ const fullFormSchema = z.object({
   co_authors: z.array(z.any()),
   requirements: z
     .array(z.literal(true))
-    .min(5, "All requirements must be accepted"),
+    .min(1, "All requirements must be accepted"),
 });
 
 export default function NewSubmissionForm() {
@@ -84,6 +84,22 @@ export default function NewSubmissionForm() {
       terms_accepted: false,
     },
   });
+
+  // Watch journal_id to get coauthor roles
+  const journalId = useWatch({
+    control: form.control,
+    name: "journal_id",
+    defaultValue: "",
+  });
+
+  const { data: selectedJournalDetails } = useGetJournalById(journalId, {
+    enabled: !!journalId,
+  });
+
+  const coauthorRoles = useMemo(
+    () => selectedJournalDetails?.settings?.coauthor_roles || [],
+    [selectedJournalDetails]
+  );
 
   // Update form when profile data loads
   useEffect(() => {
@@ -199,6 +215,7 @@ export default function NewSubmissionForm() {
                 form={form}
                 handleAddCoauthor={handleAddCoauthor}
                 handleRemoveCoauthor={handleRemoveCoauthor}
+                coauthorRoles={coauthorRoles}
               />
             </CardContent>
           </Card>

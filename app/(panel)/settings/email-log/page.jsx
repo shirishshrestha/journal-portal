@@ -2,94 +2,41 @@
 
 import {
   EmailDetailModal,
-  EmailLogFilters,
-  EmailLogPagination,
   EmailLogStats,
   EmailLogTable,
   ErrorCard,
   useGetUserEmailLogStats,
+  FilterToolbar,
+  Pagination,
 } from "@/features";
 import { useState } from "react";
-
-// TODO: Replace with API data
-
-const mockEmailLogs = [
-  {
-    id: "eeac2caf-1f5d-48a8-9461-25f4f7320f16",
-    recipient: "testuser2@example.com",
-    user_email: "testuser2@example.com",
-    template_type: "EMAIL_VERIFICATION",
-    subject: "Verify Your Email Address - Journal Publication Portal",
-    status: "FAILED",
-    status_display: "Failed",
-    sent_at: null,
-    retry_count: 0,
-    error_message: 'Invalid address ""',
-    created_at: "2025-11-02T06:19:25.325095Z",
-  },
-  {
-    id: "abc123-def456-ghi789",
-    recipient: "researcher@university.edu",
-    user_email: "researcher@university.edu",
-    template_type: "EMAIL_VERIFICATION",
-    subject: "Verify Your Email Address - Journal Publication Portal",
-    status: "DELIVERED",
-    status_display: "Delivered",
-    sent_at: "2025-11-01T10:30:00Z",
-    retry_count: 0,
-    created_at: "2025-11-01T10:25:00Z",
-  },
-  {
-    id: "xyz789-abc123-def456",
-    recipient: "editor@journal.org",
-    user_email: "editor@journal.org",
-    template_type: "EMAIL_VERIFICATION",
-    subject: "Verify Your Email Address - Journal Publication Portal",
-    status: "OPENED",
-    status_display: "Opened",
-    sent_at: "2025-10-30T14:15:00Z",
-    retry_count: 0,
-    created_at: "2025-10-30T14:10:00Z",
-  },
-];
+import { useSearchParams } from "next/navigation";
 
 export default function EmailLogTab() {
+  const searchParams = useSearchParams();
+  const [selectedEmail, setSelectedEmail] = useState(null);
+
+  // Get filter values from URL
+  const searchValue = searchParams.get("search") || "";
+
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+
+  const params = {
+    search: searchValue,
+    page: currentPage,
+  };
+
   const {
     data: EmailLogData,
     isPending: isEmailLogPending,
     isError: isEmailLogError,
     error: emailLogError,
     refetch: refetchEmailLogStats,
-  } = useGetUserEmailLogStats();
+  } = useGetUserEmailLogStats({ params });
 
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [templateFilter, setTemplateFilter] = useState("all");
-  const [searchValue, setSearchValue] = useState("");
-  const [selectedEmail, setSelectedEmail] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // TODO: Replace with API data and pagination
-  const filteredEmails = mockEmailLogs.filter((email) => {
-    if (statusFilter !== "all" && email.status !== statusFilter) return false;
-    if (templateFilter !== "all" && email.template_type !== templateFilter)
-      return false;
-    if (
-      searchValue &&
-      !email.subject.toLowerCase().includes(searchValue.toLowerCase())
-    )
-      return false;
-    return true;
-  });
-
-  // if (isEmailLogError) {
-  //   return (
-  //     <ErrorCard
-  //       title="Failed to load email logs"
-  //       error={emailLogError}
-  //       onRetry={refetchEmailLogStats}
-  //     />
-  //   );
-  // }
+  // Pagination data - TODO: Replace with actual API pagination data
+  const totalItems = EmailLogData?.recent_emails?.length || 0;
+  const pageSize = 10;
 
   return (
     <div className="space-y-4">
@@ -98,6 +45,7 @@ export default function EmailLogTab() {
           Email History
         </h2>
       </div>
+
       {/* Statistics Section */}
       <EmailLogStats
         data={EmailLogData}
@@ -105,15 +53,15 @@ export default function EmailLogTab() {
         isError={isEmailLogError}
         error={emailLogError}
       />
-      {/* Filters Section */}
-      <EmailLogFilters
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        templateFilter={templateFilter}
-        setTemplateFilter={setTemplateFilter}
-        searchValue={searchValue}
-        setSearchValue={setSearchValue}
-      />
+
+      {/* Filter Toolbar */}
+      <FilterToolbar>
+        <FilterToolbar.Search
+          placeholder="Search by subject, recipient..."
+          paramName="search"
+        />
+      </FilterToolbar>
+
       {/* Email Table Section */}
       <div className="border border-border rounded-lg">
         <EmailLogTable
@@ -123,13 +71,18 @@ export default function EmailLogTab() {
           error={emailLogError}
         />
       </div>
-      {/* Pagination Section */}
-      <EmailLogPagination
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalEmails={mockEmailLogs.length}
-        shownEmails={filteredEmails.length}
-      />
+
+      {/* Pagination */}
+      {totalItems > 0 && (
+        <div className="flex justify-center mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalItems}
+            pageSize={pageSize}
+          />
+        </div>
+      )}
+
       {/* Email Detail Modal */}
       <EmailDetailModal
         email={selectedEmail}

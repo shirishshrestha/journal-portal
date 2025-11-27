@@ -7,7 +7,7 @@ import { passwordSchema } from "@/features/panel/settings/utils/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useToggle } from "@/features/shared/hooks";
 import {
   Form,
@@ -18,12 +18,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Check } from "lucide-react";
+import { useChangePassword } from "@/features/auth/hooks";
 
 export default function ChangePassword() {
   const [passwordSaved, setPasswordSaved] = useState(false);
   const [showCurrentPassword, handleShowCurrentPassword] = useToggle();
   const [showNewPassword, handleShowNewPassword] = useToggle();
   const [showConfirmPassword, handleShowConfirmPassword] = useToggle();
+
+  const { mutate: changePassword, isPending } = useChangePassword();
 
   const passwordForm = useForm({
     resolver: zodResolver(passwordSchema),
@@ -35,10 +38,19 @@ export default function ChangePassword() {
   });
 
   const handlePasswordSubmit = async (data) => {
-    console.log("Updating password");
-    setPasswordSaved(true);
-    passwordForm.reset();
-    setTimeout(() => setPasswordSaved(false), 3000);
+    const payload = {
+      current_password: data.currentPassword,
+      new_password: data.newPassword,
+      confirm_password: data.confirmPassword,
+    };
+
+    changePassword(payload, {
+      onSuccess: () => {
+        setPasswordSaved(true);
+        passwordForm.reset();
+        setTimeout(() => setPasswordSaved(false), 3000);
+      },
+    });
   };
 
   return (
@@ -153,9 +165,11 @@ export default function ChangePassword() {
           <div className="flex items-center gap-2 pt-2">
             <Button
               type="submit"
+              disabled={isPending || passwordSaved}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Update Password
+              {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {isPending ? "Updating..." : "Update Password"}
             </Button>
             {passwordSaved && (
               <div className="flex items-center gap-1 text-green-600 text-sm">

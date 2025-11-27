@@ -110,7 +110,7 @@ FilterToolbar.Search = function FilterToolbarSearch({
   }, [value]);
 
   return (
-    <div className={`flex-1 ${className}`}>
+    <div className={`flex-2 ${className}`}>
       <label className="text-sm font-medium text-muted-foreground block mb-2">
         {label}
       </label>
@@ -159,7 +159,7 @@ FilterToolbar.Select = function FilterToolbarSelect({
   };
 
   return (
-    <div className={`w-full lg:w-40 ${className}`}>
+    <div className={`flex-1  ${className}`}>
       {label && (
         <label className="text-sm font-medium text-muted-foreground block mb-2">
           {label}
@@ -210,7 +210,7 @@ FilterToolbar.DateInput = function FilterToolbarDateInput({
   };
 
   return (
-    <div className={`w-full lg:w-48 ${className}`}>
+    <div className={`flex-1 ${className}`}>
       <label className="text-sm font-medium text-muted-foreground block mb-2">
         {label}
       </label>
@@ -254,7 +254,7 @@ FilterToolbar.Input = function FilterToolbarInput({
   };
 
   return (
-    <div className={`w-full lg:w-48 ${className}`}>
+    <div className={`flex-1  ${className}`}>
       {label && (
         <label className="text-sm font-medium text-muted-foreground block mb-2">
           {label}

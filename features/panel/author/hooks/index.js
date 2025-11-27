@@ -8,5 +8,6 @@ export { useCategorizedSubmissions } from "./useCategorizedSubmissions";
 export { useSubmitUpdatedDocument } from "./mutation/useSubmitUpdatedDocument";
 export { useDeleteSubmission } from "./mutation/useDeleteSubmission";
 export { useGetSubmissionById } from "./query/useGetSubmissionById";
+export { useGetJournalById } from "./query/useGetJournalById";
 export { useSubmitForReview } from "./mutation/useSubmitForReview";
 export { useGetDocumentVersions } from "./query/useGetDocumentVersions";

@@ -1,7 +1,7 @@
 // SubmissionGuidelines.jsx
 // Step 1: Journal Selection + Submission Guidelines
 
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -16,17 +16,22 @@ import { SearchableSelect } from "@/features/shared/components/SearchableSelect"
 import { useWatch } from "react-hook-form";
 import { useGetJournals } from "@/features/shared/hooks/useGetJournals";
 import { useGetTaxonomyTree } from "@/features/shared/hooks/useGetTaxonomyTree";
+import { useGetJournalById } from "@/features/panel/author/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const SUBMISSION_GUIDELINES = [
-  "The submission has not been previously published, nor is it before another journal for consideration (or an explanation has been provided in Comments to the Editor).",
-  "The submission file is in OpenOffice, Microsoft Word, or RTF document file format.",
-  "Where available, URLs for the references have been provided.",
-  "The text is single-spaced; uses a 12-point font; employs italics, rather than underlining (except with URL addresses); and all illustrations, figures, and tables are placed within the text at the appropriate points, rather than at the end.",
-  "The text adheres to the stylistic and bibliographic requirements outlined in the Author Guidelines.",
-];
+import { JournalInfoCard } from "@/features/panel/reviewer/components/review-detail/JournalInfoCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 
 export default function SubmissionGuidelines({ form }) {
+  const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
+
   const { data: journalData, isPending: isLoadingJournals } = useGetJournals({
     active_role: "AUTHOR",
   });
@@ -38,6 +43,12 @@ export default function SubmissionGuidelines({ form }) {
     name: "journal_id",
     defaultValue: "",
   });
+
+  // Fetch full journal details when journal is selected
+  const { data: selectedJournalDetails, isPending: isLoadingJournalDetails } =
+    useGetJournalById(journalId, {
+      enabled: !!journalId,
+    });
 
   const sectionId = useWatch({
     control: form.control,
@@ -63,6 +74,22 @@ export default function SubmissionGuidelines({ form }) {
   const selectedJournal = useMemo(
     () => journals?.find((journal) => journal.id === journalId),
     [journals, journalId]
+  );
+
+  // Get submission requirements and author guidelines from journal settings
+  const submissionRequirements = useMemo(
+    () => selectedJournalDetails?.settings?.submission_requirements || [],
+    [selectedJournalDetails]
+  );
+
+  const authorGuidelines = useMemo(
+    () => selectedJournalDetails?.settings?.author_guidelines || [],
+    [selectedJournalDetails]
+  );
+
+  const submissionGuidelines = useMemo(
+    () => selectedJournalDetails?.settings?.submission_guidelines || "",
+    [selectedJournalDetails]
   );
 
   // Transform journals for SearchableSelect
@@ -178,22 +205,6 @@ export default function SubmissionGuidelines({ form }) {
         )}
       />
 
-      {/* Journal Details Card */}
-      {selectedJournal && (
-        <Card className="p-4 bg-blue-50 gap-0 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900">
-          <h3 className="font-semibold text-foreground mb-2">
-            {selectedJournal.title}
-          </h3>
-          <p className="text-sm text-muted-foreground mb-2">
-            {selectedJournal.description || "No description available"}
-          </p>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span>• ISSN: {selectedJournal.issn || "N/A"}</span>
-            <span>• Short Name: {selectedJournal.short_name || "N/A"}</span>
-          </div>
-        </Card>
-      )}
-
       {/* Section Selection */}
       {journalId && (
         <FormField
@@ -306,41 +317,95 @@ export default function SubmissionGuidelines({ form }) {
         />
       )}
 
-      <Card className="p-4 gap-0 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900">
-        <h3 className="font-semibold text-foreground mb-4">
-          Submission Requirements
-        </h3>
-        <div className="space-y-3">
-          {SUBMISSION_GUIDELINES.map((requirement, i) => (
-            <FormField
-              key={i}
-              control={form.control}
-              name={`requirements`}
-              render={({ field }) => (
-                <FormItem className="flex items-center space-x-2">
-                  <FormControl>
-                    <Checkbox
-                      checked={
-                        Array.isArray(field.value) && field.value[i] === true
-                      }
-                      onCheckedChange={(checked) => {
-                        const arr = Array.isArray(field.value)
-                          ? [...field.value]
-                          : Array(SUBMISSION_GUIDELINES.length).fill(false);
-                        arr[i] = checked;
-                        field.onChange(arr);
-                      }}
-                    />
-                  </FormControl>
-                  <FormLabel className="font-normal text-sm leading-relaxed cursor-pointer">
-                    {requirement}
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
-          ))}
-        </div>
-      </Card>
+      {/* Journal Details Card */}
+      {selectedJournalDetails && !isLoadingJournalDetails && (
+        <Card className="p-6">
+          <JournalInfoCard journal={selectedJournalDetails} />
+        </Card>
+      )}
+
+      {isLoadingJournalDetails && journalId && (
+        <Card className="p-6">
+          <Skeleton className="h-40 w-full" />
+        </Card>
+      )}
+
+      {/* Submission Guidelines */}
+      {submissionGuidelines && (
+        <Card className="p-4 gap-0 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-lg bg-amber-500/10">
+              <FileText className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h3 className="font-semibold text-foreground">
+              Submission Guidelines
+            </h3>
+          </div>
+          <div
+            className="text-sm text-muted-foreground prose dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: submissionGuidelines }}
+          />
+        </Card>
+      )}
+
+      {/* Author Guidelines */}
+      {authorGuidelines.length > 0 && (
+        <Card className="p-4 gap-0 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-foreground">Author Guidelines</h3>
+          </div>
+          <ul className="space-y-2 list-disc list-inside">
+            {authorGuidelines.map((guideline, i) => (
+              <li key={i} className="text-sm text-muted-foreground">
+                {guideline}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {/* Submission Requirements with Checkboxes */}
+      {submissionRequirements.length > 0 && (
+        <Card className="p-4 gap-0 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900">
+          <h3 className="font-semibold text-foreground mb-4">
+            Submission Requirements *
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Please confirm all requirements below to proceed:
+          </p>
+          <div className="space-y-3">
+            {submissionRequirements.map((requirement, i) => (
+              <FormField
+                key={i}
+                control={form.control}
+                name={`requirements`}
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={
+                          Array.isArray(field.value) && field.value[i] === true
+                        }
+                        onCheckedChange={(checked) => {
+                          const arr = Array.isArray(field.value)
+                            ? [...field.value]
+                            : Array(submissionRequirements.length).fill(false);
+                          arr[i] = checked;
+                          field.onChange(arr);
+                        }}
+                      />
+                    </FormControl>
+                    <FormLabel className="font-normal text-sm leading-relaxed cursor-pointer">
+                      {requirement}
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
+            ))}
+          </div>
+          <FormMessage />
+        </Card>
+      )}
     </div>
   );
 }

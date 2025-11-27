@@ -12,10 +12,10 @@ import { getUserEmailLogStats } from "@/features/panel/settings/api/EmailLogApiS
  * @example
  * const { data, isPending, isError, refetch } = useGetUserEmailLogStats();
  */
-export const useGetUserEmailLogStats = (options = {}) => {
+export const useGetUserEmailLogStats = ({ params = {} }, options = {}) => {
   return useQuery({
-    queryKey: ["user-email-log-stats"],
-    queryFn: getUserEmailLogStats,
+    queryKey: ["user-email-log-stats", params],
+    queryFn: () => getUserEmailLogStats(params),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,

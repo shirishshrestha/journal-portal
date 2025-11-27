@@ -15,7 +15,9 @@ export const getPendingVerificationRequests = async () => {
 
 export const getVerificationRequests = async (params) => {
   try {
-    const response = await instance.get(`admin/verifications/`, { params });
+    const response = await instance.get(`admin/verifications/`, {
+      params,
+    });
     return response.data;
   } catch (error) {
     throw error;

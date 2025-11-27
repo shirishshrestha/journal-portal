@@ -4,4 +4,3 @@ export { EmailDetailModal };
 export { default as EmailLogStats } from "./EmailLogStats";
 export { default as EmailLogFilters } from "./EmailLogFilters";
 export { default as EmailLogTable } from "./EmailLogTable";
-export { default as EmailLogPagination } from "./EmailLogPagination";

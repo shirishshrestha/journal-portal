@@ -1,4 +1,5 @@
 // AuthorsStep.jsx
+import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import {
   FormField,
@@ -11,17 +12,32 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus } from "lucide-react";
 import { useFormContext, useWatch } from "react-hook-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AuthorsStep({
   form,
   handleAddCoauthor,
   handleRemoveCoauthor,
+  coauthorRoles = [],
 }) {
   const coAuthors = useWatch({
     control: form.control,
     name: "co_authors",
     defaultValue: [],
   });
+
+  // Default roles if none provided from backend
+  const defaultRoles = ["Author", "Co-Author", "Researcher", "Contributor"];
+  const availableRoles = useMemo(
+    () => (coauthorRoles.length > 0 ? coauthorRoles : defaultRoles),
+    [coauthorRoles]
+  );
 
   return (
     <div className="space-y-6">
@@ -83,7 +99,10 @@ export default function AuthorsStep({
           </Button>
         </div>
         {coAuthors?.map((_, index) => (
-          <Card key={index} className="p-4 gap-2 bg-muted/30 border border-border">
+          <Card
+            key={index}
+            className="p-4 gap-2 bg-muted/30 border border-border"
+          >
             <div className="flex items-start justify-between ">
               <h4 className="font-medium text-foreground">
                 Co-Author {index + 1}
@@ -146,6 +165,33 @@ export default function AuthorsStep({
                     <FormControl>
                       <Input placeholder="0000-0000-0000-0000" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`co_authors.${index}.contribution_role`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contribution Role</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value || availableRoles[0]}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableRoles.map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {role}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

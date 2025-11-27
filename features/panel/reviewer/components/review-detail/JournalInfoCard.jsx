@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/dialog";
 import { FileText } from "lucide-react";
 import { format } from "date-fns";
+import { useCurrentRole } from "@/features/shared";
 
 export function JournalInfoCard({ journal }) {
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const { currentRole } = useCurrentRole();
 
   if (!journal) return null;
 
@@ -62,14 +64,16 @@ export function JournalInfoCard({ journal }) {
           <span className="text-muted-foreground">{journal.publisher}</span>
         </div>
 
-        <div className="flex items-start gap-2">
-          <span className="font-medium text-foreground/80 min-w-[140px]">
-            Submission Count:
-          </span>
-          <Badge variant="outline" className="font-medium">
-            {journal.submission_count}
-          </Badge>
-        </div>
+        {currentRole !== "AUTHOR" && (
+          <div className="flex items-start gap-2">
+            <span className="font-medium text-foreground/80 min-w-[140px]">
+              Submission Count:
+            </span>
+            <Badge variant="outline" className="font-medium">
+              {journal.submission_count}
+            </Badge>
+          </div>
+        )}
 
         <div className="flex items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">
