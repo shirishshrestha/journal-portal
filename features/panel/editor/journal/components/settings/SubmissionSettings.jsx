@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Card,
   CardContent,
@@ -9,8 +11,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -21,49 +31,75 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, Plus, X } from "lucide-react";
 import { useGetJournalById } from "@/features";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { updateSubmissionSettings } from "../../api/journalsApi";
+import { submissionSettingsSchema } from "../../utils/submissionSettingsSchema";
 
 export function SubmissionSettings({ journalId }) {
-  // Fetch journal data to get current settings
   const { data: journal, isPending, error } = useGetJournalById(journalId);
   const queryClient = useQueryClient();
 
-  const [formData, setFormData] = useState({
-    // Submission Guidelines
-    submission_guidelines: "",
-    author_guidelines: "",
+  const form = useForm({
+    resolver: zodResolver(submissionSettingsSchema),
+    defaultValues: {
+      submission_guidelines: "",
+      author_guidelines: [],
+      submission_requirements: [],
+      coauthor_roles: [],
+      review_type: "DOUBLE_BLIND",
+      min_reviewers: 2,
+      review_deadline_days: 21,
+      max_file_size_mb: 25,
+      allowed_file_types: "pdf,docx,tex",
+      require_cover_letter: true,
+      require_conflict_of_interest: true,
+      publication_frequency: "MONTHLY",
+      article_processing_charge: "",
+      apc_currency: "USD",
+      allow_preprints: true,
+      require_data_availability: false,
+      require_funding_info: true,
+    },
+  });
 
-    // Review Process
-    review_type: "DOUBLE_BLIND",
-    min_reviewers: 2,
-    review_deadline_days: 21,
+  const {
+    fields: requirementFields,
+    append: appendRequirement,
+    remove: removeRequirement,
+  } = useFieldArray({
+    control: form.control,
+    name: "submission_requirements",
+  });
 
-    // File Requirements
-    max_file_size_mb: 25,
-    allowed_file_types: "pdf,docx,tex",
-    require_cover_letter: true,
-    require_conflict_of_interest: true,
+  const {
+    fields: guidelineFields,
+    append: appendGuideline,
+    remove: removeGuideline,
+  } = useFieldArray({
+    control: form.control,
+    name: "author_guidelines",
+  });
 
-    // Publication
-    publication_frequency: "MONTHLY",
-    article_processing_charge: "",
-    apc_currency: "USD",
-
-    // Additional Settings
-    allow_preprints: true,
-    require_data_availability: false,
-    require_funding_info: true,
+  const {
+    fields: roleFields,
+    append: appendRole,
+    remove: removeRole,
+  } = useFieldArray({
+    control: form.control,
+    name: "coauthor_roles",
   });
 
   // Update form when journal data loads
   useEffect(() => {
     if (journal?.settings) {
-      setFormData((prev) => ({ ...prev, ...journal.settings }));
+      form.reset({
+        ...form.getValues(),
+        ...journal.settings,
+      });
     }
-  }, [journal]);
+  }, [journal, form]);
 
   const updateSettingsMutation = useMutation({
     mutationFn: updateSubmissionSettings,
@@ -77,10 +113,10 @@ export function SubmissionSettings({ journalId }) {
     },
   });
 
-  const handleSave = async () => {
+  const onSubmit = (data) => {
     updateSettingsMutation.mutate({
       journalId,
-      settings: formData,
+      settings: data,
     });
   };
 
@@ -108,549 +144,570 @@ export function SubmissionSettings({ journalId }) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Guidelines */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Submission Guidelines</CardTitle>
-          <CardDescription>
-            Instructions and requirements for manuscript submissions
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="submission_guidelines">
-              General Submission Guidelines
-            </Label>
-            <Textarea
-              id="submission_guidelines"
-              value={formData.submission_guidelines}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  submission_guidelines: e.target.value,
-                })
-              }
-              rows={5}
-              placeholder="Enter general guidelines for manuscript submission..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="author_guidelines">Author Guidelines</Label>
-            <Textarea
-              id="author_guidelines"
-              value={formData.author_guidelines}
-              onChange={(e) =>
-                setFormData({ ...formData, author_guidelines: e.target.value })
-              }
-              rows={5}
-              placeholder="Enter specific guidelines for authors..."
-            />
-          </div>
-        </CardContent>
-        {/* Submission Requirements (Array) */}
-        <CardHeader>
-          <CardTitle>Submission Requirements</CardTitle>
-          <CardDescription>
-            List terms and conditions for submissions
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Label>Submission Requirements</Label>
-          <div className="space-y-2">
-            {formData.submission_requirements?.map((req, idx) => (
-              <div key={idx} className="flex gap-2 items-center">
-                <Input
-                  value={req}
-                  onChange={(e) => {
-                    const updated = [...formData.submission_requirements];
-                    updated[idx] = e.target.value;
-                    setFormData({
-                      ...formData,
-                      submission_requirements: updated,
-                    });
-                  }}
-                  placeholder={`Requirement #${idx + 1}`}
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => {
-                    setFormData({
-                      ...formData,
-                      submission_requirements:
-                        formData.submission_requirements.filter(
-                          (_, i) => i !== idx
-                        ),
-                    });
-                  }}
-                >
-                  Remove
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              onClick={() =>
-                setFormData({
-                  ...formData,
-                  submission_requirements: [
-                    ...(formData.submission_requirements || []),
-                    "",
-                  ],
-                })
-              }
-              className="w-full"
-            >
-              Add Requirement
-            </Button>
-          </div>
-        </CardContent>
-
-        {/* Author Guidelines (Array) */}
-        <CardHeader>
-          <CardTitle>Author Guidelines</CardTitle>
-          <CardDescription>Add multiple guidelines for authors</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Label>Author Guidelines</Label>
-          <div className="space-y-2">
-            {Array.isArray(formData.author_guidelines)
-              ? formData.author_guidelines.map((guide, idx) => (
-                  <div key={idx} className="flex gap-2 items-center">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Guidelines */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Submission Guidelines</CardTitle>
+            <CardDescription>
+              Instructions and requirements for manuscript submissions
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="submission_guidelines"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>General Submission Guidelines</FormLabel>
+                  <FormControl>
                     <Textarea
-                      value={guide}
-                      onChange={(e) => {
-                        const updated = [...formData.author_guidelines];
-                        updated[idx] = e.target.value;
-                        setFormData({
-                          ...formData,
-                          author_guidelines: updated,
-                        });
-                      }}
-                      rows={2}
-                      placeholder={`Guideline #${idx + 1}`}
-                      className="flex-1"
+                      {...field}
+                      rows={5}
+                      placeholder="Enter general guidelines for manuscript submission..."
                     />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => {
-                        setFormData({
-                          ...formData,
-                          author_guidelines: formData.author_guidelines.filter(
-                            (_, i) => i !== idx
-                          ),
-                        });
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))
-              : null}
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              onClick={() =>
-                setFormData({
-                  ...formData,
-                  author_guidelines: [
-                    ...(Array.isArray(formData.author_guidelines)
-                      ? formData.author_guidelines
-                      : []),
-                    "",
-                  ],
-                })
-              }
-              className="w-full"
-            >
-              Add Guideline
-            </Button>
-          </div>
-        </CardContent>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        {/* Coauthor Roles (Array) */}
-      </Card>
-
-      {/* Review Process */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Review Process</CardTitle>
-          <CardDescription>Configure the peer review workflow</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="review_type">Review Type</Label>
-              <Select
-                value={formData.review_type}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, review_type: value })
-                }
-              >
-                <SelectTrigger id="review_type">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="SINGLE_BLIND">Single Blind</SelectItem>
-                  <SelectItem value="DOUBLE_BLIND">Double Blind</SelectItem>
-                  <SelectItem value="OPEN">Open Review</SelectItem>
-                  <SelectItem value="POST_PUBLICATION">
-                    Post-Publication Review
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="min_reviewers">Minimum Reviewers</Label>
-              <Input
-                id="min_reviewers"
-                type="number"
-                min="1"
-                max="10"
-                value={formData.min_reviewers}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    min_reviewers: parseInt(e.target.value),
-                  })
-                }
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="review_deadline_days">
-                Review Deadline (Days)
-              </Label>
-              <Input
-                id="review_deadline_days"
-                type="number"
-                min="1"
-                max="180"
-                value={formData.review_deadline_days}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    review_deadline_days: parseInt(e.target.value),
-                  })
-                }
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* File Requirements */}
-      <Card>
-        <CardHeader>
-          <CardTitle>File Requirements</CardTitle>
-          <CardDescription>
-            Set constraints and requirements for uploaded files
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="max_file_size_mb">Maximum File Size (MB)</Label>
-              <Input
-                id="max_file_size_mb"
-                type="number"
-                min="1"
-                max="100"
-                value={formData.max_file_size_mb}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    max_file_size_mb: parseInt(e.target.value),
-                  })
-                }
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="allowed_file_types">Allowed File Types</Label>
-              <Input
-                id="allowed_file_types"
-                value={formData.allowed_file_types}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    allowed_file_types: e.target.value,
-                  })
-                }
-                placeholder="pdf,docx,tex"
-              />
-              <p className="text-xs text-muted-foreground">
-                Separate with commas
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="require_cover_letter">
-                  Require Cover Letter
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Authors must submit a cover letter with their manuscript
-                </p>
-              </div>
-              <Switch
-                id="require_cover_letter"
-                checked={formData.require_cover_letter}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, require_cover_letter: checked })
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="require_conflict_of_interest">
-                  Require Conflict of Interest Statement
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Authors must declare any conflicts of interest
-                </p>
-              </div>
-              <Switch
-                id="require_conflict_of_interest"
-                checked={formData.require_conflict_of_interest}
-                onCheckedChange={(checked) =>
-                  setFormData({
-                    ...formData,
-                    require_conflict_of_interest: checked,
-                  })
-                }
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Publication Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Publication Settings</CardTitle>
-          <CardDescription>
-            Configure publication and pricing details
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="publication_frequency">
-                Publication Frequency
-              </Label>
-              <Select
-                value={formData.publication_frequency}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, publication_frequency: value })
-                }
-              >
-                <SelectTrigger id="publication_frequency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="WEEKLY">Weekly</SelectItem>
-                  <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
-                  <SelectItem value="MONTHLY">Monthly</SelectItem>
-                  <SelectItem value="QUARTERLY">Quarterly</SelectItem>
-                  <SelectItem value="BIANNUAL">Bi-annual</SelectItem>
-                  <SelectItem value="ANNUAL">Annual</SelectItem>
-                  <SelectItem value="CONTINUOUS">Continuous</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="apc_currency">Currency</Label>
-              <Select
-                value={formData.apc_currency}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, apc_currency: value })
-                }
-              >
-                <SelectTrigger id="apc_currency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="EUR">EUR</SelectItem>
-                  <SelectItem value="GBP">GBP</SelectItem>
-                  <SelectItem value="JPY">JPY</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="article_processing_charge">
-                Article Processing Charge (APC)
-              </Label>
-              <Input
-                id="article_processing_charge"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.article_processing_charge}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    article_processing_charge: e.target.value,
-                  })
-                }
-                placeholder="0.00"
-              />
-              <p className="text-xs text-muted-foreground">
-                Leave empty if no charge
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      {/* Coauthor Roles */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Coauthor Roles</CardTitle>
-          <CardDescription>
-            Specify allowed coauthor roles for submissions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {formData.coauthor_roles?.map((role, idx) => (
-              <div key={idx} className="flex gap-2">
-                <Input
-                  value={role}
-                  onChange={(e) => {
-                    const updated = [...formData.coauthor_roles];
-                    updated[idx] = e.target.value;
-                    setFormData({ ...formData, coauthor_roles: updated });
-                  }}
-                />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <FormLabel>Author Guidelines</FormLabel>
                 <Button
                   type="button"
                   variant="outline"
-                  size="icon"
-                  onClick={() => {
-                    setFormData({
-                      ...formData,
-                      coauthor_roles: formData.coauthor_roles.filter(
-                        (_, i) => i !== idx
-                      ),
-                    });
-                  }}
+                  size="sm"
+                  onClick={() => appendGuideline("")}
                 >
-                  Remove
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Guideline
                 </Button>
               </div>
-            ))}
-            <Button
-              type="button"
-              size="sm"
-              onClick={() =>
-                setFormData({
-                  ...formData,
-                  coauthor_roles: [...(formData.coauthor_roles || []), ""],
-                })
-              }
-            >
-              Add Role
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Additional Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Additional Requirements</CardTitle>
-          <CardDescription>Optional submission requirements</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="allow_preprints">Allow Preprints</Label>
-              <p className="text-sm text-muted-foreground">
-                Accept manuscripts that have been posted as preprints
-              </p>
+              {guidelineFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2">
+                  <FormField
+                    control={form.control}
+                    name={`author_guidelines.${index}`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={`Guideline #${index + 1}`}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeGuideline(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              {guidelineFields.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No guidelines added yet.
+                </p>
+              )}
             </div>
-            <Switch
-              id="allow_preprints"
-              checked={formData.allow_preprints}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, allow_preprints: checked })
-              }
-            />
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="require_data_availability">
-                Require Data Availability Statement
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                Authors must provide information about data accessibility
-              </p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <FormLabel>Submission Requirements</FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendRequirement("")}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Requirement
+                </Button>
+              </div>
+              {requirementFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2">
+                  <FormField
+                    control={form.control}
+                    name={`submission_requirements.${index}`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={`Requirement #${index + 1}`}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeRequirement(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              {requirementFields.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No requirements added yet.
+                </p>
+              )}
             </div>
-            <Switch
-              id="require_data_availability"
-              checked={formData.require_data_availability}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, require_data_availability: checked })
-              }
-            />
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="require_funding_info">
-                Require Funding Information
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                Authors must declare funding sources
-              </p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <FormLabel>Coauthor Roles</FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendRole("")}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Role
+                </Button>
+              </div>
+              {roleFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2">
+                  <FormField
+                    control={form.control}
+                    name={`coauthor_roles.${index}`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={`Role #${index + 1}`}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeRole(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              {roleFields.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No roles added yet.
+                </p>
+              )}
             </div>
-            <Switch
-              id="require_funding_info"
-              checked={formData.require_funding_info}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, require_funding_info: checked })
-              }
-            />
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button
-          onClick={handleSave}
-          disabled={updateSettingsMutation.isPending}
-        >
-          {updateSettingsMutation.isPending ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              Save Submission Settings
-            </>
-          )}
-        </Button>
-      </div>
-    </div>
+        {/* Review Process */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Review Process</CardTitle>
+            <CardDescription>
+              Configure the peer review workflow
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="review_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Review Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select review type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="SINGLE_BLIND">
+                          Single Blind
+                        </SelectItem>
+                        <SelectItem value="DOUBLE_BLIND">
+                          Double Blind
+                        </SelectItem>
+                        <SelectItem value="OPEN_REVIEW">Open Review</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="min_reviewers"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Minimum Reviewers</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="10"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Number of reviewers required per submission
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="review_deadline_days"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Review Deadline (Days)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="365"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Days given to reviewers to complete review
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* File Requirements */}
+        <Card>
+          <CardHeader>
+            <CardTitle>File Requirements</CardTitle>
+            <CardDescription>
+              Set constraints and requirements for uploaded files
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="max_file_size_mb"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Maximum File Size (MB)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="100"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="allowed_file_types"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Allowed File Types</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="pdf,docx,tex" />
+                    </FormControl>
+                    <FormDescription>Separate with commas</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="require_cover_letter"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Require Cover Letter
+                      </FormLabel>
+                      <FormDescription>
+                        Authors must submit a cover letter with their manuscript
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="require_conflict_of_interest"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Require Conflict of Interest Statement
+                      </FormLabel>
+                      <FormDescription>
+                        Authors must declare any conflicts of interest
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Publication Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Publication Settings</CardTitle>
+            <CardDescription>
+              Configure publication and pricing details
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="publication_frequency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Publication Frequency</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select frequency" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="WEEKLY">Weekly</SelectItem>
+                        <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
+                        <SelectItem value="MONTHLY">Monthly</SelectItem>
+                        <SelectItem value="QUARTERLY">Quarterly</SelectItem>
+                        <SelectItem value="BIANNUALLY">Bi-annually</SelectItem>
+                        <SelectItem value="ANNUALLY">Annually</SelectItem>
+                        <SelectItem value="CONTINUOUS">Continuous</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="apc_currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="USD">USD</SelectItem>
+                        <SelectItem value="EUR">EUR</SelectItem>
+                        <SelectItem value="GBP">GBP</SelectItem>
+                        <SelectItem value="JPY">JPY</SelectItem>
+                        <SelectItem value="AUD">AUD</SelectItem>
+                        <SelectItem value="CAD">CAD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="article_processing_charge"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Article Processing Charge (APC)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Leave empty if no charge applies
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Additional Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Additional Requirements</CardTitle>
+            <CardDescription>Optional submission requirements</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="allow_preprints"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Allow Preprints</FormLabel>
+                    <FormDescription>
+                      Accept manuscripts that have been posted as preprints
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="require_data_availability"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Require Data Availability Statement
+                    </FormLabel>
+                    <FormDescription>
+                      Authors must provide information about data accessibility
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="require_funding_info"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Require Funding Information
+                    </FormLabel>
+                    <FormDescription>
+                      Authors must declare funding sources
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Save Button */}
+        <div className="flex justify-end gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => form.reset()}
+            disabled={updateSettingsMutation.isPending}
+          >
+            Reset
+          </Button>
+          <Button
+            type="submit"
+            disabled={
+              updateSettingsMutation.isPending || !form.formState.isDirty
+            }
+          >
+            {updateSettingsMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Submission Settings
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

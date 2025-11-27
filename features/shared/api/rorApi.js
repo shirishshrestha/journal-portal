@@ -15,3 +15,20 @@ export const searchRORInstitutions = async (query) => {
   });
   return response.data;
 };
+
+/**
+ * Get institution details by ROR ID
+ * @param {string} rorId - ROR ID (can be full URL or just the ID)
+ * @returns {Promise} API response with institution details
+ */
+export const getRORInstitutionById = async (rorId) => {
+  if (!rorId) {
+    throw new Error("ROR ID is required");
+  }
+
+  // Extract just the ID if full URL is provided
+  const id = rorId.replace("https://ror.org/", "");
+
+  const response = await instance.get(`/integrations/ror/${id}/`);
+  return response.data;
+};

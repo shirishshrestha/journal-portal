@@ -8,6 +8,7 @@ import { useGetMyAnalytics } from "./useGetMyAnalytics";
 import { useSaveSuperdocDocument } from "./mutation/useSaveSuperdocDocument";
 import { useGetMe } from "./useGetMe";
 import { useDownloadDocument } from "./useDownloadDocument";
+import { useGetRORInstitution } from "./useGetRORInstitution";
 
 export {
   useToggle,
@@ -21,4 +22,5 @@ export {
   useSaveSuperdocDocument,
   useGetMe,
   useDownloadDocument,
+  useGetRORInstitution,
 };

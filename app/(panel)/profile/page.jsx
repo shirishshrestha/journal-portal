@@ -40,6 +40,7 @@ export default function ProfilePage() {
     user_email: profileData?.user_email || "",
     bio: profileData?.bio || "",
     affiliation_name: profileData?.affiliation_name || "",
+    affiliation_ror_id: profileData?.affiliation_ror_id || "",
     orcid_id: profileData?.orcid_id || "",
     expertise_areas: Array.isArray(profileData?.expertise_areas)
       ? profileData.expertise_areas

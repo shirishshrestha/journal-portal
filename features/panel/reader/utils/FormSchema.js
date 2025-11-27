@@ -31,5 +31,6 @@ export const profileSchema = z.object({
   user_email: z.string().email("Invalid email address"),
   bio: z.string().optional(),
   affiliation_name: z.string().optional(),
+  affiliation_ror_id: z.string().optional(),
   expertise_areas: z.union([z.array(z.string()), z.string()]).optional(),
 });

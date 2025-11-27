@@ -142,7 +142,7 @@ export default function ReviewerAssignmentsPage() {
               {recentAssignments.map((assignment) => (
                 <div
                   key={assignment.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                  className="flex md:items-center flex-col md:flex-row justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => {
                     if (assignment.status === "PENDING") {
                       router.push("/reviewer/assignments/pending");

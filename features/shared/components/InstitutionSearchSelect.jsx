@@ -25,7 +25,12 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import CountryFlag from "react-country-flag";
 
-export function InstitutionSearchSelect({ value, onChange, placeholder }) {
+export function InstitutionSearchSelect({
+  value,
+  onChange,
+  placeholder,
+  onRorIdChange,
+}) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [institutions, setInstitutions] = useState([]);
@@ -55,6 +60,13 @@ export function InstitutionSearchSelect({ value, onChange, placeholder }) {
 
   const handleSelect = (institution) => {
     onChange(institution.name);
+
+    // Extract ROR ID from the full URL (e.g., "https://ror.org/02rg1r889" -> "02rg1r889")
+    if (institution.id && onRorIdChange) {
+      const rorId = institution.id.replace("https://ror.org/", "");
+      onRorIdChange(rorId);
+    }
+
     setManualEntry(false);
     setOpen(false);
   };
@@ -67,6 +79,10 @@ export function InstitutionSearchSelect({ value, onChange, placeholder }) {
   const handleManualSave = () => {
     if (manualValue.trim()) {
       onChange(manualValue.trim());
+      // Clear ROR ID when manual entry is used
+      if (onRorIdChange) {
+        onRorIdChange("");
+      }
       setManualEntry(false);
       setOpen(false);
     }
@@ -116,7 +132,7 @@ export function InstitutionSearchSelect({ value, onChange, placeholder }) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between font-normal"
+          className="w-full justify-between font-normal hover:bg-muted/30!"
         >
           <span className={cn(!value && "text-muted-foreground")}>
             {displayValue}
@@ -183,7 +199,7 @@ export function InstitutionSearchSelect({ value, onChange, placeholder }) {
                             : "opacity-0"
                         )}
                       />
-                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
                         <CountryFlag
                           countryCode={institution.country_code || ""}
                           svg
@@ -214,9 +230,18 @@ export function InstitutionSearchSelect({ value, onChange, placeholder }) {
                               </>
                             )}
                           </div>
-                          {institution.types?.length > 0 && (
-                            <div className="flex gap-1 flex-wrap mt-1">
-                              {institution.types.map((type) => (
+                          <div className="flex gap-1 flex-wrap mt-1">
+                            {institution.id && (
+                              <Badge
+                                variant="outline"
+                                className="text-xs px-2 py-0 font-mono"
+                              >
+                                ROR:{" "}
+                                {institution.id.replace("https://ror.org/", "")}
+                              </Badge>
+                            )}
+                            {institution.types?.length > 0 &&
+                              institution.types.map((type) => (
                                 <Badge
                                   key={type}
                                   variant="secondary"
@@ -225,8 +250,7 @@ export function InstitutionSearchSelect({ value, onChange, placeholder }) {
                                   {type}
                                 </Badge>
                               ))}
-                            </div>
-                          )}
+                          </div>
                         </div>
                       </div>
                     </CommandItem>

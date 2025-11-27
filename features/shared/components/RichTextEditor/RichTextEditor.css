@@ -189,6 +189,38 @@
   list-style-type: none;
 }
 
+/* Nested Lists - Different bullet/number styles for each level */
+.editor-nested-listitem > .editor-list-ul {
+  list-style-type: circle;
+}
+
+.editor-nested-listitem
+  > .editor-list-ul
+  .editor-nested-listitem
+  > .editor-list-ul {
+  list-style-type: square;
+}
+
+.editor-nested-listitem > .editor-list-ol {
+  list-style-type: lower-alpha;
+}
+
+.editor-nested-listitem
+  > .editor-list-ol
+  .editor-nested-listitem
+  > .editor-list-ol {
+  list-style-type: lower-roman;
+}
+
+.editor-nested-listitem
+  > .editor-list-ol
+  .editor-nested-listitem
+  > .editor-list-ol
+  .editor-nested-listitem
+  > .editor-list-ol {
+  list-style-type: decimal;
+}
+
 /* Code Block */
 .editor-code {
   background-color: var(--muted);

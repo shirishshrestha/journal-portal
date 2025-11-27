@@ -131,44 +131,42 @@ export function AssignmentCard({
         )}
 
         {/* Actions */}
-        <div className="flex gap-2 pt-2">
-          {assignment.status === "PENDING" && (
-            <>
-              <Button
-                size="sm"
-                onClick={() => onAccept(assignment)}
-                disabled={acceptMutation?.isPending}
-                className="flex-1"
-              >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                {acceptMutation?.isPending ? "Accepting..." : "Accept"}
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => onDeclineClick(assignment)}
-                disabled={declineMutation?.isPending}
-                className="flex-1"
-              >
-                <XCircle className="h-4 w-4 mr-2" />
-                Decline
-              </Button>
-            </>
-          )}
-          {(assignment?.status === "ACCEPTED" ||
-            (assignment?.status === "COMPLETED" &&
-              (assignment?.submission_details.status === "REVISED" ||
-                assignment?.submission_details.status === "UNDER_REVIEW"))) && (
+        {assignment.status === "PENDING" && (
+          <div className="flex gap-2 pt-2">
             <Button
               size="sm"
-              onClick={() => handleViewSubmission(assignment)}
+              onClick={() => onAccept(assignment)}
+              disabled={acceptMutation?.isPending}
               className="flex-1"
             >
-              <Eye className="h-4 w-4 mr-2" />
-              Start Review
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              {acceptMutation?.isPending ? "Accepting..." : "Accept"}
             </Button>
-          )}
-        </div>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => onDeclineClick(assignment)}
+              disabled={declineMutation?.isPending}
+              className="flex-1"
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Decline
+            </Button>
+          </div>
+        )}
+        {(assignment?.status === "ACCEPTED" ||
+          (assignment?.status === "COMPLETED" &&
+            (assignment?.submission_details.status === "REVISED" ||
+              assignment?.submission_details.status === "UNDER_REVIEW"))) && (
+          <Button
+            size="sm"
+            onClick={() => handleViewSubmission(assignment)}
+            className="flex-1"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Start Review
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

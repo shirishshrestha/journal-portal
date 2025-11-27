@@ -21,6 +21,9 @@ import { Loader2, Check, X, Plus } from "lucide-react";
 import { profileSchema } from "../../reader/utils/FormSchema";
 import { Badge } from "@/components/ui/badge";
 import { InstitutionSearchSelect } from "@/features";
+import { useGetRORInstitution } from "@/features/shared/hooks/useGetRORInstitution";
+import ReactCountryFlag from "react-country-flag";
+import { cn } from "@/lib/utils";
 
 export default function ProfileForm({
   defaultValues,
@@ -31,11 +34,29 @@ export default function ProfileForm({
 }) {
   const [expertiseAreas, setExpertiseAreas] = useState([]);
   const [newExpertise, setNewExpertise] = useState("");
+  const [currentRorId, setCurrentRorId] = useState(
+    defaultValues?.affiliation_ror_id || ""
+  );
 
   const form = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues,
   });
+
+  // Fetch ROR institution data based on current ROR ID
+  const { data: rorInstitution, isPending: isRorLoading } =
+    useGetRORInstitution(currentRorId, {
+      enabled: Boolean(currentRorId),
+    });
+
+  // Pre-populate institution name from ROR data if available
+  useEffect(() => {
+    if (rorInstitution && !form.getValues("affiliation_name")) {
+      form.setValue("affiliation_name", rorInstitution.name, {
+        shouldDirty: false,
+      });
+    }
+  }, [rorInstitution, form]);
 
   // Initialize expertise areas from default values
   useEffect(() => {
@@ -154,51 +175,128 @@ export default function ProfileForm({
           <h3 className="font-semibold text-foreground">
             Academic Information
           </h3>
-          <FormField
-            control={form.control}
-            name="affiliation_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Institution/Organization</FormLabel>
-                <FormControl>
-                  <InstitutionSearchSelect
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="e.g., Stanford University"
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+            <div>
+              <FormField
+                control={form.control}
+                name="affiliation_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Institution/Organization</FormLabel>
+                    <FormControl>
+                      <InstitutionSearchSelect
+                        value={field.value}
+                        onChange={field.onChange}
+                        onRorIdChange={(rorId) => {
+                          form.setValue("affiliation_ror_id", rorId, {
+                            shouldDirty: true,
+                          });
+                          setCurrentRorId(rorId);
+                        }}
+                        placeholder="e.g., Stanford University"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Search and select your current academic or research
+                      institution
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {isRorLoading && currentRorId && (
+                <p className="flex items-center gap-2 text-sm mt-2">
+                  <Loader2 className="animate-spin h-4 w-4 text-muted-foreground" />{" "}
+                  Loading institution...
+                </p>
+              )}
+              {!isRorLoading && rorInstitution && (
+                <div className="cursor-pointer py-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <ReactCountryFlag
+                      countryCode={rorInstitution.country_code || ""}
+                      svg
+                      style={{
+                        width: "2em",
+                        height: "2em",
+                        borderRadius: "0.25em",
+                      }}
+                      title={rorInstitution.country}
+                    />
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-sm">
+                          {rorInstitution.name}
+                        </span>
+                        {rorInstitution.acronyms?.length > 0 && (
+                          <span className="text-xs text-muted-foreground">
+                            ({rorInstitution.acronyms.join(", ")})
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{rorInstitution.location}</span>
+                        {rorInstitution.established && (
+                          <>
+                            <span>•</span>
+                            <span>Est. {rorInstitution.established}</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex gap-1 flex-wrap mt-1">
+                        {rorInstitution.id && (
+                          <Badge
+                            variant="outline"
+                            className="text-xs px-2 py-0 font-mono"
+                          >
+                            ROR:{" "}
+                            {rorInstitution.id.replace("https://ror.org/", "")}
+                          </Badge>
+                        )}
+                        {rorInstitution.types?.length > 0 &&
+                          rorInstitution.types.map((type) => (
+                            <Badge
+                              key={type}
+                              variant="secondary"
+                              className="text-xs px-2 py-0"
+                            >
+                              {type}
+                            </Badge>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Expertise Areas - Dynamic Multi-Item Input */}
+            <FormItem>
+              <FormLabel>Expertise Areas</FormLabel>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="e.g., Genomics, Machine Learning"
+                    value={newExpertise}
+                    onChange={(e) => setNewExpertise(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="flex-1"
                   />
-                </FormControl>
-                <FormDescription>
-                  Search and select your current academic or research
-                  institution
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Expertise Areas - Dynamic Multi-Item Input */}
-          <FormItem>
-            <FormLabel>Expertise Areas</FormLabel>
-            <div className="space-y-3">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="e.g., Genomics, Machine Learning"
-                  value={newExpertise}
-                  onChange={(e) => setNewExpertise(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  onClick={handleAddExpertise}
-                  variant="outline"
-                  size="icon"
-                  disabled={!newExpertise.trim()}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                  <Button
+                    type="button"
+                    onClick={handleAddExpertise}
+                    variant="outline"
+                    size="icon"
+                    disabled={!newExpertise.trim()}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-
+              <FormDescription>
+                Add your areas of expertise one at a time
+              </FormDescription>
               {/* Display expertise areas as badges */}
               {expertiseAreas.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -220,11 +318,8 @@ export default function ProfileForm({
                   ))}
                 </div>
               )}
-            </div>
-            <FormDescription>
-              Add your areas of expertise one at a time
-            </FormDescription>
-          </FormItem>
+            </FormItem>
+          </div>
         </div>
         {/* Bio Section */}
         <div className="space-y-4">

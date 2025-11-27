@@ -40,7 +40,7 @@ export default function AssignmentsLayout({ children }) {
       </div>
 
       {/* Stats Summary */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4  md:grid-cols-4">
         {/* Stats Cards */}
         <StatsCard
           icon={Clock}
@@ -77,28 +77,30 @@ export default function AssignmentsLayout({ children }) {
       </div>
 
       {/* Navigation Tabs */}
-      <Tabs value={getActiveTab()} className="w-full">
-        <TabsList>
+      <Tabs value={getActiveTab()} className="w-full h-full">
+        <TabsList className="grid grid-cols-2 md:grid-cols-5 h-full">
           <Link href="/reviewer/assignments">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger className="w-full" value="overview">
+              Overview
+            </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/pending">
-            <TabsTrigger value="pending">
+            <TabsTrigger className="w-full" value="pending">
               Pending ({isPending ? "..." : reviewerStats.pending})
             </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/accepted">
-            <TabsTrigger value="accepted">
+            <TabsTrigger className="w-full" value="accepted">
               Accepted ({isPending ? "..." : reviewerStats.accepted})
             </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/completed">
-            <TabsTrigger value="completed">
+            <TabsTrigger className="w-full" value="completed">
               Completed ({isPending ? "..." : reviewerStats.completed})
             </TabsTrigger>
           </Link>
           <Link href="/reviewer/assignments/declined">
-            <TabsTrigger value="declined">
+            <TabsTrigger className="w-full" value="declined">
               Declined ({isPending ? "..." : reviewerStats.declined})
             </TabsTrigger>
           </Link>

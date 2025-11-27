@@ -20,6 +20,7 @@ import { useTheme } from "next-themes";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import OnChangePlugin from "./plugins/OnChangePlugin";
+import TabIndentationPlugin from "./plugins/TabIndentationPlugin";
 import "./RichTextEditor.css";
 
 const theme = {
@@ -160,6 +161,7 @@ export default function RichTextEditor({
             <ListPlugin />
             <LinkPlugin />
             <AutoLinkPlugin />
+            <TabIndentationPlugin />
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
             {onChange && (
               <OnChangePlugin onChange={onChange} debounceMs={debounceMs} />

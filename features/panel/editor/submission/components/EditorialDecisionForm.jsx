@@ -32,6 +32,7 @@ import {
   FormRichTextEditor,
 } from "@/features";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useParams, useRouter } from "next/navigation";
 
 const decisionSchema = z.object({
   decision_type: z.enum(
@@ -88,6 +89,8 @@ export default function EditorialDecisionForm({
   const { data: templates, isLoading: templatesLoading } =
     useGetDecisionLetterTemplates();
 
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(decisionSchema),
     defaultValues: {
@@ -132,6 +135,7 @@ export default function EditorialDecisionForm({
     createDecision(payload, {
       onSuccess: () => {
         form.reset();
+        router.push(`/editor/submissions/${submissionId}`);
       },
     });
   };
