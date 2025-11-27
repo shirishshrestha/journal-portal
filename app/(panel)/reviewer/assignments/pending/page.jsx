@@ -167,9 +167,9 @@ export default function PendingAssignmentsPage() {
       {assignmentsData && assignmentsData.count > 0 && (
         <Pagination
           currentPage={currentPage}
-          totalPages={Math.ceil(assignmentsData.count / 10)}
+          totalPages={Math.ceil(assignmentsData.count / 6)}
           totalCount={assignmentsData.count}
-          pageSize={10}
+          pageSize={6}
           onPageChange={handlePageChange}
           showPageSizeSelector={false}
         />
