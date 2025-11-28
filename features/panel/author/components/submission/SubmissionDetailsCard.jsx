@@ -47,12 +47,12 @@ export default function SubmissionDetailsCard({ submission }) {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                {submission?.submitted_at
+                {submission && submission?.submitted_at
                   ? `Submitted ${format(
                       new Date(submission.submitted_at),
                       "PPP"
                     )}`
-                  : `Created ${format(new Date(submission.created_at), "PPP")}`}
+                  : "Not Submitted"}
               </div>
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
