@@ -2,9 +2,9 @@ import { useMutation } from "@tanstack/react-query";
 import { verifyEmail } from "../../api/passwordApi";
 import { toast } from "sonner";
 
-export const useVerifyEmail = ({ token }) => {
+export const useVerifyEmail = ({ token, uid }) => {
   return useMutation({
-    mutationFn: () => verifyEmail(token),
+    mutationFn: () => verifyEmail(token, uid),
     onSuccess: (data) => {
       toast.success("Email verified successfully");
     },

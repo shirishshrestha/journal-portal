@@ -9,21 +9,21 @@ import { useSelector } from "react-redux";
 
 export default function VerifyEmail() {
   const [emailSent, setEmailSent] = useState(false);
-  const token = useSelector((state) => state?.auth?.access);
+  const authData = useSelector((state) => state?.auth);
+  const token = authData?.access || null;
+  const uid = authData?.userData?.id || null;
   const { mutate: verifyEmail, isPending } = useVerifyEmail({
     token: token,
+    uid: uid,
   });
 
   const handleSendVerification = () => {
-    verifyEmail(
-      {},
-      {
-        onSuccess: () => {
-          setEmailSent(true);
-          setTimeout(() => setEmailSent(false), 5000);
-        },
-      }
-    );
+    verifyEmail({
+      onSuccess: () => {
+        setEmailSent(true);
+        setTimeout(() => setEmailSent(false), 5000);
+      },
+    });
   };
 
   return (

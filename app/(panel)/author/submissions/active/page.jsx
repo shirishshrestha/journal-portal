@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   AuthorSubmissionsTable,
   LoadingScreen,
+  Pagination,
   RoleBasedRoute,
   SubmissionsLayout,
 } from "@/features";
@@ -72,6 +73,18 @@ export default function ActivePage() {
         onOpenChange={setViewModalOpen}
         submissionId={selectedSubmissionId}
       />
+
+      {/* Pagination */}
+      {SubmissionsData && SubmissionsData.count > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(SubmissionsData.count / 10)}
+          totalCount={SubmissionsData.count}
+          pageSize={10}
+          onPageChange={handlePageChange}
+          showPageSizeSelector={false}
+        />
+      )}
     </RoleBasedRoute>
   );
 }

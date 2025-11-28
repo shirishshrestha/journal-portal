@@ -14,7 +14,7 @@ import DocumentUploadModal from "@/features/panel/author/components/submission/D
 import DocumentViewModal from "@/features/panel/author/components/submission/DocumentViewModal";
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
 import { useDeleteSubmission } from "@/features/panel/author/hooks/mutation/useDeleteSubmission";
-import { ConfirmationPopup } from "@/features/shared";
+import { ConfirmationPopup, Pagination } from "@/features/shared";
 
 export default function ArchivedPage() {
   const router = useRouter();
@@ -96,6 +96,18 @@ export default function ArchivedPage() {
         onOpenChange={setViewModalOpen}
         submissionId={selectedSubmissionId}
       />
+
+      {/* Pagination */}
+      {SubmissionsData && SubmissionsData.count > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(SubmissionsData.count / 10)}
+          totalCount={SubmissionsData.count}
+          pageSize={10}
+          onPageChange={handlePageChange}
+          showPageSizeSelector={false}
+        />
+      )}
     </RoleBasedRoute>
   );
 }
