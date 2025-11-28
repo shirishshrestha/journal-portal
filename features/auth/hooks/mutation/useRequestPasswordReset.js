@@ -11,7 +11,7 @@ export const useRequestPasswordReset = () => {
     onError: (error) => {
       const errorMessage =
         error?.response?.data?.message ||
-        error?.response?.data?.detail ||
+        error?.response?.data?.error ||
         "Failed to send password reset email";
       toast.error(errorMessage);
     },

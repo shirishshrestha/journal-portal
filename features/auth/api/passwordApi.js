@@ -13,8 +13,8 @@ export const changePassword = async (data) => {
  * Verify email with token
  * POST /api/auth/verify-email/
  */
-export const verifyEmail = async (token, uid) => {
-  const response = await instance.post("/auth/verify-email/", { token, uid });
+export const verifyEmail = async () => {
+  const response = await instance.post("/auth/verify-email/");
   return response.data;
 };
 
@@ -24,5 +24,24 @@ export const verifyEmail = async (token, uid) => {
  */
 export const requestPasswordReset = async (email) => {
   const response = await instance.post("/auth/password/reset/", { email });
+  return response.data;
+};
+
+/**
+ * Confirm password reset with token
+ * POST /api/auth/password/reset/confirm/
+ */
+export const confirmPasswordReset = async ({
+  uid,
+  token,
+  new_password,
+  confirm_password,
+}) => {
+  const response = await instance.post("/auth/password/reset/confirm/", {
+    uid,
+    token,
+    new_password,
+    confirm_password,
+  });
   return response.data;
 };

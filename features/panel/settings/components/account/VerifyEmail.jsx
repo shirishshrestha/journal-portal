@@ -11,11 +11,7 @@ export default function VerifyEmail() {
   const [emailSent, setEmailSent] = useState(false);
   const authData = useSelector((state) => state?.auth);
   const token = authData?.access || null;
-  const uid = authData?.userData?.id || null;
-  const { mutate: verifyEmail, isPending } = useVerifyEmail({
-    token: token,
-    uid: uid,
-  });
+  const { mutate: verifyEmail, isPending } = useVerifyEmail();
 
   const handleSendVerification = () => {
     verifyEmail({

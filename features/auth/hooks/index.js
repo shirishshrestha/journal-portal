@@ -3,6 +3,7 @@ import { useRegisterUser } from "./mutation/useRegisterUser";
 import { useChangePassword } from "./mutation/useChangePassword";
 import { useVerifyEmail } from "./mutation/useVerifyEmail";
 import { useRequestPasswordReset } from "./mutation/useRequestPasswordReset";
+import { useConfirmPasswordReset } from "./mutation/useConfirmPasswordReset";
 import useCrossTabAuth from "./useCrossTabAuth";
 
 export {
@@ -11,5 +12,6 @@ export {
   useChangePassword,
   useVerifyEmail,
   useRequestPasswordReset,
+  useConfirmPasswordReset,
   useCrossTabAuth,
 };
