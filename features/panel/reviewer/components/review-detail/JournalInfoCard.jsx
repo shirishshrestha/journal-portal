@@ -61,7 +61,9 @@ export function JournalInfoCard({ journal }) {
           <span className="font-medium text-foreground/80 min-w-[140px]">
             Publisher:
           </span>
-          <span className="text-muted-foreground">{journal.publisher}</span>
+          <span className="text-muted-foreground">
+            {journal.publisher || "N/A"}
+          </span>
         </div>
 
         {currentRole !== "AUTHOR" && (
@@ -80,7 +82,7 @@ export function JournalInfoCard({ journal }) {
             ISSN (Print):
           </span>
           <code className="text-xs bg-muted px-2 py-1 rounded">
-            {journal.issn_print}
+            {journal.issn_print || "N/A"}
           </code>
         </div>
 
@@ -89,7 +91,7 @@ export function JournalInfoCard({ journal }) {
             ISSN (Online):
           </span>
           <code className="text-xs bg-muted px-2 py-1 rounded">
-            {journal.issn_online}
+            {journal.issn_online || "N/A"}
           </code>
         </div>
 
@@ -99,12 +101,12 @@ export function JournalInfoCard({ journal }) {
               Website:
             </span>
             <a
-              href={journal.website_url}
+              href={journal.website_url || "N/A"}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline flex items-center gap-1"
             >
-              {journal.website_url}
+              {journal.website_url || "N/A"}
             </a>
           </div>
         )}
@@ -115,10 +117,10 @@ export function JournalInfoCard({ journal }) {
               Contact Email:
             </span>
             <a
-              href={`mailto:${journal.contact_email}`}
+              href={`mailto:${journal.contact_email || "N/A"}`}
               className="text-primary hover:underline"
             >
-              {journal.contact_email}
+              {journal.contact_email || "N/A"}
             </a>
           </div>
         )}
