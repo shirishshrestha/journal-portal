@@ -6,7 +6,7 @@ import { getJournals } from "@/features/panel/admin/journal/api/journalsApi";
  * @param {Object} params - Query parameters (e.g., { active_role: 'AUTHOR' })
  * @returns {Object} React Query result
  */
-export const useGetJournals = (params = {}) => {
+export const useGetJournals = ({ params = {} } = {}) => {
   return useQuery({
     queryKey: ["journals", params],
     queryFn: () => getJournals(params),

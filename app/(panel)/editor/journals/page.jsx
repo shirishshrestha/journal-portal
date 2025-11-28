@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import {
   JournalDetailsDrawer,
   JournalFormModal,
@@ -16,16 +15,34 @@ import {
   FilterToolbar,
   RoleBasedRoute,
   ConfirmationPopup,
+  Pagination,
 } from "@/features/shared";
 
 export default function JournalsPage() {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [acceptingFilter, setAcceptingFilter] = useState("all");
-  const [sortColumn, setSortColumn] = useState("title");
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [currentPage, setCurrentPage] = useState(1);
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get("page");
+  const searchParam = searchParams.get("search");
+  const statusParam = searchParams.get("status");
+  const submissionsParam = searchParams.get("submissions");
+
+  const currentPage = pageParam ? parseInt(pageParam) : 1;
+  const is_active =
+    statusParam === "active" ? true : statusParam === "inactive" ? false : "";
+  const is_accepting_submissions =
+    submissionsParam === "accepting"
+      ? true
+      : submissionsParam === "not-accepting"
+      ? false
+      : "";
+
+  const params = {
+    search: searchParam || "",
+    is_active: is_active,
+    is_accepting_submissions: is_accepting_submissions,
+    page: currentPage,
+  };
+
   const [selectedJournal, setSelectedJournal] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -36,20 +53,15 @@ export default function JournalsPage() {
     data: JournalData,
     isPending: isJournalDataPending,
     error: JournalDataError,
-  } = useGetJournals();
-
-  const itemsPerPage = 10;
-
-  const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortOrder("asc");
-    }
-  };
+  } = useGetJournals({ params });
 
   const deleteJournalMutation = useDeleteJournal();
+
+  const handlePageChange = (page) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   const handleSaveJournal = () => {
     setIsFormOpen(false);
@@ -72,11 +84,6 @@ export default function JournalsPage() {
   };
 
   const journals = JournalData?.results || [];
-  const totalPages = Math.ceil(journals.length / itemsPerPage);
-  const paginatedJournals = journals.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   return (
     <RoleBasedRoute allowedRoles={["EDITOR"]}>
@@ -105,8 +112,6 @@ export default function JournalsPage() {
         <FilterToolbar>
           <FilterToolbar.Search
             paramName="search"
-            value={searchTerm}
-            onChange={setSearchTerm}
             placeholder="Search by title, short name, or publisher..."
             label="Search"
           />
@@ -114,8 +119,6 @@ export default function JournalsPage() {
           <FilterToolbar.Select
             label="Status"
             paramName="status"
-            value={activeFilter}
-            onChange={setActiveFilter}
             options={[
               { value: "all", label: "All Status" },
               { value: "active", label: "Active" },
@@ -126,8 +129,6 @@ export default function JournalsPage() {
           <FilterToolbar.Select
             label="Submissions"
             paramName="submissions"
-            value={acceptingFilter}
-            onChange={setAcceptingFilter}
             options={[
               { value: "all", label: "All" },
               { value: "accepting", label: "Accepting" },
@@ -151,42 +152,19 @@ export default function JournalsPage() {
           onDelete={handleDelete}
           isPending={isJournalDataPending}
           error={JournalDataError}
-          sortColumn={sortColumn}
-          sortOrder={sortOrder}
-          onSort={handleSort}
         />
 
         {/* Pagination */}
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing{" "}
-            {paginatedJournals.length === 0
-              ? 0
-              : (currentPage - 1) * itemsPerPage + 1}{" "}
-            to {Math.min(currentPage * itemsPerPage, journals.length)} of{" "}
-            {journals.length} journals
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage(Math.min(totalPages, currentPage + 1))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        {JournalData && JournalData.count > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(JournalData.count / 10)}
+            totalCount={JournalData.count}
+            pageSize={10}
+            onPageChange={handlePageChange}
+            showPageSizeSelector={false}
+          />
+        )}
 
         {/* Modals */}
         <JournalFormModal

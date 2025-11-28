@@ -125,15 +125,17 @@ export default function ActivityLogsPage() {
           options={[
             { value: "all", label: "All Actions" },
             { value: "CREATE", label: "Create" },
+            { value: "READ", label: "Read" },
             { value: "UPDATE", label: "Update" },
             { value: "DELETE", label: "Delete" },
             { value: "LOGIN", label: "Login" },
             { value: "LOGOUT", label: "Logout" },
-            { value: "VIEW", label: "View" },
-            { value: "DOWNLOAD", label: "Download" },
             { value: "SUBMIT", label: "Submit" },
+            { value: "REVIEW", label: "Review" },
             { value: "APPROVE", label: "Approve" },
             { value: "REJECT", label: "Reject" },
+            { value: "PUBLISH", label: "Publish" },
+            { value: "WITHDRAW", label: "Withdraw" },
           ]}
         />
         <FilterToolbar.Select
@@ -142,11 +144,13 @@ export default function ActivityLogsPage() {
           options={[
             { value: "all", label: "All Resources" },
             { value: "USER", label: "User" },
+            { value: "PROFILE", label: "Profile" },
             { value: "SUBMISSION", label: "Submission" },
+            { value: "DOCUMENT", label: "Document" },
             { value: "REVIEW", label: "Review" },
             { value: "JOURNAL", label: "Journal" },
-            { value: "NOTIFICATION", label: "Notification" },
-            { value: "VERIFICATION", label: "Verification" },
+            { value: "PLAGIARISM_REPORT", label: "Plagiarism Report" },
+            { value: "FORMAT_CHECK", label: "Format Check" },
           ]}
         />
         <FilterToolbar.Select

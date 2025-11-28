@@ -44,14 +44,7 @@ export default function JournalsTable({
   const columns = [
     {
       key: "title",
-      header: (
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => onSort("title")}
-        >
-          Title <ArrowUpDown className="h-4 w-4 opacity-50" />
-        </div>
-      ),
+      header: "Title",
       cellClassName: "font-medium text-foreground",
     },
     {
@@ -61,14 +54,7 @@ export default function JournalsTable({
     },
     {
       key: "publisher",
-      header: (
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => onSort("publisher")}
-        >
-          Publisher <ArrowUpDown className="h-4 w-4 opacity-50" />
-        </div>
-      ),
+      header: "Publisher",
       cellClassName: "text-muted-foreground",
     },
     {
@@ -85,14 +71,7 @@ export default function JournalsTable({
     },
     {
       key: "submission_count",
-      header: (
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => onSort("submissions")}
-        >
-          Submissions <ArrowUpDown className="h-4 w-4 opacity-50" />
-        </div>
-      ),
+      header: "Submission Count",
       align: "center",
       cellClassName: "font-medium text-center",
     },

@@ -42,14 +42,8 @@ export default function JournalsPage() {
     page: currentPage,
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [acceptingFilter, setAcceptingFilter] = useState("all");
-  const [sortColumn, setSortColumn] = useState("title");
-  const [sortOrder, setSortOrder] = useState("asc");
   const [selectedJournal, setSelectedJournal] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [journalToDelete, setJournalToDelete] = useState(null);
 
@@ -65,19 +59,6 @@ export default function JournalsPage() {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
     router.push(`?${params.toString()}`, { scroll: false });
-  };
-
-  const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortOrder("asc");
-    }
-  };
-
-  const handleSaveJournal = () => {
-    setIsFormOpen(false);
   };
 
   const handleDelete = (journal) => {
@@ -117,8 +98,6 @@ export default function JournalsPage() {
         <FilterToolbar>
           <FilterToolbar.Search
             paramName="search"
-            value={searchTerm}
-            onChange={setSearchTerm}
             placeholder="Search by title, short name, or publisher..."
             label="Search"
           />
@@ -126,8 +105,6 @@ export default function JournalsPage() {
           <FilterToolbar.Select
             label="Status"
             paramName="status"
-            value={activeFilter}
-            onChange={setActiveFilter}
             options={[
               { value: "all", label: "All Status" },
               { value: "active", label: "Active" },
@@ -138,8 +115,6 @@ export default function JournalsPage() {
           <FilterToolbar.Select
             label="Submissions"
             paramName="submissions"
-            value={acceptingFilter}
-            onChange={setAcceptingFilter}
             options={[
               { value: "all", label: "All" },
               { value: "accepting", label: "Accepting" },
@@ -158,9 +133,6 @@ export default function JournalsPage() {
           onDelete={handleDelete}
           isPending={isJournalDataPending}
           error={JournalDataError}
-          sortColumn={sortColumn}
-          sortOrder={sortOrder}
-          onSort={handleSort}
         />
 
         {/* Pagination */}

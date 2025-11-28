@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getJournals } from "../../api/journalsApi";
 
-export const useGetJournals = ({ params = {} } = {}, options = {}) => {
+export const useGetJournals = ({ params = {} } = {}) => {
   return useQuery({
     queryKey: ["admin-journals", params],
     queryFn: () => getJournals(params),
@@ -10,6 +10,5 @@ export const useGetJournals = ({ params = {} } = {}, options = {}) => {
     refetchOnWindowFocus: false, // Don't refetch - journals don't change frequently
     refetchOnMount: false, // Use cached data
     retry: 2, // Retry failed requests twice
-    ...options,
   });
 };
