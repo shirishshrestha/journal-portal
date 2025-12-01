@@ -14,16 +14,19 @@ export const changePassword = async (data) => {
  * POST /api/auth/verify-email/
  */
 export const verifyEmail = async ({ uid, token }) => {
-  const response = await instance.post("/auth/verify-email/", { uid, token });
+  const response = await instance.post(`/auth/verify-email/${uid}/${token}/`);
   return response.data;
 };
 
 /**
  * Resend verification email
  * POST /api/auth/resend-verification/
+ * Note: Requires authentication, gets email from authenticated user
  */
-export const resendVerificationEmail = async () => {
-  const response = await instance.post("/auth/resend-verification/");
+export const resendVerificationEmail = async (email) => {
+  const response = await instance.post("/auth/resend-verification/", {
+    email,
+  });
   return response.data;
 };
 

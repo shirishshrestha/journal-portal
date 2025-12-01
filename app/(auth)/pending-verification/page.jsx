@@ -100,16 +100,13 @@ const PendingVerificationPage = () => {
   const handleResendEmail = () => {
     if (!canResend || !userData?.email) return;
 
-    resendEmail(
-      { email: userData.email },
-      {
-        onSuccess: () => {
-          setLastSentTime(new Date());
-          setCanResend(false);
-          setCountdown(60); // 60 second cooldown
-        },
-      }
-    );
+    resendEmail(undefined, {
+      onSuccess: () => {
+        setLastSentTime(new Date());
+        setCanResend(false);
+        setCountdown(60); // 60 second cooldown
+      },
+    });
   };
 
   const handleLogout = () => {

@@ -16,7 +16,6 @@ const RoleBasedRoute = ({ allowedRoles = [], children }) => {
       return;
     }
 
-    // Check if email is verified
     if (isVerified === false && !userRoles.includes("ADMIN")) {
       router.replace("/pending-verification");
       return;
