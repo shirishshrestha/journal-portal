@@ -73,6 +73,7 @@ export const getSingleSubmissionById = async (id) => {
  * @returns {Promise} API response
  */
 export const updateSubmission = async (id, data) => {
+  console.log(data);
   const response = await instance.patch("submissions/" + id + "/", data);
   return response.data;
 };

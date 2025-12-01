@@ -32,6 +32,7 @@ import {
   reviewRecommendationConfig,
   FormRichTextEditor,
 } from "@/features";
+import { stripHtmlTags } from "@/features/shared/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams, useRouter } from "next/navigation";
 
@@ -44,7 +45,11 @@ const decisionSchema = z.object({
   ),
   decision_letter: z
     .string()
-    .min(50, "Decision letter must be at least 50 characters"),
+    .min(50, "Decision letter must be at least 50 characters")
+    .refine((val) => {
+      const plainText = stripHtmlTags(val);
+      return plainText.length >= 50;
+    }, "Decision letter must contain at least 50 characters of text"),
   confidential_notes: z.string().optional(),
   revision_deadline: z.string().optional(),
   template_id: z.string().optional(),

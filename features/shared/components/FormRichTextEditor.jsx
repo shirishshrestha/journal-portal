@@ -44,7 +44,7 @@ export default function FormRichTextEditor({
             <RichTextEditor
               placeholder={placeholder}
               onChange={(html) => field.onChange(html)}
-              initialValue={field.value || ""}
+              initialValue={field.value}
               debounceMs={debounceMs}
               autoFocus={autoFocus}
               editor_classname={editor_classname}

@@ -1,4 +1,5 @@
 export { useCreateSubmission } from "./mutation/useCreateSubmission";
+export { useUpdateSubmission } from "./mutation/useUpdateSubmission";
 export { useGetSubmissions } from "./query/useGetSubmissions";
 export { useGetDraftSubmissions } from "./query/useGetDraftSubmissions";
 export { useGetUnassignedSubmissions } from "./query/useGetUnassignedSubmissions";

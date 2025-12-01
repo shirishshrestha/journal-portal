@@ -15,6 +15,7 @@ import { FormRichTextEditor, FormInputField } from "@/features";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 import { useUpdateJournal } from "@/features";
+import { stripHtmlTags } from "@/features/shared/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -32,7 +33,14 @@ const generalSettingsSchema = z.object({
   title: z.string().min(1, "Title is required"),
   short_name: z.string().min(1, "Short name is required"),
   publisher: z.string().optional(),
-  description: z.string().optional(),
+  description: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val) return true;
+      const plainText = stripHtmlTags(val);
+      return plainText.length <= 2000;
+    }, "Description must not exceed 2,000 characters of text"),
   issn_print: z
     .string()
     .regex(/^\d{4}-\d{4}$/, "ISSN must be in format: 1234-5678")

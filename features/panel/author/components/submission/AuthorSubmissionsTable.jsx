@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/features/shared";
-import { BookOpen, MoreVertical, Trash2, Eye } from "lucide-react";
+import { BookOpen, MoreVertical, Trash2, Eye, Pencil } from "lucide-react";
 import Link from "next/link";
 import { statusConfig } from "../../../../shared/utils/submission-status-color";
 
@@ -97,6 +97,21 @@ const columns = [
               </DropdownMenuItem>
             </Link>
 
+            {row.onEdit && (
+              <>
+                <DropdownMenuSeparator />
+                <Link
+                  href={`/author/submissions/${row.id}/edit`}
+                  className={"flex items-center text-sm gap-2 "}
+                >
+                  <DropdownMenuItem>
+                    <Pencil className=" h-4 w-4 text-foreground hover:text-primary-foreground" />
+                    Edit Submission
+                  </DropdownMenuItem>
+                </Link>
+              </>
+            )}
+
             {row.onDelete && (
               <>
                 <DropdownMenuSeparator />
@@ -124,6 +139,7 @@ export default function AuthorSubmissionsTable({
   onViewDocuments,
   onSubmit,
   onDelete,
+  onEdit,
   viewUrl,
 }) {
   // Attach action handlers to each submission row
@@ -133,6 +149,7 @@ export default function AuthorSubmissionsTable({
     onViewDocuments,
     onSubmit,
     onDelete,
+    onEdit,
     viewUrl: typeof viewUrl === "function" ? viewUrl(submission) : viewUrl,
   }));
   return (

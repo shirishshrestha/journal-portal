@@ -21,6 +21,7 @@ import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import OnChangePlugin from "./plugins/OnChangePlugin";
 import TabIndentationPlugin from "./plugins/TabIndentationPlugin";
+import InitialValuePlugin from "./plugins/InitialValuePlugin";
 import "./RichTextEditor.css";
 
 const theme = {
@@ -163,6 +164,7 @@ export default function RichTextEditor({
             <AutoLinkPlugin />
             <TabIndentationPlugin />
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+            {initialValue && <InitialValuePlugin initialValue={initialValue} />}
             {onChange && (
               <OnChangePlugin onChange={onChange} debounceMs={debounceMs} />
             )}

@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Save, Loader2, Plus, X } from "lucide-react";
-import { useGetJournalById } from "@/features";
+import { useGetJournalById, FormRichTextEditor } from "@/features";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { updateSubmissionSettings } from "../../api/journalsApi";
 import { submissionSettingsSchema } from "../../utils/submissionSettingsSchema";
@@ -45,7 +45,7 @@ export function SubmissionSettings({ journalId }) {
     resolver: zodResolver(submissionSettingsSchema),
     defaultValues: {
       submission_guidelines: "",
-      author_guidelines: [],
+      author_guidelines: "",
       submission_requirements: [],
       coauthor_roles: [],
       review_type: "DOUBLE_BLIND",
@@ -71,15 +71,6 @@ export function SubmissionSettings({ journalId }) {
   } = useFieldArray({
     control: form.control,
     name: "submission_requirements",
-  });
-
-  const {
-    fields: guidelineFields,
-    append: appendGuideline,
-    remove: removeGuideline,
-  } = useFieldArray({
-    control: form.control,
-    name: "author_guidelines",
   });
 
   const {
@@ -173,52 +164,12 @@ export function SubmissionSettings({ journalId }) {
               )}
             />
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <FormLabel>Author Guidelines</FormLabel>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => appendGuideline("")}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Guideline
-                </Button>
-              </div>
-              {guidelineFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`author_guidelines.${index}`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder={`Guideline #${index + 1}`}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeGuideline(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-              {guidelineFields.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  No guidelines added yet.
-                </p>
-              )}
-            </div>
+            <FormRichTextEditor
+              control={form.control}
+              name="author_guidelines"
+              label="Author Guidelines"
+              placeholder="Enter detailed guidelines for authors on manuscript preparation, formatting, and submission..."
+            />
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">

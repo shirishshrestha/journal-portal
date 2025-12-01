@@ -3,7 +3,7 @@ import * as z from "zod";
 export const submissionSettingsSchema = z.object({
   // Submission Guidelines
   submission_guidelines: z.string().optional(),
-  author_guidelines: z.array(z.string()).optional().default([]),
+  author_guidelines: z.string().optional(),
   submission_requirements: z.array(z.string()).optional().default([]),
   coauthor_roles: z.array(z.string()).optional().default([]),
 

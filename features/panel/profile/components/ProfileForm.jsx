@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { FormRichTextEditor } from "@/features";
 import { Loader2, Check, X, Plus } from "lucide-react";
@@ -23,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { InstitutionSearchSelect } from "@/features";
 import { useGetRORInstitution } from "@/features/shared/hooks/useGetRORInstitution";
 import ReactCountryFlag from "react-country-flag";
-import { cn } from "@/lib/utils";
+import { getPlainTextLength } from "@/features/shared/utils";
 
 export default function ProfileForm({
   defaultValues,
@@ -329,9 +328,9 @@ export default function ProfileForm({
             name="bio"
             label="Bio"
             placeholder="Tell us about yourself, your research interests, and professional background..."
-            description={`${
-              form.watch("bio")?.replace(/<[^>]*>/g, "").length || 0
-            }/500 characters`}
+            description={`${getPlainTextLength(
+              form.watch("bio")
+            )}/500 characters`}
           />
         </div>
         {/* Action Buttons */}

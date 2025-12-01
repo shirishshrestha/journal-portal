@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,13 +13,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Send } from "lucide-react";
-import { useRouter } from "next/navigation";
-import SubmissionGuidelines from "./submission-form-steps/SubmissionGuidelines";
-import ManuscriptInfoStep from "./submission-form-steps/ManuscriptInfoStep";
-import AuthorsStep from "./submission-form-steps/AuthorsStep";
-import { useCreateSubmission, useGetJournalById } from "../../hooks";
-import { useGetMe, SubmissionCreatedDialog } from "@/features/shared";
+import { Save, Loader2 } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
+import SubmissionGuidelines from "../new-submission/submission-form-steps/SubmissionGuidelines";
+import ManuscriptInfoStep from "../new-submission/submission-form-steps/ManuscriptInfoStep";
+import AuthorsStep from "../new-submission/submission-form-steps/AuthorsStep";
+import { useUpdateSubmission, useGetJournalById } from "../../hooks";
+import { useGetMe } from "@/features/shared";
 import { stripHtmlTags } from "@/features/shared/utils";
 
 const fullFormSchema = z.object({
@@ -56,40 +56,51 @@ const fullFormSchema = z.object({
     .min(1, "All requirements must be accepted"),
 });
 
-export default function NewSubmissionForm() {
+export default function EditSubmissionForm({ submission }) {
   const router = useRouter();
+  const params = useParams();
   const { data: meData } = useGetMe();
   const profile = useMemo(() => meData?.profile, [meData]);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [createdSubmissionId, setCreatedSubmissionId] = useState(null);
 
-  const { mutate: createSubmission, isPending: isCreating } =
-    useCreateSubmission();
+  const { mutate: updateSubmission, isPending: isUpdating } =
+    useUpdateSubmission();
+
+  // Extract metadata from submission
+  const metadata = useMemo(() => {
+    if (!submission?.metadata_json) return {};
+    return typeof submission.metadata_json === "string"
+      ? JSON.parse(submission.metadata_json)
+      : submission.metadata_json;
+  }, [submission]);
 
   const form = useForm({
     resolver: zodResolver(fullFormSchema),
     defaultValues: {
-      journal_id: "",
-      requirements: [],
-      title: "",
-      abstract: "",
-      keywords: [],
-      section_id: "",
-      category_id: "",
-      research_type_id: "",
-      area_id: "",
+      journal_id: submission?.journal?.id?.toString() || "",
+      requirements: [true],
+      title: submission?.title || "",
+      abstract: submission?.abstract || "",
+      keywords: metadata?.keywords || [],
+      section_id: submission?.section || "",
+      category_id: submission?.category || "",
+      research_type_id: submission?.research_type || "",
+      area_id: submission?.area || "",
       metadata_json: {
-        review_type: "Single Blind",
-        subject_area: "Computer Science",
-        funding_info: "",
-        ethics_declarations: [],
+        review_type: metadata?.review_type || "Single Blind",
+        subject_area: metadata?.subject_area || "Computer Science",
+        funding_info: metadata?.funding_info || "",
+        ethics_declarations: metadata?.ethics_declarations || [],
       },
       corresponding_author: {
-        name: profile?.user_name || "",
-        email: profile?.user_email || "",
-        institution: profile?.affiliation_name || "",
+        name: metadata?.corresponding_author?.name || profile?.user_name || "",
+        email:
+          metadata?.corresponding_author?.email || profile?.user_email || "",
+        institution:
+          metadata?.corresponding_author?.institution ||
+          profile?.affiliation_name ||
+          "",
       },
-      co_authors: [],
+      co_authors: metadata?.co_authors || [],
       terms_accepted: false,
     },
   });
@@ -110,9 +121,14 @@ export default function NewSubmissionForm() {
     [selectedJournalDetails]
   );
 
+  const submissionRequirements = useMemo(
+    () => selectedJournalDetails?.settings?.submission_requirements || [],
+    [selectedJournalDetails]
+  );
+
   // Update form when profile data loads
   useEffect(() => {
-    if (profile) {
+    if (profile && !metadata?.corresponding_author) {
       form.setValue("corresponding_author.name", profile.user_name || "");
       form.setValue("corresponding_author.email", profile.user_email || "");
       form.setValue(
@@ -120,7 +136,20 @@ export default function NewSubmissionForm() {
         profile.affiliation_name || ""
       );
     }
-  }, [profile, form]);
+  }, [profile, form, metadata]);
+
+  // Initialize requirements array when journal details load
+  useEffect(() => {
+    if (submissionRequirements.length > 0) {
+      const existingRequirements = form.getValues("requirements");
+      if (!existingRequirements || existingRequirements.length === 0) {
+        form.setValue(
+          "requirements",
+          submissionRequirements.map(() => true)
+        );
+      }
+    }
+  }, [submissionRequirements, form]);
 
   const handleAddCoauthor = () => {
     const currentCoAuthors = form.getValues("co_authors") || [];
@@ -165,21 +194,23 @@ export default function NewSubmissionForm() {
       },
     };
 
-    createSubmission(submissionData, {
-      onSuccess: (response) => {
-        setCreatedSubmissionId(response?.id || response?.data?.id);
-        setShowSuccessDialog(true);
-      },
-    });
+    updateSubmission(
+      { id: params.id, data: submissionData },
+      {
+        onSuccess: (response) => {
+          router.push("/author/submissions/drafts");
+        },
+      }
+    );
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">New Submission</h1>
+        <h1 className="text-3xl font-bold text-foreground">Edit Submission</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Complete all sections below to submit your manuscript
+          Update your manuscript information
         </p>
       </div>
 
@@ -231,26 +262,36 @@ export default function NewSubmissionForm() {
           </Card>
 
           {/* Submit Button */}
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+              disabled={isUpdating}
+            >
+              Cancel
+            </Button>
             <Button
               type="submit"
               size="lg"
-              disabled={isCreating}
+              disabled={isUpdating}
               className="gap-2"
             >
-              <Send className="h-4 w-4" />
-              {isCreating ? "Submitting..." : "Submit Manuscript"}
+              {isUpdating ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  Save Changes
+                </>
+              )}
             </Button>
           </div>
         </form>
       </Form>
-
-      {/* Success Dialog */}
-      <SubmissionCreatedDialog
-        open={showSuccessDialog}
-        onOpenChange={setShowSuccessDialog}
-        submissionId={createdSubmissionId}
-      />
     </div>
   );
 }

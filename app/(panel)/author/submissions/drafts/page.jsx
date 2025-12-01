@@ -67,12 +67,17 @@ export default function DraftsPage() {
     setDeleteDialogOpen(true);
   };
 
+  const handleEdit = (submission) => {
+    router.push(`/author/submissions/${submission.id}/edit`);
+  };
+
   const confirmDelete = () => {
     if (submissionToDelete) {
       deleteSubmissionMutation.mutate(submissionToDelete.id, {
         onSuccess: () => {
           setDeleteDialogOpen(false);
           setSubmissionToDelete(null);
+          deleteSubmissionMutation.reset();
         },
       });
     }
@@ -95,6 +100,7 @@ export default function DraftsPage() {
           viewUrl={(submission) =>
             `/author/submissions/drafts/${submission.id}`
           }
+          onEdit={handleEdit}
           onDelete={handleDelete}
         />
       </SubmissionsLayout>
@@ -116,7 +122,12 @@ export default function DraftsPage() {
       {/* Delete Confirmation Popup */}
       <ConfirmationPopup
         open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
+        onOpenChange={(open) => {
+          setDeleteDialogOpen(open);
+          if (!open) {
+            deleteSubmissionMutation.reset();
+          }
+        }}
         title="Delete Submission"
         description={`Are you sure you want to delete "${submissionToDelete?.title}"? This action cannot be undone.`}
         confirmText="Delete"

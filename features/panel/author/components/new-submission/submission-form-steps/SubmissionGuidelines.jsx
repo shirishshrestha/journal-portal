@@ -4,6 +4,7 @@
 import { useMemo, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import {
   FormField,
   FormItem,
@@ -13,21 +14,16 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { SearchableSelect } from "@/features/shared/components/SearchableSelect";
+import { AuthorGuidelinesDialog } from "@/features/shared/components/AuthorGuidelinesDialog";
 import { useWatch } from "react-hook-form";
 import { useGetJournals } from "@/features/shared/hooks/useGetJournals";
 import { useGetTaxonomyTree } from "@/features/shared/hooks/useGetTaxonomyTree";
 import { useGetJournalById } from "@/features/panel/author/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { JournalInfoCard } from "@/features/panel/reviewer/components/review-detail/JournalInfoCard";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { stripHtmlTags } from "@/features/shared/utils";
+
+import { FileText, ExternalLink } from "lucide-react";
 
 export default function SubmissionGuidelines({ form }) {
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
@@ -52,19 +48,19 @@ export default function SubmissionGuidelines({ form }) {
 
   const sectionId = useWatch({
     control: form.control,
-    name: "section",
+    name: "section_id",
     defaultValue: "",
   });
 
   const categoryId = useWatch({
     control: form.control,
-    name: "category",
+    name: "category_id",
     defaultValue: "",
   });
 
   const researchTypeId = useWatch({
     control: form.control,
-    name: "research_type",
+    name: "research_type_id",
     defaultValue: "",
   });
 
@@ -83,7 +79,7 @@ export default function SubmissionGuidelines({ form }) {
   );
 
   const authorGuidelines = useMemo(
-    () => selectedJournalDetails?.settings?.author_guidelines || [],
+    () => selectedJournalDetails?.settings?.author_guidelines || "",
     [selectedJournalDetails]
   );
 
@@ -91,6 +87,15 @@ export default function SubmissionGuidelines({ form }) {
     () => selectedJournalDetails?.settings?.submission_guidelines || "",
     [selectedJournalDetails]
   );
+
+  // Truncate author guidelines to 150 characters
+  const truncatedGuidelines = useMemo(() => {
+    if (!authorGuidelines) return "";
+    const plainText = stripHtmlTags(authorGuidelines);
+    return plainText.length > 150
+      ? plainText.substring(0, 150) + "..."
+      : plainText;
+  }, [authorGuidelines]);
 
   // Transform journals for SearchableSelect
   const journalOptions = useMemo(
@@ -156,25 +161,25 @@ export default function SubmissionGuidelines({ form }) {
 
   // Reset dependent fields when parent changes
   useEffect(() => {
-    form.setValue("section", "");
-    form.setValue("category", "");
-    form.setValue("research_type", "");
-    form.setValue("area", "");
+    form.setValue("section_id", "");
+    form.setValue("category_id", "");
+    form.setValue("research_type_id", "");
+    form.setValue("area_id", "");
   }, [journalId, form]);
 
   useEffect(() => {
-    form.setValue("category", "");
-    form.setValue("research_type", "");
-    form.setValue("area", "");
+    form.setValue("category_id", "");
+    form.setValue("research_type_id", "");
+    form.setValue("area_id", "");
   }, [sectionId, form]);
 
   useEffect(() => {
-    form.setValue("research_type", "");
-    form.setValue("area", "");
+    form.setValue("research_type_id", "");
+    form.setValue("area_id", "");
   }, [categoryId, form]);
 
   useEffect(() => {
-    form.setValue("area", "");
+    form.setValue("area_id", "");
   }, [researchTypeId, form]);
 
   return (
@@ -209,7 +214,7 @@ export default function SubmissionGuidelines({ form }) {
       {journalId && (
         <FormField
           control={form.control}
-          name="section"
+          name="section_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Section</FormLabel>
@@ -240,7 +245,7 @@ export default function SubmissionGuidelines({ form }) {
       {sectionId && categoryOptions.length > 0 && (
         <FormField
           control={form.control}
-          name="category"
+          name="category_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
@@ -267,7 +272,7 @@ export default function SubmissionGuidelines({ form }) {
       {categoryId && researchTypeOptions.length > 0 && (
         <FormField
           control={form.control}
-          name="research_type"
+          name="research_type_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Research Type</FormLabel>
@@ -294,7 +299,7 @@ export default function SubmissionGuidelines({ form }) {
       {researchTypeId && areaOptions.length > 0 && (
         <FormField
           control={form.control}
-          name="area"
+          name="area_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Research Area</FormLabel>
@@ -349,20 +354,31 @@ export default function SubmissionGuidelines({ form }) {
       )}
 
       {/* Author Guidelines */}
-      {authorGuidelines.length > 0 && (
+      {authorGuidelines && (
         <Card className="p-4 gap-0 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-foreground">Author Guidelines</h3>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowGuidelinesModal(true)}
+              className="gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View Details
+            </Button>
           </div>
-          <ul className="space-y-2 list-disc list-inside">
-            {authorGuidelines.map((guideline, i) => (
-              <li key={i} className="text-sm text-muted-foreground">
-                {guideline}
-              </li>
-            ))}
-          </ul>
+          <p className="text-sm text-muted-foreground">{truncatedGuidelines}</p>
         </Card>
       )}
+
+      {/* Author Guidelines Dialog */}
+      <AuthorGuidelinesDialog
+        open={showGuidelinesModal}
+        onOpenChange={setShowGuidelinesModal}
+        guidelines={authorGuidelines}
+      />
 
       {/* Submission Requirements with Checkboxes */}
       {submissionRequirements.length > 0 && (
@@ -373,14 +389,16 @@ export default function SubmissionGuidelines({ form }) {
           <p className="text-sm text-muted-foreground mb-4">
             Please confirm all requirements below to proceed:
           </p>
-          <div className="space-y-3">
-            {submissionRequirements.map((requirement, i) => (
-              <FormField
-                key={i}
-                control={form.control}
-                name={`requirements`}
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
+          <FormField
+            control={form.control}
+            name="requirements"
+            render={({ field }) => (
+              <div className="space-y-3">
+                {submissionRequirements.map((requirement, i) => (
+                  <FormItem
+                    key={i}
+                    className="flex items-center space-x-2 space-y-0"
+                  >
                     <FormControl>
                       <Checkbox
                         checked={
@@ -399,10 +417,10 @@ export default function SubmissionGuidelines({ form }) {
                       {requirement}
                     </FormLabel>
                   </FormItem>
-                )}
-              />
-            ))}
-          </div>
+                ))}
+              </div>
+            )}
+          />
           <FormMessage />
         </Card>
       )}

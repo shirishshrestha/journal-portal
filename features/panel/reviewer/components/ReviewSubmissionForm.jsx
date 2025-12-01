@@ -30,6 +30,7 @@ import { Separator } from "@/components/ui/separator";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useSubmitReview } from "../hooks/mutation/useSubmitReview";
 import { FormRichTextEditor } from "@/features/shared";
+import { getPlainTextLength, stripHtmlTags } from "@/features/shared/utils";
 
 // Validation schema
 const reviewSchema = z.object({
@@ -51,8 +52,22 @@ const reviewSchema = z.object({
   review_text: z
     .string()
     .min(100, "Review must be at least 100 characters")
-    .max(10000, "Review must not exceed 10,000 characters"),
-  confidential_comments: z.string().max(5000).optional(),
+    .refine((val) => {
+      const plainText = stripHtmlTags(val);
+      return plainText.length >= 100;
+    }, "Review must contain at least 100 characters of text")
+    .refine((val) => {
+      const plainText = stripHtmlTags(val);
+      return plainText.length <= 10000;
+    }, "Review must not exceed 10,000 characters of text"),
+  confidential_comments: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val) return true;
+      const plainText = stripHtmlTags(val);
+      return plainText.length <= 5000;
+    }, "Confidential comments must not exceed 5,000 characters of text"),
 });
 
 const RECOMMENDATION_OPTIONS = [
@@ -374,9 +389,9 @@ export function ReviewSubmissionForm({ assignment }) {
               control={control}
               name="review_text"
               placeholder="Provide your detailed review here. Include strengths, weaknesses, and suggestions for improvement..."
-              description={`${
-                reviewText?.length || 0
-              } characters (minimum 100 required)`}
+              description={`${getPlainTextLength(
+                reviewText
+              )} characters (minimum 100 required)`}
               editor_classname="min-h-[300px]"
             />
           </CardContent>

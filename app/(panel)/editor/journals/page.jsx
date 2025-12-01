@@ -182,7 +182,12 @@ export default function JournalsPage() {
         {/* Delete Confirmation Popup */}
         <ConfirmationPopup
           open={deleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
+          onOpenChange={(open) => {
+            setDeleteDialogOpen(open);
+            if (!open) {
+              deleteJournalMutation.reset();
+            }
+          }}
           title="Delete Journal"
           description={`Are you sure you want to delete "${journalToDelete?.title}"? This action cannot be undone and will remove all associated data.`}
           confirmText="Delete"

@@ -1,5 +1,5 @@
 // AuthorsStep.jsx
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import {
   FormField,
@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus } from "lucide-react";
-import { useFormContext, useWatch } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { InstitutionSearchSelect } from "@/features";
+import CoAuthorInstitutionDetails from "./CoAuthorInstitutionDetails";
 
 export default function AuthorsStep({
   form,
@@ -32,11 +34,33 @@ export default function AuthorsStep({
     defaultValue: [],
   });
 
+  // Helper to handle institution selection and ROR assignment
+  const handleInstitutionChange = useCallback(
+    (index, val, rorId) => {
+      form.setValue(`co_authors.${index}.institution`, val || "", {
+        shouldDirty: true,
+      });
+      if (rorId) {
+        form.setValue(`co_authors.${index}.affiliation_ror_id`, rorId, {
+          shouldDirty: true,
+        });
+      } else {
+        form.setValue(`co_authors.${index}.affiliation_ror_id`, "", {
+          shouldDirty: true,
+        });
+      }
+    },
+    [form]
+  );
+
   // Default roles if none provided from backend
-  const defaultRoles = ["Author", "Co-Author", "Researcher", "Contributor"];
+  const defaultRoles = useMemo(
+    () => ["Author", "Co-Author", "Researcher", "Contributor"],
+    []
+  );
   const availableRoles = useMemo(
     () => (coauthorRoles.length > 0 ? coauthorRoles : defaultRoles),
-    [coauthorRoles]
+    [coauthorRoles, defaultRoles]
   );
 
   return (
@@ -143,19 +167,38 @@ export default function AuthorsStep({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name={`co_authors.${index}.institution`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Institution</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Institution" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="col-span-2">
+                <FormField
+                  control={form.control}
+                  name={`co_authors.${index}.institution`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Institution</FormLabel>
+                      <FormControl>
+                        <InstitutionSearchSelect
+                          value={field.value}
+                          onChange={field.onChange}
+                          onRorIdChange={(rorId) => {
+                            form.setValue(
+                              `co_authors.${index}.affiliation_ror_id`,
+                              rorId,
+                              {
+                                shouldDirty: true,
+                              }
+                            );
+                          }}
+                          placeholder="e.g., Stanford University"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* ROR Institution display (always render, handles null/empty internally) */}
+                <CoAuthorInstitutionDetails
+                  rorId={coAuthors[index]?.affiliation_ror_id}
+                />
+              </div>
               <FormField
                 control={form.control}
                 name={`co_authors.${index}.orcid`}

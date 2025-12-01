@@ -83,7 +83,7 @@ export default function SubmissionsLayout({ children, title, description }) {
               key={item.href}
               onClick={() => router.push(item.href)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 border-b-2 transition-colors",
+                "flex items-center cursor-pointer gap-2 px-4 py-2 border-b-2 transition-colors",
                 isActive
                   ? "border-primary text-primary font-medium"
                   : "border-transparent text-muted-foreground hover:text-foreground"

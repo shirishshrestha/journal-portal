@@ -15,6 +15,7 @@ export default function ProfileInfoCard({
   profileData,
   setShowEditForm,
   showEditForm,
+  profileEmailVerification,
 }) {
   if (!profileData) return null;
 
@@ -57,25 +58,25 @@ export default function ProfileInfoCard({
             <p className="text-sm font-medium text-muted-foreground">Email</p>
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-sm">{profileData.user_email || "-"}</p>
-              {/* TODO: Uncomment when backend is ready with email_verified field */}
-              {/* {profileData.email_verified ? (
-                <Badge variant="outline" className="gap-1 text-green-600 border-green-600">
+              {profileEmailVerification ? (
+                <Badge
+                  variant="outline"
+                  className="gap-1 text-green-600 border-green-600"
+                >
                   <CheckCircle2 className="h-3 w-3" />
                   Verified
                 </Badge>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="gap-1 text-amber-600 border-amber-600">
+                  <Badge
+                    variant="outline"
+                    className="gap-1 text-amber-600 border-amber-600"
+                  >
                     <AlertCircle className="h-3 w-3" />
                     Not Verified
                   </Badge>
-                  <Link href="/settings/account">
-                    <Button variant="link" size="sm" className="h-auto p-0 text-xs">
-                      Verify now
-                    </Button>
-                  </Link>
                 </div>
-              )} */}
+              )}
             </div>
           </div>
           <div className="space-y-1">

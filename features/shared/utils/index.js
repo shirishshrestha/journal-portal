@@ -4,3 +4,4 @@ export {
   decisionTypeConfig,
   reviewRecommendationConfig,
 } from "./decision-type-config";
+export { stripHtmlTags, getPlainTextLength } from "./htmlUtils";

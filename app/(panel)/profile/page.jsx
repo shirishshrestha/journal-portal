@@ -146,6 +146,7 @@ export default function ProfilePage() {
         <div className="flex items-center flex-col  gap-4">
           <ProfileInfoCard
             profileData={profileData}
+            profileEmailVerification={meData?.email_verified}
             showEditForm={showEditForm}
             setShowEditForm={setShowEditForm}
           />

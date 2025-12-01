@@ -24,6 +24,9 @@ import { SystemHealth } from "./SystemHealth";
 import { InstitutionSearchSelect } from "./InstitutionSearchSelect";
 import Pagination from "./Pagination";
 import { ReviewSummaryCard } from "./ReviewSummaryCard";
+import { JournalCreatedDialog } from "./JournalCreatedDialog";
+import { SubmissionCreatedDialog } from "./SubmissionCreatedDialog";
+import { AuthorGuidelinesDialog } from "./AuthorGuidelinesDialog";
 export * from "./charts";
 
 export {
@@ -53,4 +56,7 @@ export {
   InstitutionSearchSelect,
   Pagination,
   ReviewSummaryCard,
+  JournalCreatedDialog,
+  SubmissionCreatedDialog,
+  AuthorGuidelinesDialog,
 };
