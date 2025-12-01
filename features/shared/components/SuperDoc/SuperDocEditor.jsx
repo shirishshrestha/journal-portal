@@ -10,6 +10,7 @@ import "@harbour-enterprises/superdoc/style.css";
 import { useCurrentRole } from "../../hooks";
 import { useSubmitUpdatedDocument } from "@/features/panel";
 import { ConfirmationInputPopup } from "..";
+import { useParams, useRouter } from "next/navigation";
 
 /**
  * SuperDoc Editor Component - Self-contained with save functionality
@@ -27,6 +28,9 @@ export default function SuperDocEditor({
   const isInitializedRef = useRef(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+  const router = useRouter();
+  const { id } = useParams();
+
   const { currentRole } = useCurrentRole();
   const effectiveRole = userRole || currentRole;
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
@@ -36,7 +40,8 @@ export default function SuperDocEditor({
     documentId: documentData.id,
     onSuccess: () => {
       toast.success("Document version created successfully");
-      router.push(`/author/submissions/active/${submissionId}`);
+      router.push(`/author/submissions/drafts/${id}`);
+      
     },
     onError: (error) => {
       toast.error(

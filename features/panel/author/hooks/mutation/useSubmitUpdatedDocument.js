@@ -17,6 +17,7 @@ export function useSubmitUpdatedDocument({ documentId, onSuccess, onError }) {
       createDocumentVersion(documentId, changeSummary),
     onSuccess: (data, ...args) => {
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["document-versions"] });
 
       if (onSuccess) onSuccess(data, ...args);
     },

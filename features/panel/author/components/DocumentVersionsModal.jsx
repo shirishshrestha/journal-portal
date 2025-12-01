@@ -32,7 +32,7 @@ export default function DocumentVersionsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="md:max-w-[85%] lg:max-w-[55%] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Document Version History</DialogTitle>
           <DialogDescription>
