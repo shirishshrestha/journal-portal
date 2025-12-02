@@ -79,7 +79,7 @@ export default function ArchivedPage() {
   };
 
   return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
+    <>
       {isSubmissionsPending && <LoadingScreen />}
       <SubmissionsLayout
         title="Archived Submissions"
@@ -123,6 +123,6 @@ export default function ArchivedPage() {
           showPageSizeSelector={false}
         />
       )}
-    </RoleBasedRoute>
+    </>
   );
 }

@@ -155,82 +155,80 @@ export default function AdminDashboard() {
   }
 
   return (
-    <RoleBasedRoute allowedRoles={["ADMIN"]}>
+    <div className="space-y-5 ">
       {isPending && <LoadingScreen />}
-      <div className="space-y-5 ">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-foreground">
-              Admin Dashboard
-            </h1>
-          </div>
-          <SystemHealth />
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-foreground">
+            Admin Dashboard
+          </h1>
+        </div>
+        <SystemHealth />
+      </div>
+
+      {/* KPI Cards */}
+      {isPending ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <StatsCard
+              key={`skeleton-${i}`}
+              title="Loading..."
+              value="-"
+              isLoading={isPending}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {statistics.map((stat) => (
+            <StatsCard
+              key={stat.title}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              valueClass={stat.valueClass}
+              iconClass={stat.iconClass}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Analytics Charts Section */}
+      <div className="space-y-5">
+        <h2 className="text-xl font-semibold text-foreground">
+          Analytics Overview
+        </h2>
+
+        {/* Submission and Review Status Charts */}
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <SubmissionStatusChart
+            data={analyticsData?.submissions || {}}
+            isPending={isPending}
+          />
+          <ReviewStatusChart
+            data={analyticsData?.reviews || {}}
+            isPending={isPending}
+          />
         </div>
 
-        {/* KPI Cards */}
-        {isPending ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <StatsCard
-                key={`skeleton-${i}`}
-                title="Loading..."
-                value="-"
-                isLoading={isPending}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {statistics.map((stat) => (
-              <StatsCard
-                key={stat.title}
-                title={stat.title}
-                value={stat.value}
-                icon={stat.icon}
-                valueClass={stat.valueClass}
-                iconClass={stat.iconClass}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Analytics Charts Section */}
-        <div className="space-y-5">
-          <h2 className="text-xl font-semibold text-foreground">
-            Analytics Overview
-          </h2>
-
-          {/* Submission and Review Status Charts */}
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <SubmissionStatusChart
-              data={analyticsData?.submissions || {}}
-              isPending={isPending}
-            />
-            <ReviewStatusChart
-              data={analyticsData?.reviews || {}}
-              isPending={isPending}
-            />
-          </div>
-
-          {/* User and Journal Distribution Charts */}
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <UserDistributionChart
-              data={analyticsData?.users || {}}
-              isPending={isPending}
-            />
-            <JournalDistributionChart
-              data={analyticsData?.journals || {}}
-              isPending={isPending}
-            />
-          </div>
-        </div>
-
-        {/* Recent Activity and Quick Links */}
-        <div className="">
-          <QuickLinksPanel />
+        {/* User and Journal Distribution Charts */}
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <UserDistributionChart
+            data={analyticsData?.users || {}}
+            isPending={isPending}
+          />
+          <JournalDistributionChart
+            data={analyticsData?.journals || {}}
+            isPending={isPending}
+          />
         </div>
       </div>
-    </RoleBasedRoute>
+
+      {/* Recent Activity and Quick Links */}
+      <div className="">
+        <QuickLinksPanel />
+      </div>
+    </div>
   );
 }

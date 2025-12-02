@@ -31,21 +31,19 @@ export default function ReaderDashboard() {
   // Error state
   if (isError) {
     return (
-      <RoleBasedRoute allowedRoles={["READER"]}>
-        <ErrorCard
-          title="Failed to load dashboard"
-          description="We couldn't load your dashboard data. Please try again."
-          details={error?.message || error?.toString()}
-          onRetry={refetch}
-        />
-      </RoleBasedRoute>
+      <ErrorCard
+        title="Failed to load dashboard"
+        description="We couldn't load your dashboard data. Please try again."
+        details={error?.message || error?.toString()}
+        onRetry={refetch}
+      />
     );
   }
 
   // Pending state for ProfileCompletionCard and ScoreCard
   if (isLoadingScore) {
     return (
-      <RoleBasedRoute allowedRoles={["READER"]}>
+      <>
         <LoadingScreen />
         <div className="mx-auto space-y-5">
           <div>
@@ -56,12 +54,12 @@ export default function ReaderDashboard() {
 
           <ScoreCard pending />
         </div>
-      </RoleBasedRoute>
+      </>
     );
   }
 
   return (
-    <RoleBasedRoute allowedRoles={["READER"]}>
+    <>
       <div className="mx-auto space-y-5">
         <div>
           <div className="lg:col-span-2">
@@ -73,6 +71,6 @@ export default function ReaderDashboard() {
         </div>
         <ScoreCard scoreData={scoreData} pending={false} />
       </div>
-    </RoleBasedRoute>
+    </>
   );
 }

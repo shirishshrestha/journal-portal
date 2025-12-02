@@ -29,7 +29,9 @@ export function LoginForm() {
     },
   });
 
-  const { mutate: LoginMutation, isPending: LoginPending } = useLoginUser();
+  const { mutate: LoginMutation, isPending: LoginPending } = useLoginUser({
+    reset: form.reset,
+  });
 
   const onSubmit = (data) => {
     LoginMutation(data);

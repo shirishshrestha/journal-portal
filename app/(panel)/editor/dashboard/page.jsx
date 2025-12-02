@@ -38,31 +38,26 @@ export default function EditorDashboard() {
   }
 
   return (
-    <RoleBasedRoute allowedRoles={["EDITOR"]}>
+    <div className="space-y-5">
       {isAnalyticsPending && <LoadingScreen />}
-      <div className="space-y-5">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Editor Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage and track journal submissions and editorial workflow
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        <EditorDashboardStats counts={editorStats} isLoading={isLoading} />
-
-        {/* Charts Section */}
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-          <EditorSubmissionsChart data={editorStats} isLoading={isLoading} />
-          <EditorJournalsDoughnutChart
-            data={editorStats}
-            isLoading={isLoading}
-          />
-        </div>
-
-        {/* TODO: Add tables for new submissions, journals, or other editor-specific data here */}
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold">Editor Dashboard</h1>
+        <p className="text-muted-foreground">
+          Manage and track journal submissions and editorial workflow
+        </p>
       </div>
-    </RoleBasedRoute>
+
+      {/* Stats Cards */}
+      <EditorDashboardStats counts={editorStats} isLoading={isLoading} />
+
+      {/* Charts Section */}
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+        <EditorSubmissionsChart data={editorStats} isLoading={isLoading} />
+        <EditorJournalsDoughnutChart data={editorStats} isLoading={isLoading} />
+      </div>
+
+      {/* TODO: Add tables for new submissions, journals, or other editor-specific data here */}
+    </div>
   );
 }

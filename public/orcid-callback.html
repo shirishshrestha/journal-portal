@@ -190,16 +190,6 @@
       const detail = urlParams.get("detail");
       const message = urlParams.get("message");
 
-      console.log("Callback page loaded");
-      console.log("URL params:", {
-        success,
-        orcidId,
-        userEmail,
-        detail,
-        message,
-      });
-      console.log("window.opener exists:", !!window.opener);
-
       // Display ORCID ID in the UI
       const orcidDisplay = document.getElementById("orcid-display");
       const contentContainer = document.getElementById("content");
@@ -225,31 +215,20 @@
             "orcid_auth_result",
             JSON.stringify(messageData)
           );
-          console.log("Saved to localStorage:", messageData);
         } catch (e) {
           console.error("Failed to save to localStorage:", e);
         }
 
         // Send success message to parent window
         if (window.opener && !window.opener.closed) {
-          console.log("Sending ORCID_SUCCESS message to opener");
-          console.log("Message data:", messageData);
-          console.log("Target origin:", window.location.origin);
-
           try {
             window.opener.postMessage(messageData, window.location.origin);
-            console.log("Message sent successfully via postMessage");
           } catch (e) {
             console.error("Error sending postMessage:", e);
           }
         } else {
           console.error("window.opener is not available or closed");
         }
-
-        // Don't auto-close for new tab
-        console.log(
-          "ORCID data saved to localStorage. User can close this tab."
-        );
       } else {
         // Show error state
         contentContainer.innerHTML = `
@@ -290,13 +269,8 @@
 
         // Send error message
         if (window.opener && !window.opener.closed) {
-          console.log("Sending ORCID_ERROR message to opener");
           window.opener.postMessage(errorData, window.location.origin);
         }
-
-        console.log(
-          "ORCID error saved to localStorage. User can close this tab."
-        );
       }
     </script>
   </body>

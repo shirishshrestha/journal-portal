@@ -7,7 +7,7 @@ import { loginUser } from "../../api/LoginApiSlice";
 import { useRoleRedirect } from "@/features/shared";
 import { useRouter } from "next/navigation";
 
-export const useLoginUser = () => {
+export const useLoginUser = ({ reset }) => {
   const dispatch = useDispatch();
   const broadcast = useCrossTabAuth();
   const router = useRouter();
@@ -19,6 +19,7 @@ export const useLoginUser = () => {
     retry: 0, // Don't retry login attempts - incorrect credentials should not be retried
     onSuccess: (userData) => {
       toast.success("Login successful.");
+      reset();
       dispatch(authLogin({ userData }));
       broadcast("login");
 

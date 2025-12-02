@@ -65,7 +65,7 @@ export default function EmailLogTab() {
       {/* Email Table Section */}
       <div className="border border-border rounded-lg">
         <EmailLogTable
-          emails={EmailLogData?.recent_emails}
+          emails={EmailLogData?.results}
           onViewEmail={setSelectedEmail}
           isPending={isEmailLogPending}
           error={emailLogError}

@@ -74,7 +74,7 @@ export default function UnassignedDetailPage() {
   }
 
   return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -118,6 +118,6 @@ export default function UnassignedDetailPage() {
         onOpenChange={setVersionsDialogOpen}
         documentId={selectedDocumentId}
       />
-    </RoleBasedRoute>
+    </>
   );
 }

@@ -84,7 +84,7 @@ export default function DraftsPage() {
   };
 
   return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
+    <>
       {isSubmissionsPending && <LoadingScreen />}
       <SubmissionsLayout
         title="Draft Submissions"
@@ -150,6 +150,6 @@ export default function DraftsPage() {
           showPageSizeSelector={false}
         />
       )}
-    </RoleBasedRoute>
+    </>
   );
 }

@@ -80,7 +80,6 @@ export default function JournalsPage() {
   const journals = JournalData?.results || [];
 
   return (
-    <RoleBasedRoute allowedRoles={["ADMIN"]}>
       <div className="space-y-5">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -168,6 +167,5 @@ export default function JournalsPage() {
           icon={<Trash2 className="h-6 w-6 text-destructive" />}
         />
       </div>
-    </RoleBasedRoute>
   );
 }

@@ -71,7 +71,6 @@ export function StaffSettings({ journalId }) {
   const removeStaffMutation = useRemoveJournalStaff();
 
   const handleAddStaff = (data) => {
-    console.log("Adding staff with data:", data);
     addStaffMutation.mutate(
       {
         journalId,
@@ -87,7 +86,6 @@ export function StaffSettings({ journalId }) {
 
   const handleEditStaff = (data) => {
     // TODO: Implement staff update
-    console.log("Editing staff:", data);
     toast.success("Staff member updated successfully");
     setIsEditStaffOpen(false);
     setSelectedStaff(null);
@@ -291,7 +289,6 @@ function AddStaffDialog({ isOpen, onClose, onSubmit, staffData }) {
   // Filter out users already present in staffData
   const staffProfileIds = (staffData || []).map((s) => s.profile?.id);
 
-  console.log("staffProfileIds:", staffProfileIds);
   const filteredProfiles = profiles.filter(
     (profile) => !staffProfileIds.includes(profile.profile.id)
   );

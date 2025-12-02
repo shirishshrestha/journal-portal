@@ -56,7 +56,8 @@ export default function UnassignedPage() {
   };
 
   return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
+    <>
+      {" "}
       {isSubmissionsPending && <LoadingScreen />}
       <SubmissionsLayout
         title="Unassigned Submissions"
@@ -74,14 +75,12 @@ export default function UnassignedPage() {
           }
         />
       </SubmissionsLayout>
-
       {/* Document Upload Modal */}
       <DocumentUploadModal
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         submissionId={selectedSubmissionId}
       />
-
       {/* Document View Modal */}
       <DocumentViewModal
         open={viewModalOpen}
@@ -99,6 +98,6 @@ export default function UnassignedPage() {
           showPageSizeSelector={false}
         />
       )}
-    </RoleBasedRoute>
+    </>
   );
 }

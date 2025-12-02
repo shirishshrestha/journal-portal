@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,12 @@ const OrcidConnection = () => {
 
   // Listen for ORCID authentication success
   useEffect(() => {
+    let storageInterval = null;
+    let isMounted = true;
+
     const handleMessage = (event) => {
+      if (!isMounted) return;
+
       // Filter out React DevTools messages
       if (event.data?.source?.includes("react-devtools")) {
         return;
@@ -52,38 +58,54 @@ const OrcidConnection = () => {
       }
 
       if (event.data.type === "ORCID_SUCCESS") {
-        console.log("ORCID authentication successful, fetching status...");
-
         setIsOrcidLinkPending(false);
         toast.success("ORCID connected successfully!");
-        // Fetch the actual ORCID status from API
         queryClient.invalidateQueries(["orcid-status"]);
         localStorage.removeItem("orcid_auth_result");
+        // Clear interval once successful
+        if (storageInterval) {
+          clearInterval(storageInterval);
+          storageInterval = null;
+        }
       } else if (event.data.type === "ORCID_ERROR") {
         setIsOrcidLinkPending(false);
         toast.error("Failed to connect ORCID");
         localStorage.removeItem("orcid_auth_result");
+        // Clear interval on error
+        if (storageInterval) {
+          clearInterval(storageInterval);
+          storageInterval = null;
+        }
       }
     };
 
     // Check localStorage periodically for ORCID auth result
     const checkLocalStorage = () => {
+      if (!isMounted) return;
+
       const result = localStorage.getItem("orcid_auth_result");
       if (result) {
         try {
           const parsedResult = JSON.parse(result);
           if (parsedResult.type === "ORCID_SUCCESS") {
-            console.log("ORCID authentication successful, fetching status...");
             setIsOrcidLinkPending(false);
             toast.success("ORCID connected successfully!");
-            // Fetch the actual ORCID status from API
             queryClient.invalidateQueries(["orcid-status"]);
-
             localStorage.removeItem("orcid_auth_result");
+            // Clear interval once successful
+            if (storageInterval) {
+              clearInterval(storageInterval);
+              storageInterval = null;
+            }
           } else if (parsedResult.type === "ORCID_ERROR") {
             setIsOrcidLinkPending(false);
             toast.error("Failed to connect ORCID");
             localStorage.removeItem("orcid_auth_result");
+            // Clear interval on error
+            if (storageInterval) {
+              clearInterval(storageInterval);
+              storageInterval = null;
+            }
           }
         } catch (e) {
           console.error("Error parsing localStorage result:", e);
@@ -91,13 +113,18 @@ const OrcidConnection = () => {
       }
     };
 
-    // Check localStorage every 500ms
-    const storageInterval = setInterval(checkLocalStorage, 500);
+    // Only start polling if component is mounted
+    storageInterval = setInterval(checkLocalStorage, 500);
 
     window.addEventListener("message", handleMessage);
+
     return () => {
+      isMounted = false;
       window.removeEventListener("message", handleMessage);
-      clearInterval(storageInterval);
+      if (storageInterval) {
+        clearInterval(storageInterval);
+        storageInterval = null;
+      }
     };
   }, [queryClient]);
 
@@ -138,6 +165,15 @@ const OrcidConnection = () => {
     <Card className="border-border dark:border-slate-700">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
+          <Image
+            src="/orcid.logo.svg"
+            alt="ORCID Logo"
+            width={24}
+            height={24}
+            style={{ display: "inline-block" }}
+            className="w-12 h-fit "
+            priority
+          />
           <CheckCircle2 className="w-5 h-5" />
           Connect ORCID iD
         </CardTitle>
@@ -232,13 +268,11 @@ const OrcidConnection = () => {
         ) : (
           <Button
             onClick={() => handleConnectOrcid()}
-            className="w-fit"
+            className="w-fit flex items-center gap-2"
             size="md"
             disabled={isOrcidLinkPending}
           >
-            {isOrcidLinkPending && (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            )}
+            {isOrcidLinkPending && <Loader2 className="w-4 h-4 animate-spin" />}
             {isOrcidLinkPending ? "Redirecting..." : "Connect ORCID"}
           </Button>
         )}

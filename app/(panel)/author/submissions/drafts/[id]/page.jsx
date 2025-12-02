@@ -89,7 +89,7 @@ export default function DraftDetailPage() {
   }
 
   return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -174,6 +174,6 @@ export default function DraftDetailPage() {
         isSuccess={deleteSubmissionMutation.isSuccess}
         icon={<Trash2 className="h-6 w-6 text-destructive" />}
       />
-    </RoleBasedRoute>
+    </>
   );
 }

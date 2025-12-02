@@ -1,12 +1,10 @@
 "use client";
 
-import { use, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import {
-  RoleBasedRoute,
-  LoadingScreen,
   useGetSubmissionById,
   SubmissionDetailsCard,
   SubmissionDocumentsCard,
@@ -14,9 +12,7 @@ import {
   DocumentVersionsModal,
   ReviewSummaryCard,
 } from "@/features";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGetSubmissionReviews } from "@/features/panel/editor/submission/hooks/useGetSubmissionReviews";
-import { DecisionBadge, reviewRecommendationConfig } from "@/features";
 
 export default function ArchivedDetailPage() {
   const params = useParams();
@@ -47,7 +43,8 @@ export default function ArchivedDetailPage() {
   const reviewsData = useMemo(() => reviews?.results || [], [reviews]);
 
   return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
+    <>
+      {" "}
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -86,13 +83,12 @@ export default function ArchivedDetailPage() {
         {/* Co-authors Card */}
         <CoAuthorsCard authorContributions={submission?.author_contributions} />
       </div>
-
       {/* Document Versions Modal */}
       <DocumentVersionsModal
         open={versionsDialogOpen}
         onOpenChange={setVersionsDialogOpen}
         documentId={selectedDocumentId}
       />
-    </RoleBasedRoute>
+    </>
   );
 }

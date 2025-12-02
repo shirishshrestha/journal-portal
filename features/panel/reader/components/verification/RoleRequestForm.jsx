@@ -59,7 +59,6 @@ const RoleRequestForm = () => {
 
   const defaultRoles = ["READER", "AUTHOR", "REVIEWER", "EDITOR"];
 
-  console.log(RoleLists);
 
   const existingRoleNames =
     RoleLists?.map((role) => role?.trim().toUpperCase()) || [];

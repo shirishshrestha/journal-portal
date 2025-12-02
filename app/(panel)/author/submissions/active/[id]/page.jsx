@@ -91,7 +91,7 @@ export default function ActiveDetailPage() {
   }
 
   return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -171,6 +171,6 @@ export default function ActiveDetailPage() {
         onOpenChange={setVersionsDialogOpen}
         documentId={selectedDocumentId}
       />
-    </RoleBasedRoute>
+    </>
   );
 }

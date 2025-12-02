@@ -15,7 +15,6 @@ export const saveSuperdocDocument = async (documentId, payload) => {
     const formData = new FormData();
     formData.append("file", payload.blob, payload.fileName);
 
-    console.log(payload.blob);
     const response = await instance.post(
       `submissions/documents/${documentId}/save/`,
       formData,

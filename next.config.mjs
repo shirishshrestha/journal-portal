@@ -4,8 +4,8 @@ const nextConfig = {
   /* config options here */
   experimental: {
     turbopackFileSystemCacheForDev: true,
-    
   },
+  reactStrictMode: false,
 };
 
 export default withSentryConfig(nextConfig, {

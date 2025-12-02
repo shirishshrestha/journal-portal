@@ -55,12 +55,12 @@ export default function ActivePage() {
   };
 
   return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
-      {isSubmissionsPending && <LoadingScreen />}
+    <>
       <SubmissionsLayout
         title="Active Submissions"
         description="Manuscripts currently under review"
       >
+        {isSubmissionsPending && <LoadingScreen />}
         <AuthorSubmissionsTable
           submissions={SubmissionsData?.results || []}
           isPending={isSubmissionsPending}
@@ -99,6 +99,6 @@ export default function ActivePage() {
           showPageSizeSelector={false}
         />
       )}
-    </RoleBasedRoute>
+    </>
   );
 }

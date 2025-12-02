@@ -53,6 +53,7 @@ const authSlice = createSlice({
 const authPersistConfig = {
   key: "auth",
   storage: storage,
+  throttle: 1000, // Wait 1 second between persist operations
 };
 
 export const persistAuthReducer = persistReducer(

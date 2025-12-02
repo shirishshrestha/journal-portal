@@ -93,7 +93,6 @@ export default function AdminSubmissionDetailPage() {
   const assignReviewerMutation = useAssignReviewers();
 
   const handleAssignReviewer = (reviewerId) => {
-    console.log("Assigning reviewer ID:", reviewerId);
     setAssigningReviewerId(reviewerId);
 
     // Get review deadline days from journal settings, default to 30 days

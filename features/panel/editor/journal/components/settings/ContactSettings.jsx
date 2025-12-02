@@ -4,7 +4,13 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,17 +21,23 @@ import { useUpdateJournal } from "@/features";
 
 const contactSchema = z.object({
   main_contact_name: z.string().optional(),
-  main_contact_email: z.string().email("Invalid email").or(z.literal("")).optional(),
+  main_contact_email: z
+    .string()
+    .email("Invalid email")
+    .or(z.literal(""))
+    .optional(),
   main_contact_phone: z.string().optional(),
   technical_contact_name: z.string().optional(),
-  technical_contact_email: z.string().email("Invalid email").or(z.literal("")).optional(),
+  technical_contact_email: z
+    .string()
+    .email("Invalid email")
+    .or(z.literal(""))
+    .optional(),
   technical_contact_phone: z.string().optional(),
 });
 
 export function ContactSettings({ journal }) {
   const updateJournalMutation = useUpdateJournal();
-
-  console.log("ContactSettings - journal data:", journal);
 
   const {
     register,
@@ -47,14 +59,6 @@ export function ContactSettings({ journal }) {
   // Update form when journal data changes
   useEffect(() => {
     if (journal) {
-      console.log("Resetting form with journal data:", {
-        main_contact_name: journal.main_contact_name || "",
-        main_contact_email: journal.main_contact_email || "",
-        main_contact_phone: journal.main_contact_phone || "",
-        technical_contact_name: journal.technical_contact_name || "",
-        technical_contact_email: journal.technical_contact_email || "",
-        technical_contact_phone: journal.technical_contact_phone || "",
-      });
       reset({
         main_contact_name: journal.main_contact_name || "",
         main_contact_email: journal.main_contact_email || "",
@@ -67,13 +71,10 @@ export function ContactSettings({ journal }) {
   }, [journal, reset]);
 
   const onSubmit = (data) => {
-    console.log("Contact form data:", data);
-    console.log("Journal ID:", journal.id);
-    
     updateJournalMutation.mutate(
-      { 
-        id: journal.id, 
-        ...data  // Spread the data at the top level
+      {
+        id: journal.id,
+        ...data, // Spread the data at the top level
       },
       {
         onSuccess: () => {
@@ -118,7 +119,9 @@ export function ContactSettings({ journal }) {
                   {...register("main_contact_name")}
                 />
                 {errors.main_contact_name && (
-                  <p className="text-sm text-destructive">{errors.main_contact_name.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.main_contact_name.message}
+                  </p>
                 )}
               </div>
 
@@ -131,7 +134,9 @@ export function ContactSettings({ journal }) {
                   {...register("main_contact_email")}
                 />
                 {errors.main_contact_email && (
-                  <p className="text-sm text-destructive">{errors.main_contact_email.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.main_contact_email.message}
+                  </p>
                 )}
               </div>
 
@@ -144,7 +149,9 @@ export function ContactSettings({ journal }) {
                   {...register("main_contact_phone")}
                 />
                 {errors.main_contact_phone && (
-                  <p className="text-sm text-destructive">{errors.main_contact_phone.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.main_contact_phone.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -169,7 +176,9 @@ export function ContactSettings({ journal }) {
                   {...register("technical_contact_name")}
                 />
                 {errors.technical_contact_name && (
-                  <p className="text-sm text-destructive">{errors.technical_contact_name.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.technical_contact_name.message}
+                  </p>
                 )}
               </div>
 
@@ -182,7 +191,9 @@ export function ContactSettings({ journal }) {
                   {...register("technical_contact_email")}
                 />
                 {errors.technical_contact_email && (
-                  <p className="text-sm text-destructive">{errors.technical_contact_email.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.technical_contact_email.message}
+                  </p>
                 )}
               </div>
 
@@ -195,7 +206,9 @@ export function ContactSettings({ journal }) {
                   {...register("technical_contact_phone")}
                 />
                 {errors.technical_contact_phone && (
-                  <p className="text-sm text-destructive">{errors.technical_contact_phone.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.technical_contact_phone.message}
+                  </p>
                 )}
               </div>
             </div>

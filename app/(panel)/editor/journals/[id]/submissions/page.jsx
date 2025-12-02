@@ -158,93 +158,87 @@ export default function JournalSubmissionsPage() {
 
   if (journalError) {
     return (
-      <RoleBasedRoute allowedRoles={["EDITOR"]}>
-        <ErrorCard
-          title="Failed to load journal submissions"
-          description={error.message}
-          onBack={() => router.push("/editor/journals")}
-        />
-      </RoleBasedRoute>
+      <ErrorCard
+        title="Failed to load journal submissions"
+        description={error.message}
+        onBack={() => router.push("/editor/journals")}
+      />
     );
   }
 
   return (
-    <RoleBasedRoute allowedRoles={["EDITOR"]}>
-      <div className="space-y-6">
-        {/* Header */}
-        {isJournalPending && <LoadingScreen />}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                className={"hover:text-primary-foreground"}
-                onClick={() => router.push("/editor/journals")}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">
-              {journal?.title}
-            </h1>
-            <p className="text-muted-foreground">
-              View and manage all submissions for this journal
-            </p>
+    <div className="space-y-6">
+      {/* Header */}
+      {isJournalPending && <LoadingScreen />}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              className={"hover:text-primary-foreground"}
+              onClick={() => router.push("/editor/journals")}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
           </div>
-        </div>
-
-        {/* Journal Info Card */}
-        <Card className={"gap-3"}>
-          <CardHeader>
-            <CardTitle>Journal Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <JournalInfoCard journal={journal} />
-          </CardContent>
-        </Card>
-
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground ">
-            Submissions
-          </h2>
-          {/* Filters */}
-          <FilterToolbar>
-            <FilterToolbar.Search
-              paramName="search"
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="Search by title, number, or author..."
-              label="Search Submissions"
-            />
-            <FilterToolbar.Select
-              paramName="status"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              label="Status"
-              options={[
-                { value: "all", label: "All Status" },
-                { value: "SUBMITTED", label: "Submitted" },
-                { value: "UNDER_REVIEW", label: "Under Review" },
-                { value: "REVISION_REQUESTED", label: "Revision Requested" },
-                { value: "ACCEPTED", label: "Accepted" },
-                { value: "REJECTED", label: "Rejected" },
-                { value: "PUBLISHED", label: "Published" },
-              ]}
-            />
-          </FilterToolbar>
-          <DataTable
-            data={filteredSubmissions}
-            columns={columns}
-            emptyMessage="No submissions found for this journal"
-            isPending={isSubmissionsPending}
-            error={submissionsError}
-            errorMessage="Error loading submissions"
-            hoverable={true}
-            tableClassName="bg-card border flex justify-center"
-          />
+          <h1 className="text-3xl font-bold text-foreground">
+            {journal?.title}
+          </h1>
+          <p className="text-muted-foreground">
+            View and manage all submissions for this journal
+          </p>
         </div>
       </div>
-    </RoleBasedRoute>
+
+      {/* Journal Info Card */}
+      <Card className={"gap-3"}>
+        <CardHeader>
+          <CardTitle>Journal Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <JournalInfoCard journal={journal} />
+        </CardContent>
+      </Card>
+
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground ">Submissions</h2>
+        {/* Filters */}
+        <FilterToolbar>
+          <FilterToolbar.Search
+            paramName="search"
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Search by title, number, or author..."
+            label="Search Submissions"
+          />
+          <FilterToolbar.Select
+            paramName="status"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            label="Status"
+            options={[
+              { value: "all", label: "All Status" },
+              { value: "SUBMITTED", label: "Submitted" },
+              { value: "UNDER_REVIEW", label: "Under Review" },
+              { value: "REVISION_REQUESTED", label: "Revision Requested" },
+              { value: "ACCEPTED", label: "Accepted" },
+              { value: "REJECTED", label: "Rejected" },
+              { value: "PUBLISHED", label: "Published" },
+            ]}
+          />
+        </FilterToolbar>
+        <DataTable
+          data={filteredSubmissions}
+          columns={columns}
+          emptyMessage="No submissions found for this journal"
+          isPending={isSubmissionsPending}
+          error={submissionsError}
+          errorMessage="Error loading submissions"
+          hoverable={true}
+          tableClassName="bg-card border flex justify-center"
+        />
+      </div>
+    </div>
   );
 }

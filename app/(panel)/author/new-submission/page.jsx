@@ -1,9 +1,4 @@
-"use client";
-import { NewSubmissionForm, RoleBasedRoute } from "@/features";
+import { NewSubmissionForm } from "@/features";
 export default function NewSubmissionPage() {
-  return (
-    <RoleBasedRoute allowedRoles={["AUTHOR"]}>
-      <NewSubmissionForm />
-    </RoleBasedRoute>
-  );
+  return <NewSubmissionForm />;
 }

@@ -7,12 +7,9 @@ export const useUpdateJournal = (options = {}) => {
 
   return useMutation({
     mutationFn: ({ id, ...journalData }) => {
-      console.log("Update Journal Mutation - ID:", id);
-      console.log("Update Journal Mutation - Data:", journalData);
       return updateJournal({ id, journalData });
     },
     onSuccess: (data, variables, context) => {
-      console.log("Journal update success:", data);
       // Invalidate both the journal list and the specific journal
       queryClient.invalidateQueries({ queryKey: ["admin-journals"] });
       queryClient.invalidateQueries({ queryKey: ["journal", variables.id] });
