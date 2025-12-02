@@ -37,12 +37,18 @@ import { useGetOJSStatus } from "../../hooks/query/useGetOJSStatus";
 import { useConfigureOJSConnection } from "../../hooks/mutation/useConfigureOJSConnection";
 import { useDisconnectOJS } from "../../hooks/mutation/useDisconnectOJS";
 import { LoadingScreen, ErrorCard } from "@/features/shared";
+import ConfirmationPopup from "@/features/shared/components/ConfirmationPopup";
+import Image from "next/image";
+import { useTheme } from "next-themes";
 
 const ojsConnectionSchema = z.object({
   ojs_api_url: z
     .string()
     .url("Must be a valid URL")
-    .min(1, "API URL is required"),
+    .min(1, "API URL is required")
+    .refine((val) => val.endsWith("/api/v1"), {
+      message: "API URL must end with /api/v1",
+    }),
   ojs_api_key: z.string().min(1, "API Key is required"),
   ojs_journal_id: z.coerce.number().min(1, "Journal ID must be at least 1"),
   ojs_enabled: z.boolean().default(true),
@@ -50,6 +56,7 @@ const ojsConnectionSchema = z.object({
 
 export function OJSConnectionSettings({ journalId }) {
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const {
     data: ojsStatus,
@@ -60,6 +67,8 @@ export function OJSConnectionSettings({ journalId }) {
 
   const configureOJSMutation = useConfigureOJSConnection();
   const disconnectOJSMutation = useDisconnectOJS();
+
+  const { resolvedTheme } = useTheme();
 
   const form = useForm({
     resolver: zodResolver(ojsConnectionSchema),
@@ -91,18 +100,13 @@ export function OJSConnectionSettings({ journalId }) {
   };
 
   const handleDisconnect = () => {
-    if (
-      confirm(
-        "Are you sure you want to disconnect from OJS? This action cannot be undone."
-      )
-    ) {
-      setIsDisconnecting(true);
-      disconnectOJSMutation.mutate(journalId, {
-        onSettled: () => {
-          setIsDisconnecting(false);
-        },
-      });
-    }
+    setIsDisconnecting(true);
+    disconnectOJSMutation.mutate(journalId, {
+      onSettled: () => {
+        setIsDisconnecting(false);
+        setIsConfirmOpen(false);
+      },
+    });
   };
 
   if (isLoadingStatus) {
@@ -121,7 +125,7 @@ export function OJSConnectionSettings({ journalId }) {
     );
   }
 
-  const isConnected = ojsStatus?.connected;
+  const isConnected = ojsStatus?.ojs_configured;
 
   return (
     <div className="space-y-6">
@@ -131,6 +135,23 @@ export function OJSConnectionSettings({ journalId }) {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
+                {resolvedTheme === "light" ? (
+                  <Image
+                    src="/ojs.png"
+                    alt="OJS Logo"
+                    width={55}
+                    height={55}
+                    className="inline-block  h-fit"
+                  />
+                ) : (
+                  <Image
+                    src="/ojs-white.png"
+                    alt="OJS Logo"
+                    width={55}
+                    height={55}
+                    className="inline-block  h-fit"
+                  />
+                )}
                 <CheckCircle2 className="h-5 w-5 text-green-600" />
                 <CardTitle>OJS Connected</CardTitle>
               </div>
@@ -172,154 +193,168 @@ export function OJSConnectionSettings({ journalId }) {
               <Button
                 type="button"
                 variant="destructive"
-                onClick={handleDisconnect}
+                onClick={() => setIsConfirmOpen(true)}
                 disabled={isDisconnecting || disconnectOJSMutation.isPending}
               >
-                {isDisconnecting || disconnectOJSMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Disconnecting...
-                  </>
-                ) : (
-                  <>
-                    <Unlink className="h-4 w-4 mr-2" />
-                    Disconnect OJS
-                  </>
-                )}
+                <Unlink className="h-4 w-4 mr-2" />
+                Disconnect OJS
               </Button>
+              <ConfirmationPopup
+                open={isConfirmOpen}
+                onOpenChange={(open) => {
+                  setIsConfirmOpen(open);
+                  disconnectOJSMutation.reset();
+                }}
+                title="Disconnect OJS"
+                description="Are you sure you want to disconnect from OJS? This action cannot be undone."
+                confirmText="Disconnect"
+                cancelText="Cancel"
+                variant="danger"
+                icon={<Unlink className="h-6 w-6 text-red-600" />}
+                onConfirm={handleDisconnect}
+                isPending={isDisconnecting || disconnectOJSMutation.isPending}
+              />
             </div>
           </CardContent>
         </Card>
       )}
 
       {/* Configuration Form */}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Link2 className="h-5 w-5" />
-                <CardTitle>
-                  {isConnected ? "Update OJS Connection" : "Connect to OJS"}
-                </CardTitle>
-              </div>
-              <CardDescription>
-                {isConnected
-                  ? "Update your Open Journal Systems connection settings"
-                  : "Configure connection to Open Journal Systems for seamless integration"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="ojs_api_url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      OJS API URL <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="https://your-ojs-instance.com/api/v1"
-                        type="url"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      The base URL of your OJS API endpoint
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ojs_api_key"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      API Key <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Enter your OJS API key"
-                        type="password"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Your OJS API authentication key
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ojs_journal_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      OJS Journal ID <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="1" type="number" min="1" />
-                    </FormControl>
-                    <FormDescription>
-                      The journal ID in your OJS system
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ojs_enabled"
-                render={({ field }) => (
-                  <FormItem className="flex items-center justify-between space-y-0">
-                    <div className="space-y-0.5">
-                      <FormLabel>Enable OJS Integration</FormLabel>
+      {!isConnected && (
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Link2 className="h-5 w-5" />
+                  <CardTitle>Connect to OJS</CardTitle>
+                </div>
+                <CardDescription>
+                  Configure connection to Open Journal Systems for seamless
+                  integration
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="ojs_api_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        OJS API URL <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="https://your-ojs-instance.com/api/v1"
+                          type="url"
+                        />
+                      </FormControl>
                       <FormDescription>
-                        Activate synchronization with OJS
+                        The base URL of your OJS API endpoint
                       </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              disabled={
-                configureOJSMutation.isPending || !form.formState.isDirty
-              }
-            >
-              {configureOJSMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {isConnected ? "Update Connection" : "Connect to OJS"}
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
+                <FormField
+                  control={form.control}
+                  name="ojs_api_key"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        API Key <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Enter your OJS API key"
+                          type="text"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Your OJS API authentication key
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ojs_journal_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        OJS Journal ID{" "}
+                        <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="1"
+                          type="number"
+                          min="1"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        The journal ID in your OJS system
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ojs_enabled"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between space-y-0">
+                      <div className="space-y-0.5">
+                        <FormLabel>Enable OJS Integration</FormLabel>
+                        <FormDescription>
+                          Activate synchronization with OJS
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                disabled={
+                  configureOJSMutation.isPending || !form.formState.isDirty
+                }
+              >
+                {configureOJSMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Connect to OJS
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      )}
     </div>
   );
 }

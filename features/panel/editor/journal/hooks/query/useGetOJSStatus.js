@@ -6,6 +6,8 @@ export const useGetOJSStatus = (journalId, options = {}) => {
     queryKey: ["ojs-status", journalId],
     queryFn: () => getOJSStatus(journalId),
     enabled: !!journalId && (options.enabled ?? true),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
     ...options,
   });
 };
