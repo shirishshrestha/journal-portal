@@ -17,6 +17,7 @@ import {
 } from "@/features";
 import ErrorCard from "@/features/shared/components/ErrorCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { OJSConnectionSettings } from "@/features/panel/editor/journal/components/settings/OJSConnectionSettings";
 
 export default function JournalSettingsPage() {
   const params = useParams();
@@ -85,12 +86,13 @@ export default function JournalSettingsPage() {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList className="grid w-full grid-cols-5 lg:w-[750px]">
+        <TabsList className="grid w-full grid-cols-6 lg:w-[750px]">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="taxonomy">Taxonomy</TabsTrigger>
           <TabsTrigger value="staff">Staff</TabsTrigger>
           <TabsTrigger value="contact">Contact</TabsTrigger>
           <TabsTrigger value="submissions">Submissions</TabsTrigger>
+          <TabsTrigger value="ojs">OJS Connection</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-4">
@@ -111,6 +113,10 @@ export default function JournalSettingsPage() {
 
         <TabsContent value="submissions" className="space-y-4">
           <SubmissionSettings journalId={journalId} />
+        </TabsContent>
+
+        <TabsContent value="ojs" className="space-y-4">
+          <OJSConnectionSettings journalId={journalId} />
         </TabsContent>
       </Tabs>
     </div>

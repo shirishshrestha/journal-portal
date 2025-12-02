@@ -10,11 +10,12 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Layers, Users, FileText } from "lucide-react";
+import { Settings, Layers, Users, FileText, Link2 } from "lucide-react";
 import { TaxonomySettings } from "./settings/TaxonomySettings";
 import { GeneralSettings } from "./settings/GeneralSettings";
 import { StaffSettings } from "./settings/StaffSettings";
 import { SubmissionSettings } from "./settings/SubmissionSettings";
+import { OJSConnectionSettings } from "./settings/OJSConnectionSettings";
 
 export function JournalSettingsDrawer({ journal, isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState("general");
@@ -30,12 +31,17 @@ export function JournalSettingsDrawer({ journal, isOpen, onClose }) {
             Journal Settings - {journal?.title}
           </DrawerTitle>
           <DrawerDescription>
-            Configure journal settings, taxonomy, staff, and submission rules
+            Configure journal settings, taxonomy, staff, submission rules, and
+            OJS integration
           </DrawerDescription>
         </DrawerHeader>
 
         <div className="flex-1 overflow-hidden">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="h-full flex flex-col"
+          >
             <TabsList className="mx-4 mt-4 w-auto">
               <TabsTrigger value="general" className="gap-2">
                 <FileText className="h-4 w-4" />
@@ -53,6 +59,10 @@ export function JournalSettingsDrawer({ journal, isOpen, onClose }) {
                 <Settings className="h-4 w-4" />
                 Submissions
               </TabsTrigger>
+              <TabsTrigger value="ojs" className="gap-2">
+                <Link2 className="h-4 w-4" />
+                OJS Connection
+              </TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-y-auto px-4 pb-6">
@@ -69,7 +79,11 @@ export function JournalSettingsDrawer({ journal, isOpen, onClose }) {
               </TabsContent>
 
               <TabsContent value="submissions" className="mt-4">
-                <SubmissionSettings journal={journal} />
+                <SubmissionSettings journalId={journal?.id} />
+              </TabsContent>
+
+              <TabsContent value="ojs" className="mt-4">
+                <OJSConnectionSettings journalId={journal?.id} />
               </TabsContent>
             </div>
           </Tabs>
