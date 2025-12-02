@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ import {
   FilterToolbar,
   StatusBadge,
   statusConfig,
+  Pagination,
 } from "@/features/shared";
 import { format } from "date-fns";
 import {
@@ -32,9 +33,17 @@ import { JournalInfoCard } from "@/features";
 export default function JournalSubmissionsPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search");
+  const statusParam = searchParams.get("status");
+  const pageParam = searchParams.get("page");
+  const currentPage = pageParam ? parseInt(pageParam) : 1;
+
+  const submissionParams = {
+    search: search,
+  };
+
   const journalId = params.id;
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch journal details using custom hook
   const {
@@ -43,43 +52,18 @@ export default function JournalSubmissionsPage() {
     error: journalError,
   } = useGetJournalById(journalId);
 
+  const handlePageChange = (page) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   // Fetch submissions for this journal using custom hook
   const {
     data: submissionsData,
     isPending: isSubmissionsPending,
     error: submissionsError,
-  } = useGetJournalSubmissions(journalId, {
-    status: statusFilter !== "all" ? statusFilter : undefined,
-  });
-
-  const submissions = submissionsData?.results || [];
-
-  // Filter submissions by search term
-  const filteredSubmissions = submissions.filter((submission) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      submission.title?.toLowerCase().includes(searchLower) ||
-      submission.submission_number?.toLowerCase().includes(searchLower) ||
-      submission.corresponding_author_name?.toLowerCase().includes(searchLower)
-    );
-  });
-
-  // Status badge colors
-  const statusColors = {
-    DRAFT: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100",
-    SUBMITTED: "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100",
-    UNDER_REVIEW:
-      "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100",
-    REVISION_REQUESTED:
-      "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-100",
-    ACCEPTED:
-      "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100",
-    REJECTED: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100",
-    WITHDRAWN:
-      "bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100",
-    PUBLISHED:
-      "bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-100",
-  };
+  } = useGetJournalSubmissions(journalId, { params: submissionParams });
 
   const columns = [
     {
@@ -207,15 +191,11 @@ export default function JournalSubmissionsPage() {
         <FilterToolbar>
           <FilterToolbar.Search
             paramName="search"
-            value={searchTerm}
-            onChange={setSearchTerm}
             placeholder="Search by title, number, or author..."
             label="Search Submissions"
           />
           <FilterToolbar.Select
             paramName="status"
-            value={statusFilter}
-            onChange={setStatusFilter}
             label="Status"
             options={[
               { value: "all", label: "All Status" },
@@ -229,7 +209,7 @@ export default function JournalSubmissionsPage() {
           />
         </FilterToolbar>
         <DataTable
-          data={filteredSubmissions}
+          data={submissionsData?.results || []}
           columns={columns}
           emptyMessage="No submissions found for this journal"
           isPending={isSubmissionsPending}
@@ -238,6 +218,17 @@ export default function JournalSubmissionsPage() {
           hoverable={true}
           tableClassName="bg-card border flex justify-center"
         />
+
+        {submissionsData && submissionsData.count > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(submissionsData.count / 10)}
+            totalCount={submissionsData.count}
+            pageSize={10}
+            onPageChange={handlePageChange}
+            showPageSizeSelector={false}
+          />
+        )}
       </div>
     </div>
   );

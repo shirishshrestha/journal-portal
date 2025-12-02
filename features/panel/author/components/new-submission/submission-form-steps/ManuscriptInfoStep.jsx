@@ -57,6 +57,7 @@ export default function ManuscriptInfoStep({ form }) {
 
       <FormRichTextEditor
         control={form.control}
+        autoFocus={false}
         name="abstract"
         label="Abstract"
         placeholder="Enter your abstract..."

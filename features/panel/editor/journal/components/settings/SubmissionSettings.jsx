@@ -52,7 +52,7 @@ export function SubmissionSettings({ journalId }) {
       min_reviewers: 2,
       review_deadline_days: 21,
       max_file_size_mb: 25,
-      allowed_file_types: "pdf,docx,tex",
+      allowed_file_types: "docx",
       require_cover_letter: true,
       require_conflict_of_interest: true,
       publication_frequency: "MONTHLY",
@@ -86,7 +86,6 @@ export function SubmissionSettings({ journalId }) {
   useEffect(() => {
     if (journal?.settings) {
       form.reset({
-        ...form.getValues(),
         ...journal.settings,
       });
     }
@@ -184,33 +183,35 @@ export function SubmissionSettings({ journalId }) {
                   Add Requirement
                 </Button>
               </div>
-              {requirementFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`submission_requirements.${index}`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder={`Requirement #${index + 1}`}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeRequirement(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {requirementFields.map((field, index) => (
+                  <div key={field.id} className="flex gap-2">
+                    <FormField
+                      control={form.control}
+                      name={`submission_requirements.${index}`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder={`Requirement #${index + 1}`}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeRequirement(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
               {requirementFields.length === 0 && (
                 <p className="text-sm text-muted-foreground">
                   No requirements added yet.
@@ -231,33 +232,35 @@ export function SubmissionSettings({ journalId }) {
                   Add Role
                 </Button>
               </div>
-              {roleFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`coauthor_roles.${index}`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder={`Role #${index + 1}`}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeRole(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {roleFields.map((field, index) => (
+                  <div key={field.id} className="flex gap-2">
+                    <FormField
+                      control={form.control}
+                      name={`coauthor_roles.${index}`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder={`Role #${index + 1}`}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeRole(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
               {roleFields.length === 0 && (
                 <p className="text-sm text-muted-foreground">
                   No roles added yet.
@@ -281,7 +284,7 @@ export function SubmissionSettings({ journalId }) {
                 control={form.control}
                 name="review_type"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={" flex items-start gap-2 flex-col"}>
                     <FormLabel>Review Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -369,44 +372,25 @@ export function SubmissionSettings({ journalId }) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="max_file_size_mb"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Maximum File Size (MB)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="100"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="allowed_file_types"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Allowed File Types</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="pdf,docx,tex" />
-                    </FormControl>
-                    <FormDescription>Separate with commas</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="max_file_size_mb"
+              render={({ field }) => (
+                <FormItem className={" flex items-start gap-2 flex-col"}>
+                  <FormLabel>Maximum File Size (MB)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="100"
+                      {...field}
+                      onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="space-y-4">
               <FormField

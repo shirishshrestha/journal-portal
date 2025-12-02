@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getJournalSubmissions } from "../../api/journalsApi";
 
-export const useGetJournalSubmissions = (journalId, params = {}, options = {}) => {
+export const useGetJournalSubmissions = (
+  journalId,
+  { params = {} } = {},
+  options = {}
+) => {
   return useQuery({
     queryKey: ["journal-submissions", journalId, params],
     queryFn: () => getJournalSubmissions(journalId, params),

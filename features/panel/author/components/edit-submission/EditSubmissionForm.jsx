@@ -15,10 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Save, Loader2 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import SubmissionGuidelines from "../new-submission/submission-form-steps/SubmissionGuidelines";
+import EditSubmissionGuidelines from "./EditSubmissionGuidelines";
 import ManuscriptInfoStep from "../new-submission/submission-form-steps/ManuscriptInfoStep";
 import AuthorsStep from "../new-submission/submission-form-steps/AuthorsStep";
-import { useUpdateSubmission, useGetJournalById } from "../../hooks";
+import { useUpdateSubmission } from "../../hooks";
 import { useGetMe } from "@/features/shared";
 import { stripHtmlTags } from "@/features/shared/utils";
 
@@ -81,10 +81,10 @@ export default function EditSubmissionForm({ submission }) {
       title: submission?.title || "",
       abstract: submission?.abstract || "",
       keywords: metadata?.keywords || [],
-      section_id: submission?.section || "",
-      category_id: submission?.category || "",
-      research_type_id: submission?.research_type || "",
-      area_id: submission?.area || "",
+      section_id: "",
+      category_id: "",
+      research_type_id: "",
+      area_id: "",
       metadata_json: {
         review_type: metadata?.review_type || "Single Blind",
         subject_area: metadata?.subject_area || "Computer Science",
@@ -104,26 +104,29 @@ export default function EditSubmissionForm({ submission }) {
       terms_accepted: false,
     },
   });
+  // Set taxonomy fields when submission changes
+  useEffect(() => {
+    form.setValue("section_id", submission?.section?.id || "");
+    form.setValue("category_id", submission?.section?.category?.id || "");
+    form.setValue(
+      "research_type_id",
+      submission?.section?.category?.research_type?.id || ""
+    );
+    form.setValue(
+      "area_id",
+      submission?.section?.category?.research_type?.area?.id || ""
+    );
+  }, [submission, form]);
 
-  // Watch journal_id to get coauthor roles
-  const journalId = useWatch({
-    control: form.control,
-    name: "journal_id",
-    defaultValue: "",
-  });
-
-  const { data: selectedJournalDetails } = useGetJournalById(journalId, {
-    enabled: !!journalId,
-  });
-
+  // Get coauthor roles and requirements directly from submission's journal
   const coauthorRoles = useMemo(
-    () => selectedJournalDetails?.settings?.coauthor_roles || [],
-    [selectedJournalDetails]
+    () => submission?.journal?.settings?.coauthor_roles || [],
+    [submission]
   );
 
   const submissionRequirements = useMemo(
-    () => selectedJournalDetails?.settings?.submission_requirements || [],
-    [selectedJournalDetails]
+    () => submission?.journal?.settings?.submission_requirements || [],
+    [submission]
   );
 
   // Update form when profile data loads
@@ -226,7 +229,7 @@ export default function EditSubmissionForm({ submission }) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SubmissionGuidelines form={form} />
+              <EditSubmissionGuidelines form={form} submission={submission} />
             </CardContent>
           </Card>
 
