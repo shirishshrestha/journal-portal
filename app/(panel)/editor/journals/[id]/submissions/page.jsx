@@ -29,6 +29,8 @@ import {
   useGetJournalSubmissions,
 } from "@/features/panel/admin/journal";
 import { JournalInfoCard } from "@/features";
+import { useImportFromOJS } from "@/features/panel/editor/journal/hooks/mutation/useImportFromOJS";
+import { RefreshCw } from "lucide-react";
 
 export default function JournalSubmissionsPage() {
   const params = useParams();
@@ -64,6 +66,13 @@ export default function JournalSubmissionsPage() {
     isPending: isSubmissionsPending,
     error: submissionsError,
   } = useGetJournalSubmissions(journalId, { params: submissionParams });
+
+  // OJS Import mutation
+  const importFromOJSMutation = useImportFromOJS();
+
+  const handleSyncFromOJS = () => {
+    importFromOJSMutation.mutate(journalId);
+  };
 
   const columns = [
     {
@@ -186,7 +195,27 @@ export default function JournalSubmissionsPage() {
       </Card>
 
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-foreground ">Submissions</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-foreground">Submissions</h2>
+          <Button
+            onClick={handleSyncFromOJS}
+            disabled={importFromOJSMutation.isPending}
+            variant="outline"
+            size="sm"
+          >
+            {importFromOJSMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Syncing...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Sync from OJS
+              </>
+            )}
+          </Button>
+        </div>
         {/* Filters */}
         <FilterToolbar>
           <FilterToolbar.Search

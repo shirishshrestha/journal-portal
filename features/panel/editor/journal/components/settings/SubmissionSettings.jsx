@@ -85,9 +85,9 @@ export function SubmissionSettings({ journalId }) {
   // Update form when journal data loads
   useEffect(() => {
     if (journal?.settings) {
-      form.reset({
-        ...journal.settings,
-      });
+      setTimeout(() => {
+        form.reset(journal.settings);
+      }, 0);
     }
   }, [journal, form]);
 
@@ -286,10 +286,7 @@ export function SubmissionSettings({ journalId }) {
                 render={({ field }) => (
                   <FormItem className={" flex items-start gap-2 flex-col"}>
                     <FormLabel>Review Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select review type" />
@@ -458,10 +455,7 @@ export function SubmissionSettings({ journalId }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Publication Frequency</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select frequency" />
@@ -488,10 +482,7 @@ export function SubmissionSettings({ journalId }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Currency</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select currency" />
