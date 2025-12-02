@@ -37,3 +37,15 @@ export async function disconnectOJS(journalId) {
   );
   return data;
 }
+
+/**
+ * Import submissions from OJS
+ * @param {string} journalId
+ * @returns {Promise}
+ */
+export async function importFromOJS(journalId) {
+  const { data } = await instance.post(
+    `/journals/journals/${journalId}/import-from-ojs/`
+  );
+  return data;
+}
