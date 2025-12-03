@@ -28,7 +28,7 @@ import {
   useGetJournalById,
   useGetJournalSubmissions,
 } from "@/features/panel/admin/journal";
-import { JournalInfoCard } from "@/features";
+import { JournalInfoCard, OJSSyncingDialog } from "@/features";
 import { useImportFromOJS } from "@/features/panel/editor/journal/hooks/mutation/useImportFromOJS";
 import { RefreshCw } from "lucide-react";
 
@@ -68,10 +68,14 @@ export default function JournalSubmissionsPage() {
   } = useGetJournalSubmissions(journalId, { params: submissionParams });
 
   // OJS Import mutation
-  const importFromOJSMutation = useImportFromOJS();
+  const {
+    mutate: importFromOJSMutation,
+    progress,
+    isPending: importOJSPending,
+  } = useImportFromOJS();
 
   const handleSyncFromOJS = () => {
-    importFromOJSMutation.mutate(journalId);
+    importFromOJSMutation(journalId);
   };
 
   const columns = [
@@ -258,6 +262,8 @@ export default function JournalSubmissionsPage() {
             showPageSizeSelector={false}
           />
         )}
+
+        <OJSSyncingDialog open={importOJSPending} progress={progress} />
       </div>
     </div>
   );

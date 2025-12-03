@@ -43,9 +43,33 @@ export async function disconnectOJS(journalId) {
  * @param {string} journalId
  * @returns {Promise}
  */
-export async function importFromOJS(journalId) {
+export async function importFromOJS(journalId, onProgress) {
   const { data } = await instance.post(
-    `/journals/journals/${journalId}/import-from-ojs/`
+    `/journals/journals/${journalId}/import-from-ojs/`,
+    {},
+    {
+      onDownloadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          onProgress?.(percentCompleted);
+        } else {
+          // If total is not available, simulate progress
+          const loaded = progressEvent.loaded;
+          const estimatedProgress = Math.min(
+            Math.round((loaded / 1024 / 1024) * 10), // Rough estimate based on MB
+            90 // Cap at 90% until complete
+          );
+          onProgress?.(estimatedProgress);
+        }
+      },
+      // Optional: Set a timeout for long-running imports
+      timeout: 300000, // 5 minutes
+    }
   );
+  // Set to 100% when complete
+  onProgress?.(100);
+
   return data;
 }

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { importFromOJS } from "../../api/ojsConnectionApi";
 import { toast } from "sonner";
+import { useState } from "react";
 
 /**
  * Custom hook to import submissions from OJS
@@ -8,9 +9,10 @@ import { toast } from "sonner";
  */
 export function useImportFromOJS() {
   const queryClient = useQueryClient();
+  const [progress, setProgress] = useState(0);
 
-  return useMutation({
-    mutationFn: importFromOJS,
+  const mutation = useMutation({
+    mutationFn: (journalId) => importFromOJS(journalId, setProgress),
     onSuccess: (data, journalId) => {
       // Invalidate submissions queries to refetch updated data
       queryClient.invalidateQueries({
@@ -32,4 +34,9 @@ export function useImportFromOJS() {
       toast.error(errorMessage);
     },
   });
+
+  return {
+    ...mutation,
+    progress,
+  };
 }

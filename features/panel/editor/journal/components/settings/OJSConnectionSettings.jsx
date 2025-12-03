@@ -46,7 +46,7 @@ const ojsConnectionSchema = z.object({
     .string()
     .url("Must be a valid URL")
     .min(1, "API URL is required")
-    .refine((val) => val.endsWith("/api/v1"), {
+    .refine((val) => val.endsWith("/api"), {
       message: "API URL must end with /api/v1",
     }),
   ojs_api_key: z.string().min(1, "API Key is required"),
