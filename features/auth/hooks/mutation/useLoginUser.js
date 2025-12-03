@@ -23,22 +23,18 @@ export const useLoginUser = ({ reset }) => {
       dispatch(authLogin({ userData }));
       broadcast("login");
 
-      // Check if user email is verified
       if (
         userData?.user?.is_verified === false &&
-        !userData?.user?.roles.includes("ADMIN")
+        userData?.user?.roles.length === 1
       ) {
-        // Redirect to pending verification page
-        setTimeout(() => {
-          router.push("/pending-verification");
-        }, 300);
+        router.push(
+          `/pending-verification?is_verified=${userData?.user?.is_verified}`
+        );
         return;
       }
 
       // Normal redirect for verified users
-      setTimeout(() => {
-        redirectUser(userData?.user?.roles || []);
-      }, 300);
+      redirectUser(userData?.user?.roles || []);
     },
     onError: (error) => {
       const detail = error?.response?.data?.detail;

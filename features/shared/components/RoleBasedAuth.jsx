@@ -8,7 +8,6 @@ const RoleBasedRoute = ({ allowedRoles = [], children }) => {
   const router = useRouter();
   const authStatus = useSelector((state) => state.auth?.status);
   const userRoles = useSelector((state) => state.auth?.userData?.roles || []);
-  const isVerified = useSelector((state) => state.auth?.userData?.is_verified);
 
   useEffect(() => {
     if (!authStatus || userRoles.length === 0) {
@@ -16,25 +15,15 @@ const RoleBasedRoute = ({ allowedRoles = [], children }) => {
       return;
     }
 
-    if (isVerified === false && !userRoles.includes("ADMIN")) {
-      router.replace("/pending-verification");
-      return;
-    }
-
     const hasRole = allowedRoles.some((role) => userRoles.includes(role));
     if (!hasRole) {
       router.replace("/unauthorized");
     }
-  }, [authStatus, userRoles, isVerified, router, allowedRoles]);
+  }, [authStatus, userRoles, router, allowedRoles]);
 
   // Show nothing while redirecting
   const hasRole = allowedRoles.some((role) => userRoles.includes(role));
-  if (
-    !authStatus ||
-    userRoles.length === 0 ||
-    (isVerified === false && !userRoles.includes("ADMIN")) ||
-    !hasRole
-  ) {
+  if (!authStatus || userRoles.length === 0 || !hasRole) {
     return null;
   }
 

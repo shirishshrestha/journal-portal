@@ -16,12 +16,15 @@ import {
 } from "@/features/auth/hooks";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { updateVerificationStatus } from "@/features/auth/redux/authSlice";
 
 const PendingVerificationPage = () => {
+  const searchParams = useSearchParams();
+  const isVerified = searchParams.get("is_verified");
+
   const { resolvedTheme } = useTheme();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -42,11 +45,12 @@ const PendingVerificationPage = () => {
 
   // Redirect verified users immediately - this should run first
   useEffect(() => {
-    if (userData?.is_verified) {
-      const roles = userData?.roles || [];
-      if (roles.includes("ADMIN")) {
-        router.replace("/admin/dashboard");
-      } else if (roles.length === 1 && roles.includes("READER")) {
+    const roles = userData?.roles || [];
+    if (roles.includes("ADMIN")) {
+      router.replace("/admin/dashboard");
+    }
+    if (userData?.is_verified === true) {
+      if (roles.length === 1 && roles.includes("READER")) {
         router.replace("/reader/dashboard");
       } else if (roles.length > 2) {
         router.replace("/choose-role");
@@ -115,8 +119,15 @@ const PendingVerificationPage = () => {
     logout();
   };
 
+  console.log(isVerified);
+
+  if (isVerified === "true") {
+    return null;
+  }
+
+  // Don't render anything while redirecting
   if (!userData) {
-    return null; // Don't show anything while redirecting
+    return null;
   }
 
   return (
