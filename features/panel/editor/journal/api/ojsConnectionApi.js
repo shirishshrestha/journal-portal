@@ -41,35 +41,24 @@ export async function disconnectOJS(journalId) {
 /**
  * Import submissions from OJS
  * @param {string} journalId
+ * @param {Function} onComplete - Callback function when import completes
  * @returns {Promise}
  */
-export async function importFromOJS(journalId, onProgress) {
-  const { data } = await instance.post(
-    `/journals/journals/${journalId}/import-from-ojs/`,
-    {},
-    {
-      onDownloadProgress: (progressEvent) => {
-        if (progressEvent.total) {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          onProgress?.(percentCompleted);
-        } else {
-          // If total is not available, simulate progress
-          const loaded = progressEvent.loaded;
-          const estimatedProgress = Math.min(
-            Math.round((loaded / 1024 / 1024) * 10), // Rough estimate based on MB
-            90 // Cap at 90% until complete
-          );
-          onProgress?.(estimatedProgress);
-        }
-      },
-      // Optional: Set a timeout for long-running imports
-      timeout: 300000, // 5 minutes
-    }
-  );
-  // Set to 100% when complete
-  onProgress?.(100);
+export async function importFromOJS(journalId, onComplete) {
+  try {
+    const { data } = await instance.post(
+      `/journals/journals/${journalId}/import-from-ojs/`,
+      {},
+      {
+        timeout: 300000, // 5 minutes
+      }
+    );
 
-  return data;
+    // Signal completion to trigger 100%
+    onComplete?.();
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
 }

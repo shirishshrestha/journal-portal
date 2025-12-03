@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Upload, Edit, Eye, History } from "lucide-react";
+import { FileText, Upload, Edit, History } from "lucide-react";
 import Link from "next/link";
 
 /**

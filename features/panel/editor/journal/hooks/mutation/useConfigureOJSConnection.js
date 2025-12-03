@@ -2,13 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { configureOJSConnection } from "../../api/ojsConnectionApi";
 import { toast } from "sonner";
 
-export const useConfigureOJSConnection = (options = {}) => {
+export const useConfigureOJSConnection = ({ reset }, options = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ journalId, data }) =>
       configureOJSConnection(journalId, data),
     onSuccess: (data, variables) => {
+      reset();
       queryClient.invalidateQueries({
         queryKey: ["ojs-status", variables.journalId],
       });
