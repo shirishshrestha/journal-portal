@@ -46,7 +46,7 @@ const ojsConnectionSchema = z.object({
     .string()
     .url("Must be a valid URL")
     .min(1, "API URL is required")
-    .refine((val) => val.endsWith("/api"), {
+    .refine((val) => val.endsWith("/api/v1"), {
       message: "API URL must end with /api/v1",
     }),
   ojs_api_key: z.string().min(1, "API Key is required"),
@@ -65,11 +65,6 @@ export function OJSConnectionSettings({ journalId }) {
     refetch: refetchStatus,
   } = useGetOJSStatus(journalId);
 
-  const configureOJSMutation = useConfigureOJSConnection();
-  const disconnectOJSMutation = useDisconnectOJS();
-
-  const { resolvedTheme } = useTheme();
-
   const form = useForm({
     resolver: zodResolver(ojsConnectionSchema),
     defaultValues: {
@@ -79,6 +74,11 @@ export function OJSConnectionSettings({ journalId }) {
       ojs_enabled: true,
     },
   });
+
+  const configureOJSMutation = useConfigureOJSConnection({ reset: form.reset });
+  const disconnectOJSMutation = useDisconnectOJS();
+
+  const { resolvedTheme } = useTheme();
 
   // Update form when OJS status is fetched
   useEffect(() => {
@@ -155,7 +155,10 @@ export function OJSConnectionSettings({ journalId }) {
                 <CheckCircle2 className="h-5 w-5 text-green-600" />
                 <CardTitle>OJS Connected</CardTitle>
               </div>
-              <Badge variant="success" className="bg-green-600">
+              <Badge
+                variant="success"
+                className="bg-green-600 text-primary-foreground"
+              >
                 Active
               </Badge>
             </div>

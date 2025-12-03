@@ -40,15 +40,7 @@ const PendingVerificationPage = () => {
     !userData?.is_verified && !isLoggingOut && !!userData
   );
 
-  useEffect(() => {
-    if (
-      verificationData?.email_verified === true &&
-      userData?.is_verified === false
-    ) {
-      dispatch(updateVerificationStatus({ isVerified: true }));
-    }
-  }, [verificationData, userData, dispatch]);
-
+  // Redirect verified users immediately - this should run first
   useEffect(() => {
     if (userData?.is_verified) {
       const roles = userData?.roles || [];
@@ -69,6 +61,16 @@ const PendingVerificationPage = () => {
       }
     }
   }, [userData, router]);
+
+  // Update verification status from polling
+  useEffect(() => {
+    if (
+      verificationData?.email_verified === true &&
+      userData?.is_verified === false
+    ) {
+      dispatch(updateVerificationStatus({ isVerified: true }));
+    }
+  }, [verificationData, userData, dispatch]);
 
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -113,7 +115,7 @@ const PendingVerificationPage = () => {
     logout();
   };
 
-  if (!userData || userData?.is_verified) {
+  if (!userData) {
     return null; // Don't show anything while redirecting
   }
 
