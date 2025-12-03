@@ -57,3 +57,27 @@ export const confirmPasswordReset = async ({
   });
   return response.data;
 };
+
+/**
+ * Request password setup for imported OJS users
+ * POST /api/auth/password/setup/request/
+ */
+export const requestPasswordSetup = async (email) => {
+  const response = await instance.post("/auth/password/setup/request/", {
+    email,
+  });
+  return response.data;
+};
+
+/**
+ * Setup password for imported OJS users with token
+ * POST /api/auth/password/setup/
+ */
+export const setupPassword = async ({ uid, token, password }) => {
+  const response = await instance.post("/auth/password/setup/", {
+    uid,
+    token,
+    password,
+  });
+  return response.data;
+};

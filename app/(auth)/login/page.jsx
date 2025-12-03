@@ -10,6 +10,7 @@ import {
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { LoginForm } from "@/features";
+import Link from "next/link";
 
 const LoginPage = () => {
   const { resolvedTheme } = useTheme();
@@ -53,6 +54,23 @@ const LoginPage = () => {
             <LoginForm />
           </CardContent>
         </Card>
+
+        {/* Info message for imported OJS users */}
+        <div className="mt-6">
+          <Card className="border py-3 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
+            <CardContent className="pt-1 pb-1">
+              <p className="text-sm text-center text-blue-700 dark:text-blue-300">
+                <span className="font-medium">Imported from OJS?</span>{" "}
+                <Link
+                  href="/setup-password"
+                  className="underline text-foreground hover:text-blue-800 dark:hover:text-blue-200"
+                >
+                  Setup your password here
+                </Link>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="text-center mt-8 text-xs text-muted-foreground ">
           © {new Date().getFullYear()} Journal Portal. All rights reserved.
