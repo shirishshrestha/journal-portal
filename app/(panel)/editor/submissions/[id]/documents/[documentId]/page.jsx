@@ -74,9 +74,19 @@ export default function EditorDocumentViewPage() {
         </Button>
       </div>
 
-      <Card className="flex flex-col">
+      <Card
+        className={`flex flex-col ${
+          documentData.file_name?.toLowerCase().endsWith(".pdf")
+            ? "p-0 border-none"
+            : ""
+        }`}
+      >
         {isLoading && <LoadingScreen />}
-        <CardContent className="">
+        <CardContent
+          className={`${
+            documentData.file_name?.toLowerCase().endsWith(".pdf") ? "p-0" : ""
+          }`}
+        >
           {documentData.file_name?.toLowerCase().endsWith(".pdf") ? (
             <PDFViewer
               fileUrl={documentData.file_url}

@@ -37,13 +37,10 @@ const PendingVerificationPage = () => {
     useResendVerificationEmail(countdown === 0);
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
-  // Poll verification status every 10 seconds without reloading page
-  // Disable polling when logging out or user data is null
   const { data: verificationData } = useCheckVerificationStatus(
     !userData?.email_verified && !isLoggingOut && !!userData
   );
 
-  // Redirect verified users immediately - this should run first
   useEffect(() => {
     const roles = userData?.roles || [];
     if (roles.includes("ADMIN")) {

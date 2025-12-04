@@ -2,30 +2,32 @@
 
 import { useMemo, useState } from "react";
 import { FilterToolbar, Pagination } from "@/features/shared";
+import { ActionConfirmationPopup, LoadingScreen } from "@/features";
 import {
-  ActionConfirmationPopup,
-  VerificationDetailsModal,
-  VerificationRequestsTable,
-  LoadingScreen,
-  useGetVerificationRequests,
-  useApproveVerification,
-  useRejectVerification,
-  useRequestInfoVerification,
-} from "@/features";
+  useGetEditorVerificationRequests,
+  useGetEditorJournals,
+  useApproveEditorVerification,
+  useRejectEditorVerification,
+  useRequestInfoEditorVerification,
+  EditorVerificationRequestsTable,
+  EditorVerificationDetailsModal,
+} from "@/features/panel/editor/verification-requests";
 
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function VerificationsPage() {
+export default function EditorVerificationsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageParam = searchParams.get("page");
   const currentPage = pageParam ? parseInt(pageParam) : 1;
   const searchParam = searchParams.get("search");
   const status = searchParams.get("status");
+  const journal = searchParams.get("journal");
 
   const params = {
     search: searchParam,
     status: status,
+    journal: journal,
     page: pageParam,
   };
 
@@ -33,23 +35,29 @@ export default function VerificationsPage() {
     data: verificationsData,
     isPending: isVerificationRequestsPending,
     error,
-  } = useGetVerificationRequests({ params });
+  } = useGetEditorVerificationRequests({ params });
+
+  const { data: journalsData, isPending: isJournalsLoading } =
+    useGetEditorJournals();
 
   const verifications = useMemo(
     () => verificationsData?.results || [],
     [verificationsData]
   );
 
+  const journals = useMemo(() => journalsData?.results || [], [journalsData]);
+
   // Mutations
   const { mutate: approveVerification, isPending: isApproving } =
-    useApproveVerification();
+    useApproveEditorVerification();
   const { mutate: rejectVerification, isPending: isRejecting } =
-    useRejectVerification();
+    useRejectEditorVerification();
   const { mutate: requestInfoVerification, isPending: isRequestingInfo } =
-    useRequestInfoVerification();
+    useRequestInfoEditorVerification();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [journalFilter, setJournalFilter] = useState("all");
   const [selectedVerification, setSelectedVerification] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -136,6 +144,11 @@ export default function VerificationsPage() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
+  const journalOptions = [
+    { value: "all", label: "All Journals" },
+    ...journals.map((j) => ({ value: j.id.toString(), label: j.name })),
+  ];
+
   return (
     <div className="space-y-6">
       {isVerificationRequestsPending && <LoadingScreen />}
@@ -145,7 +158,7 @@ export default function VerificationsPage() {
           Verification Requests
         </h1>
         <p className="text-muted-foreground">
-          Review and manage user verification requests
+          Review and manage user verification requests for your journals
         </p>
       </div>
 
@@ -157,6 +170,14 @@ export default function VerificationsPage() {
           onChange={setSearchQuery}
           placeholder="Search by name or email..."
           label="Search"
+        />
+        <FilterToolbar.Select
+          paramName="journal"
+          label="Journal"
+          value={journalFilter}
+          onChange={setJournalFilter}
+          options={journalOptions}
+          disabled={isJournalsLoading}
         />
         <FilterToolbar.Select
           paramName="status"
@@ -174,7 +195,7 @@ export default function VerificationsPage() {
       </FilterToolbar>
 
       {/* Verifications Table */}
-      <VerificationRequestsTable
+      <EditorVerificationRequestsTable
         requests={verifications}
         onViewDetails={handleViewDetails}
         isPending={isVerificationRequestsPending}
@@ -182,7 +203,7 @@ export default function VerificationsPage() {
       />
 
       {/* Modals */}
-      <VerificationDetailsModal
+      <EditorVerificationDetailsModal
         verification={selectedVerification}
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}

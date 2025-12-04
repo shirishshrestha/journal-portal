@@ -65,11 +65,6 @@ export default function ReviewAssignmentsTable({
     {
       key: "submission_title",
       header: "Submission Title",
-      render: (row) => (
-        <p className="font-medium text-sm max-w-xs truncate">
-          {row.submission_title}
-        </p>
-      ),
     },
     {
       key: "journal_name",

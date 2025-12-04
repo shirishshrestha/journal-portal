@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { DataTable } from "@/features/shared";
+import EllipsisTooltip from "@/components/ui/EllipsisTooltip";
 
 export function ActivityLogsTable({ logs, onViewDetails, isPending, error }) {
   const getActionIcon = (actionType) => {
@@ -123,7 +124,7 @@ export function ActivityLogsTable({ logs, onViewDetails, isPending, error }) {
             <>
               <div className="flex items-center gap-1.5">
                 <User className="h-3 w-3 text-muted-foreground" />
-                <span className="text-sm font-medium">{row.user_email}</span>
+                <EllipsisTooltip text={row.user_email || "-"} />
               </div>
               <Badge variant="outline" className="text-xs">
                 {row.actor_type_display || row.actor_type}

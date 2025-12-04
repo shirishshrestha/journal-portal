@@ -3,7 +3,13 @@ import { NextResponse } from "next/server";
 export function proxy(request) {
   const token = request.cookies.get("auth-token")?.value;
   const url = request.nextUrl.clone();
-  const publicPaths = ["/login", "/register", "/unauthorized", "/choose-role"];
+  const publicPaths = [
+    "/login",
+    "/register",
+    "/unauthorized",
+    "/choose-role",
+    "/pending-verification",
+  ];
 
   if (url.pathname === "/") {
     url.pathname = "/login";
@@ -32,14 +38,26 @@ export function proxy(request) {
       const decoded = JSON.parse(decodedPayload);
 
       const roles = decoded?.roles || [];
+      const emailVerified = decoded?.email_verified;
 
-      // ✅ If user has multiple roles → go to /choose-role
+      // If user is READER only with unverified email → redirect to pending verification
+      if (
+        roles.length === 1 &&
+        roles[0] === "READER" &&
+        emailVerified === false
+      ) {
+        url.pathname = "/pending-verification";
+        url.searchParams.set("email_verified", "false");
+        return NextResponse.redirect(url);
+      }
+
+      // If user has multiple roles → go to /choose-role
       if (roles.length > 1) {
         url.pathname = "/choose-role";
         return NextResponse.redirect(url);
       }
 
-      // 🧭 Role-based redirect map
+      // Role-based redirect map
       const rolePathMap = {
         READER: "/reader/dashboard",
         AUTHOR: "/author/dashboard",
@@ -80,5 +98,6 @@ export const config = {
     "/register",
     "/unauthorized",
     "/choose-role",
+    "/pending-verification",
   ],
 };

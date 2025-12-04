@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen } from "lucide-react";
 import { DataTable } from "@/features/shared";
+import EllipsisTooltip from "@/components/ui/EllipsisTooltip";
 
 // Table columns config
 const columns = [
@@ -13,7 +14,7 @@ const columns = [
       <div className="flex items-center gap-2">
         <BookOpen className="w-4 h-4 text-muted-foreground" />
         <div>
-          <p className="font-medium">{row.title}</p>
+          <EllipsisTooltip text={row.title || "-"} />
           <p className="text-xs text-muted-foreground">
             {row.submission_number}
           </p>

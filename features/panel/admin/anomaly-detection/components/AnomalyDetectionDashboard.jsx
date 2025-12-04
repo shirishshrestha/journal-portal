@@ -10,6 +10,7 @@ import { AlertTriangle, Shield, Users, Eye, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
 import { AnomalySummaryCards } from "./AnomalySummaryCards";
 import { AnomalyDetailsModal } from "./AnomalyDetailsModal";
+import EllipsisTooltip from "@/components/ui/EllipsisTooltip";
 
 export const AnamolyDetectionDashboard = () => {
   const router = useRouter();
@@ -101,9 +102,7 @@ export const AnamolyDetectionDashboard = () => {
       key: "description",
       header: "Description",
       cellClassName: "text-muted-foreground",
-      render: (row) => (
-        <div className="max-w-[300px] truncate">{row.description}</div>
-      ),
+      render: (row) => <EllipsisTooltip text={row.description || "-"} />,
     },
     {
       key: "affected_user",
@@ -119,13 +118,7 @@ export const AnamolyDetectionDashboard = () => {
     {
       key: "submission",
       header: "Submission",
-      render: (row) => (
-        <div className="max-w-[200px] truncate text-sm">
-          {row.submission_title || (
-            <span className="text-muted-foreground italic">N/A</span>
-          )}
-        </div>
-      ),
+      render: (row) => <EllipsisTooltip text={row.submission_title || "-"} />,
     },
     {
       key: "metric",

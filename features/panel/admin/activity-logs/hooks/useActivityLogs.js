@@ -14,6 +14,8 @@ export const useActivityLogs = (params = {}) => {
     queryKey: ["activityLogs", params],
     queryFn: () => fetchActivityLogs(params),
     keepPreviousData: true,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
   });
 };
 

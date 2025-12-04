@@ -37,6 +37,7 @@ import {
   useGetUsers,
 } from "@/features";
 import { DataTable, SearchableSelect } from "@/features/shared";
+import EllipsisTooltip from "@/components/ui/EllipsisTooltip";
 
 const STAFF_ROLES = [
   { value: "EDITOR_IN_CHIEF", label: "Editor-in-Chief" },
@@ -139,9 +140,7 @@ export function StaffSettings({ journalId }) {
       key: "affiliation",
       header: "Affiliation",
       render: (staff) => (
-        <span className="text-sm">
-          {staff.profile?.affiliation_name || "N/A"}
-        </span>
+        <EllipsisTooltip text={staff.profile?.affiliation_name || "-"} />
       ),
     },
     {

@@ -25,7 +25,8 @@ export const useLoginUser = ({ reset }) => {
 
       if (
         userData?.user?.email_verified === false &&
-        userData?.user?.roles.length === 1
+        userData?.user?.roles.length === 1 &&
+        userData?.user?.roles[0] === "READER"
       ) {
         router.push(
           `/pending-verification?email_verified=${userData?.user?.email_verified}`

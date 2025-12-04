@@ -32,14 +32,10 @@ const statusBadgeColors = {
 export default function JournalsTable({
   journals = [],
   onViewSubmissions,
-  onEdit,
   onDelete,
   onSettings,
   isPending = false,
   error = null,
-  sortColumn,
-  sortOrder,
-  onSort,
 }) {
   const columns = [
     {

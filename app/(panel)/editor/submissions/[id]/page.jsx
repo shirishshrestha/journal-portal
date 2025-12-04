@@ -161,7 +161,15 @@ export default function AdminSubmissionDetailPage() {
           <p className="text-muted-foreground">Review and manage submission</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() =>
+              router.push(
+                `/editor/journals/${submission?.journal.id}/submissions`
+              )
+            }
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
@@ -325,7 +333,7 @@ export default function AdminSubmissionDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {submission.author_contributions.map((author) => (
                   <div
                     key={author.id}
