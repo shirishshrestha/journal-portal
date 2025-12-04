@@ -59,7 +59,6 @@ const RoleRequestForm = () => {
 
   const defaultRoles = ["READER", "AUTHOR", "REVIEWER", "EDITOR"];
 
-
   const existingRoleNames =
     RoleLists?.map((role) => role?.trim().toUpperCase()) || [];
 
@@ -74,7 +73,6 @@ const RoleRequestForm = () => {
     resolver: zodResolver(roleRequestSchema),
     defaultValues: {
       requested_roles: [],
-      affiliation: "",
       affiliation_email: "",
       research_interests: "",
       academic_position: "",
@@ -172,14 +170,6 @@ const RoleRequestForm = () => {
 
                 <FormInputField
                   control={roleForm.control}
-                  name="affiliation"
-                  label="Institution/Organization"
-                  placeholder="e.g., Harvard University, MIT"
-                  description="Your current academic or research institution"
-                />
-
-                <FormInputField
-                  control={roleForm.control}
                   name="affiliation_email"
                   label="Institutional Email"
                   placeholder="your.name@institution.edu"
@@ -192,6 +182,7 @@ const RoleRequestForm = () => {
                   label="Academic Position"
                   placeholder="e.g., PhD, Professor, Postdoctoral Researcher"
                   description="Your current academic position or title"
+                  form_classname="lg:col-span-2"
                 />
 
                 <FormTextareaField

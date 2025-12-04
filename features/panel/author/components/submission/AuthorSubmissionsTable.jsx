@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/features/shared";
 import { BookOpen, MoreVertical, Trash2, Eye, Pencil } from "lucide-react";
+import EllipsisTooltip from "@/components/ui/EllipsisTooltip";
 import Link from "next/link";
 import { statusConfig } from "../../../../shared/utils/submission-status-color";
 
@@ -32,7 +33,10 @@ const columns = [
         <div className="flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-muted-foreground" />
           <div>
-            <p className="font-medium">{row.title}</p>
+            <EllipsisTooltip
+              text={row.title}
+              spanProps={{ className: "font-medium" }}
+            />
             <p className="text-xs text-muted-foreground">
               {row.submission_number}
             </p>

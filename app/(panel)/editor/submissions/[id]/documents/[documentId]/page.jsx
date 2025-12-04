@@ -5,7 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { SuperDocEditor, LoadingScreen, ErrorCard } from "@/features";
+import {
+  SuperDocEditor,
+  LoadingScreen,
+  ErrorCard,
+  PDFViewer,
+} from "@/features";
 import { loadDocument } from "@/features/panel/author/api/superdocApi";
 import { useSelector } from "react-redux";
 
@@ -69,17 +74,36 @@ export default function EditorDocumentViewPage() {
         </Button>
       </div>
 
-      <Card className="flex flex-col">
+      <Card
+        className={`flex flex-col ${
+          documentData.file_name?.toLowerCase().endsWith(".pdf")
+            ? "p-0 border-none"
+            : ""
+        }`}
+      >
         {isLoading && <LoadingScreen />}
-        <CardContent className="">
-          <SuperDocEditor
-            documentData={documentData}
-            userData={userData}
-            userRole="EDITOR"
-            readOnly={true}
-            commentsReadOnly={true}
-            className="border rounded-lg"
-          />
+        <CardContent
+          className={`${
+            documentData.file_name?.toLowerCase().endsWith(".pdf") ? "p-0" : ""
+          }`}
+        >
+          {documentData.file_name?.toLowerCase().endsWith(".pdf") ? (
+            <PDFViewer
+              fileUrl={documentData.file_url}
+              fileName={documentData.file_name}
+              showDownload={true}
+              className="border rounded-lg"
+            />
+          ) : (
+            <SuperDocEditor
+              documentData={documentData}
+              userData={userData}
+              userRole="EDITOR"
+              readOnly={true}
+              commentsReadOnly={true}
+              className="border rounded-lg"
+            />
+          )}
         </CardContent>
       </Card>
     </div>

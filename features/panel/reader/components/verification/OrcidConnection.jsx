@@ -272,6 +272,14 @@ const OrcidConnection = () => {
             size="md"
             disabled={isOrcidLinkPending}
           >
+            <Image
+              src="/orcid.logo.icon.svg"
+              alt="ORCID Logo"
+              width={20}
+              height={20}
+              className="w-6 h-fit inline-block "
+              priority
+            />
             {isOrcidLinkPending && <Loader2 className="w-4 h-4 animate-spin" />}
             {isOrcidLinkPending ? "Redirecting..." : "Connect ORCID"}
           </Button>

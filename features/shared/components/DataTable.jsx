@@ -3,6 +3,11 @@
  * @module features/shared/components/DataTable
  */
 import React from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import TableSkeleton from "@/features/shared/components/TableSkeleton";
 import {
   Table,
@@ -113,6 +118,28 @@ export default function DataTable({
 
     if (column.render) {
       return column.render(row, value);
+    }
+
+    // If value is a string and longer than 45 chars, show ellipsis and shadcn tooltip
+    if (typeof value === "string" && value.length > 45) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span
+              style={{
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: 180,
+              }}
+            >
+              {value.slice(0, 45)}...
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>{value}</TooltipContent>
+        </Tooltip>
+      );
     }
 
     return value;

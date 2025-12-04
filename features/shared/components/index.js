@@ -27,6 +27,7 @@ import { ReviewSummaryCard } from "./ReviewSummaryCard";
 import { JournalCreatedDialog } from "./JournalCreatedDialog";
 import { SubmissionCreatedDialog } from "./SubmissionCreatedDialog";
 import { AuthorGuidelinesDialog } from "./AuthorGuidelinesDialog";
+import { PDFViewer } from "./PDFViewer";
 export * from "./charts";
 
 export {
@@ -59,4 +60,5 @@ export {
   JournalCreatedDialog,
   SubmissionCreatedDialog,
   AuthorGuidelinesDialog,
+  PDFViewer,
 };

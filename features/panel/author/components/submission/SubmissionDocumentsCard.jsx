@@ -97,16 +97,17 @@ export default function SubmissionDocumentsCard({
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {isEditable && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onViewVersions(doc.id)}
-                    >
-                      <History className="h-4 w-4 mr-1 stroke-[1.5px]" />
-                      Versions
-                    </Button>
-                  )}
+                  {isEditable &&
+                    !doc.file_name?.toLowerCase().endsWith(".pdf") && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onViewVersions(doc.id)}
+                      >
+                        <History className="h-4 w-4 mr-1 stroke-[1.5px]" />
+                        Versions
+                      </Button>
+                    )}
                   {isEditable && editBasePath && (
                     <Link
                       href={`${editBasePath}/${submissionId}/editor/${doc.id}`}
@@ -117,7 +118,9 @@ export default function SubmissionDocumentsCard({
                         size="sm"
                       >
                         <Edit className="h-4 w-4 mr-1 stroke-[1.5px]" />
-                        Edit
+                        {doc.file_name?.toLowerCase().endsWith(".pdf")
+                          ? "View"
+                          : "Edit"}
                       </Button>
                     </Link>
                   )}

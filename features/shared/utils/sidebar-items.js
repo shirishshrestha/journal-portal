@@ -173,6 +173,11 @@ export const sidebarConfig = {
       icon: Book,
     },
     {
+      name: "Verification Requests",
+      path: "/editor/verification-requests",
+      icon: CheckCircle,
+    },
+    {
       name: "Settings",
       path: "/settings",
       icon: Settings,

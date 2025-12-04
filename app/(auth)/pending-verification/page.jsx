@@ -23,7 +23,7 @@ import { updateVerificationStatus } from "@/features/auth/redux/authSlice";
 
 const PendingVerificationPage = () => {
   const searchParams = useSearchParams();
-  const isVerified = searchParams.get("is_verified");
+  const email_verified = searchParams.get("email_verified");
 
   const { resolvedTheme } = useTheme();
   const router = useRouter();
@@ -37,19 +37,16 @@ const PendingVerificationPage = () => {
     useResendVerificationEmail(countdown === 0);
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
-  // Poll verification status every 10 seconds without reloading page
-  // Disable polling when logging out or user data is null
   const { data: verificationData } = useCheckVerificationStatus(
-    !userData?.is_verified && !isLoggingOut && !!userData
+    !userData?.email_verified && !isLoggingOut && !!userData
   );
 
-  // Redirect verified users immediately - this should run first
   useEffect(() => {
     const roles = userData?.roles || [];
     if (roles.includes("ADMIN")) {
       router.replace("/admin/dashboard");
     }
-    if (userData?.is_verified === true) {
+    if (userData?.email_verified === true) {
       if (roles.length === 1 && roles.includes("READER")) {
         router.replace("/reader/dashboard");
       } else if (roles.length > 2) {
@@ -70,7 +67,7 @@ const PendingVerificationPage = () => {
   useEffect(() => {
     if (
       verificationData?.email_verified === true &&
-      userData?.is_verified === false
+      userData?.email_verified === false
     ) {
       dispatch(updateVerificationStatus({ isVerified: true }));
     }
@@ -119,9 +116,7 @@ const PendingVerificationPage = () => {
     logout();
   };
 
-  console.log(isVerified);
-
-  if (isVerified === "true") {
+  if (email_verified === "true") {
     return null;
   }
 

@@ -31,6 +31,7 @@ import {
 import { JournalInfoCard, OJSSyncingDialog } from "@/features";
 import { useImportFromOJS } from "@/features/panel/editor/journal/hooks/mutation/useImportFromOJS";
 import { RefreshCw } from "lucide-react";
+import EllipsisTooltip from "@/components/ui/EllipsisTooltip";
 
 export default function JournalSubmissionsPage() {
   const params = useParams();
@@ -96,9 +97,7 @@ export default function JournalSubmissionsPage() {
       render: (row) => (
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">
-            {row.corresponding_author_name || "-"}
-          </span>
+          <EllipsisTooltip text={row.corresponding_author_name || "-"} />
         </div>
       ),
     },
@@ -158,7 +157,7 @@ export default function JournalSubmissionsPage() {
     return (
       <ErrorCard
         title="Failed to load journal submissions"
-        description={error.message}
+        description={journalError}
         onBack={() => router.push("/editor/journals")}
       />
     );

@@ -17,7 +17,12 @@ import {
   loadDocument,
   downloadDocx,
 } from "@/features/panel/author/api/superdocApi";
-import { LoadingScreen, SuperDocEditor, ErrorCard } from "@/features";
+import {
+  LoadingScreen,
+  SuperDocEditor,
+  ErrorCard,
+  PDFViewer,
+} from "@/features";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function ReviewerDocumentViewPage() {
@@ -150,12 +155,21 @@ export default function ReviewerDocumentViewPage() {
               </div>
             </div>
 
-            {/* SuperDoc Editor */}
-            <SuperDocEditor
-              documentData={documentData}
-              userData={userData}
-              className="border rounded-lg"
-            />
+            {/* Document Viewer - PDF or SuperDoc */}
+            {documentData.file_name?.toLowerCase().endsWith(".pdf") ? (
+              <PDFViewer
+                fileUrl={documentData.file_url}
+                fileName={documentData.file_name}
+                showDownload={false}
+                className="border rounded-lg"
+              />
+            ) : (
+              <SuperDocEditor
+                documentData={documentData}
+                userData={userData}
+                className="border rounded-lg"
+              />
+            )}
           </div>
         </div>
       </CardContent>

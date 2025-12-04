@@ -15,6 +15,7 @@ export const FormInputField = ({
   label,
   className = "",
   description,
+  form_classname = "",
   ...props
 }) => {
   return (
@@ -22,7 +23,7 @@ export const FormInputField = ({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={form_classname}>
           {label && <FormLabel>{label}</FormLabel>}
           <FormControl>
             <Input

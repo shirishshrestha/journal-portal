@@ -2,13 +2,27 @@
 
 import {
   EditorDashboardStats,
-  EditorJournalsDoughnutChart,
-  EditorSubmissionsChart,
   ErrorCard,
   LoadingScreen,
   RoleBasedRoute,
   useGetMyAnalytics,
 } from "@/features";
+import dynamic from "next/dynamic";
+
+const EditorJournalsDoughnutChart = dynamic(
+  () =>
+    import(
+      "@/features/panel/editor/dashboard/components/EditorJournalsDoughnutChart"
+    ),
+  { ssr: false }
+);
+const EditorSubmissionsChart = dynamic(
+  () =>
+    import(
+      "@/features/panel/editor/dashboard/components/EditorSubmissionsChart"
+    ),
+  { ssr: false }
+);
 import React from "react";
 
 export default function EditorDashboard() {
