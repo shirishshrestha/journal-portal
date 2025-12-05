@@ -14,12 +14,37 @@ import {
 import { FileText } from "lucide-react";
 import { format } from "date-fns";
 import { useCurrentRole } from "@/features/shared";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function JournalInfoCard({ journal }) {
+export function JournalInfoCard({ journal, isPending = false }) {
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const { currentRole } = useCurrentRole();
 
-  if (!journal) return null;
+  if (isPending) {
+    return (
+      <>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Skeleton className="h-5 w-5" />
+          </div>
+          <Skeleton className="h-6 w-32" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+          {[...Array(10)].map((_, i) => (
+            <div className="flex items-start gap-2" key={i}>
+              <Skeleton className="min-w-[140px] h-5 w-24" />
+              <Skeleton className="h-5 w-32" />
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 pt-5 border-t">
+          <Skeleton className="h-5 w-32 mb-2" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-24 mt-2" />
+        </div>
+      </>
+    );
+  }
 
   // Helper to get plain text preview from HTML
   const getDescriptionPreview = (html, maxLength = 150) => {
@@ -33,7 +58,6 @@ export function JournalInfoCard({ journal }) {
 
   return (
     <>
-      {" "}
       <div className="flex items-center gap-3 mb-5">
         <div className="p-2 rounded-lg bg-primary/10">
           <FileText className="h-5 w-5 text-primary" />

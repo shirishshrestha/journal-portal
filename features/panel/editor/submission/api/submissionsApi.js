@@ -29,8 +29,8 @@ export const updateSubmissionStatus = async (id, data) => {
  * @param {Object} data - { reviewer_ids: string[] }
  * @returns {Promise} API response
  */
-export const assignReviewers = async ( data) => {
-  console.log("Assign Reviewers API - Data:", data);    
+export const assignReviewers = async (data) => {
+  console.log("Assign Reviewers API - Data:", data);
   const response = await instance.post(`reviews/assignments/`, data);
   return response.data;
 };
@@ -42,5 +42,21 @@ export const assignReviewers = async ( data) => {
  */
 export const getReviewerRecommendations = async (id) => {
   const response = await instance.get(`ml/reviewer-recommendations/${id}`);
+  return response.data;
+};
+
+/**
+ * Sync a single submission to OJS
+ * @param {string} id - Submission ID
+ * @returns {Promise} API response
+ */
+export const syncSubmissionToOJS = async (id) => {
+  const response = await instance.post(
+    `submissions/${id}/sync-to-ojs/`,
+    {},
+    {
+      timeout: 60000, // 60 seconds
+    }
+  );
   return response.data;
 };

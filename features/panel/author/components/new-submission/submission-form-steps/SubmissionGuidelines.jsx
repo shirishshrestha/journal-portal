@@ -325,7 +325,10 @@ export default function SubmissionGuidelines({ form }) {
       {/* Journal Details Card */}
       {selectedJournalDetails && !isLoadingJournalDetails && (
         <Card className="p-6">
-          <JournalInfoCard journal={selectedJournalDetails} />
+          <JournalInfoCard
+            journal={selectedJournalDetails}
+            isPending={isLoadingJournalDetails}
+          />
         </Card>
       )}
 

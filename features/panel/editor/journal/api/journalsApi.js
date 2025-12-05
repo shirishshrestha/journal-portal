@@ -401,7 +401,7 @@ export const getJournalSubmissions = async (journalId, params = {}) => {
   const response = await instance.get("submissions/", {
     params: {
       journal: journalId,
-      ...params,
+      ...params.params,
     },
   });
   return response.data;

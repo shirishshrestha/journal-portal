@@ -47,11 +47,7 @@ export async function disconnectOJS(journalId) {
 export async function importFromOJS(journalId, onComplete) {
   try {
     const { data } = await instance.post(
-      `/journals/journals/${journalId}/import-from-ojs/`,
-      {},
-      {
-        timeout: 300000, // 5 minutes
-      }
+      `/journals/journals/${journalId}/import-from-ojs/`
     );
 
     // Signal completion to trigger 100%

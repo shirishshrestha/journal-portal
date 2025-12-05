@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft,
   FileText,
@@ -17,7 +15,6 @@ import {
   DataTable,
   ErrorCard,
   LoadingScreen,
-  RoleBasedRoute,
   FilterToolbar,
   StatusBadge,
   statusConfig,
@@ -27,7 +24,7 @@ import { format } from "date-fns";
 import {
   useGetJournalById,
   useGetJournalSubmissions,
-} from "@/features/panel/admin/journal";
+} from "@/features/panel/editor/journal";
 import { JournalInfoCard, OJSSyncingDialog } from "@/features";
 import { useImportFromOJS } from "@/features/panel/editor/journal/hooks/mutation/useImportFromOJS";
 import { RefreshCw } from "lucide-react";
@@ -186,24 +183,26 @@ export default function JournalSubmissionsPage() {
             View and manage all submissions for this journal
           </p>
         </div>
-        <Button
-          onClick={handleSyncFromOJS}
-          disabled={importFromOJSMutation.isPending}
-          variant="secondary"
-          size="sm"
-        >
-          {importFromOJSMutation.isPending ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Syncing...
-            </>
-          ) : (
-            <>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Sync from OJS
-            </>
-          )}
-        </Button>
+        {journal?.ojs_connection_status?.connected && (
+          <Button
+            onClick={handleSyncFromOJS}
+            disabled={importFromOJSMutation.isPending}
+            variant="secondary"
+            size="sm"
+          >
+            {importFromOJSMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Syncing...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Sync from OJS
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Journal Info Card */}
@@ -212,7 +211,7 @@ export default function JournalSubmissionsPage() {
           <CardTitle>Journal Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <JournalInfoCard journal={journal} />
+          <JournalInfoCard journal={journal} isPending={isJournalPending} />
         </CardContent>
       </Card>
 

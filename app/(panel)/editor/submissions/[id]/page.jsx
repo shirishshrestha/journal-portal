@@ -3,21 +3,9 @@
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
-import {
-  ArrowLeft,
-  Calendar,
-  User,
-  FileText,
-  Mail,
-  Building2,
-  Star,
-  Loader2,
-  Eye,
-  Download,
-} from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Calendar } from "lucide-react";
 import { useGetSubmissionReviews } from "@/features/panel/editor/submission/hooks/useGetSubmissionReviews";
 import { useGetSubmissionDecisions } from "@/features/panel/editor/submission/hooks/useGetSubmissionDecisions";
-import EditorialDecisionForm from "@/features/panel/editor/submission/components/EditorialDecisionForm";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,30 +14,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  useAssignReviewers,
-  useGetEditorSubmissionById,
-  useGetReviewerRecommendations,
-} from "@/features/panel/editor/submission";
-import {
-  LoadingScreen,
+  ConfirmationPopup,
+  DecisionBadge,
+  decisionTypeConfig,
   ErrorCard,
   StatusBadge,
   statusConfig,
-  DecisionBadge,
-  decisionTypeConfig,
-  reviewRecommendationConfig,
+  useAssignReviewers,
+  useGetEditorSubmissionById,
+  useGetReviewerRecommendations,
+  useSyncSubmissionToOJS,
 } from "@/features";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { SubmissionInfoCard } from "@/features/panel/editor/submission/components/SubmissionInfoCard";
+import { SubmissionDocuments } from "@/features/panel/editor/submission/components/SubmissionDocumentsCard";
+import { SubmissionCoAuthorsCard } from "@/features/panel/editor/submission/components/SubmissionCoAuthorsCard";
+import { ReviewerRecommendations } from "@/features/panel/editor/submission/components/ReviewerRecommendationsCard";
+import { InvitedReviewersCard } from "@/features/panel/editor/submission/components/InvitedReviewersCard";
+import { EditorialDecisionForm } from "@/features/panel/editor/submission/components/EditorialDecisionForm";
 
-export default function AdminSubmissionDetailPage() {
+export default function EditorSubmissionDetailPage() {
   const params = useParams();
   const router = useRouter();
   const submissionId = params?.id;
   const [assigningReviewerId, setAssigningReviewerId] = useState(null);
+  const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false);
 
   // Fetch submission details
   const {
@@ -58,6 +49,13 @@ export default function AdminSubmissionDetailPage() {
     error: submissionError,
     refetch: refetchSubmission,
   } = useGetEditorSubmissionById(submissionId);
+
+  // Sync submission to OJS mutation
+  const {
+    mutate: syncToOJS,
+    isPending: isSyncing,
+    isSuccess: syncSuccess,
+  } = useSyncSubmissionToOJS();
 
   // Fetch reviewer recommendations (admin always sees them)
   const {
@@ -92,6 +90,14 @@ export default function AdminSubmissionDetailPage() {
   // Assign reviewer mutation
   const assignReviewerMutation = useAssignReviewers();
 
+  const handleSyncToOJS = () => {
+    syncToOJS(submissionId, {
+      onSuccess: () => {
+        setIsSyncDialogOpen(false);
+      },
+    });
+  };
+
   const handleAssignReviewer = (reviewerId) => {
     setAssigningReviewerId(reviewerId);
 
@@ -120,8 +126,24 @@ export default function AdminSubmissionDetailPage() {
 
   if (isSubmissionLoading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className=" space-y-6">
         <Skeleton className="h-10 w-48" />
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+            <div className="space-y-4">
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader>
             <Skeleton className="h-8 w-3/4" />
@@ -157,13 +179,10 @@ export default function AdminSubmissionDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold">Submission Details</h1>
-          <p className="text-muted-foreground">Review and manage submission</p>
-        </div>
-        <div className="flex items-center gap-3">
           <Button
-            variant="ghost"
+            variant="secondary"
             size="sm"
+            className={"mb-4"}
             onClick={() =>
               router.push(
                 `/editor/journals/${submission?.journal.id}/submissions`
@@ -173,491 +192,57 @@ export default function AdminSubmissionDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
+          <h1 className="text-3xl font-bold">Submission Details</h1>
+          <p className="text-muted-foreground">Review and manage submission</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {submission.journal.ojs_connection_status.connected && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsSyncDialogOpen(true)}
+              disabled={isSyncing}
+            >
+              {isSyncing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Sync to OJS
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Submission Details Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-2 flex-1">
-              <CardTitle className="text-2xl">{submission.title}</CardTitle>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Submitted {format(new Date(submission.submitted_at), "PPP")}
-                </div>
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  {submission.corresponding_author_name}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <StatusBadge
-                status={submission.status}
-                statusConfig={statusConfig}
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4 grid grid-cols-1 md:grid-cols-2">
-          <div>
-            <h3 className="font-semibold mb-2">Submission Number</h3>
-            <p className="text-muted-foreground">
-              {submission.submission_number}
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-2">Journal</h3>
-            <p className="text-muted-foreground">{submission.journal.title}</p>
-          </div>
-
-          {/* Abstract */}
-          <div className="col-span-2">
-            <h3 className="font-semibold mb-2">Abstract</h3>
-            <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded border bg-muted/30 p-4">
-              <div
-                dangerouslySetInnerHTML={{ __html: submission?.abstract }}
-                className="text-muted-foreground whitespace-pre-wrap"
-              />
-            </ScrollArea>
-          </div>
-
-          {submission.metadata_json?.keywords && (
-            <>
-              <div>
-                <h3 className="font-semibold mb-2">Keywords</h3>
-                <div className="flex flex-wrap gap-2">
-                  {submission.metadata_json.keywords.map((keyword, index) => (
-                    <Badge key={index} variant="outline">
-                      {keyword}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+      <SubmissionInfoCard submission={submission} />
 
       {/* Documents Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Documents</CardTitle>
-              <CardDescription>
-                Submitted manuscript files and supporting documents
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {!submission.documents || submission.documents.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed rounded-lg">
-              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="font-semibold mb-2">No documents found</h3>
-              <p className="text-sm text-muted-foreground">
-                This submission has no documents attached
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {submission.documents.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-8 w-8 text-primary stroke-[1.5]" />
-                    <div>
-                      <p className="font-medium">{doc.title}</p>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <span>{doc.document_type_display}</span>
-                        <span>•</span>
-                        <span>{doc.file_name}</span>
-                        {doc.file_size && (
-                          <>
-                            <span>•</span>
-                            <span>
-                              {(doc.file_size / 1024 / 1024).toFixed(2)} MB
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {doc.file_url && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          router.push(
-                            `/editor/submissions/${submissionId}/documents/${doc.id}`
-                          )
-                        }
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        View
-                      </Button>
-                    )}
-                    {doc.original_file && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => window.open(doc.original_file, "_blank")}
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Download
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <SubmissionDocuments
+        submission={submission}
+        submissionId={submissionId}
+      />
 
       {/* Co-authors Section */}
-      {submission.author_contributions &&
-        submission.author_contributions.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Co-authors</CardTitle>
-              <CardDescription>
-                Authors contributing to this manuscript
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {submission.author_contributions.map((author) => (
-                  <div
-                    key={author.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium">
-                        {author.profile?.display_name || "Unknown Author"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {author.contrib_role_display} • Order: {author.order}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+      <SubmissionCoAuthorsCard submission={submission} />
 
       {/* Reviewer Recommendations Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Reviewer Recommendations</CardTitle>
-              <CardDescription>
-                AI-powered reviewer recommendations based on expertise
-              </CardDescription>
-            </div>
-            {isRecommendationsPending && (
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {recommendationsError ? (
-            <div className="text-center py-8 border-2 border-dashed rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                Failed to load reviewer recommendations
-              </p>
-            </div>
-          ) : isRecommendationsPending ? (
-            <div className="text-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground mb-4" />
-              <p className="text-sm text-muted-foreground">
-                Analyzing submission and finding suitable reviewers...
-              </p>
-            </div>
-          ) : !recommendations?.recommendations ||
-            recommendations.recommendations.length === 0 ? (
-            <div className="text-center py-8 border-2 border-dashed rounded-lg">
-              <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="font-semibold mb-2">
-                No recommendations available
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                The system couldn&apos;t find suitable reviewer recommendations
-                for this submission
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {recommendations.recommendations
-                .slice(0, 5)
-                .map((reviewer, index) => {
-                  const compositeScore = reviewer.scores?.composite;
-                  const similarityScore = reviewer.scores?.similarity;
-                  const scorePercent = compositeScore
-                    ? (compositeScore * 100).toFixed(1)
-                    : null;
-
-                  return (
-                    <div
-                      key={reviewer.reviewer_id || index}
-                      className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-lg">
-                              {reviewer.reviewer_name || "Unknown Reviewer"}
-                            </h4>
-                            {scorePercent && (
-                              <Badge variant="secondary" className="gap-1">
-                                <Star className="h-3 w-3 fill-current" />
-                                {scorePercent}% Match
-                              </Badge>
-                            )}
-                          </div>
-
-                          {reviewer.reviewer_email && (
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Mail className="h-4 w-4" />
-                              {reviewer.reviewer_email}
-                            </div>
-                          )}
-
-                          {reviewer.affiliation && (
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Building2 className="h-4 w-4" />
-                              {reviewer.affiliation}
-                            </div>
-                          )}
-
-                          {reviewer.scores && (
-                            <div className="flex flex-wrap gap-3 mt-2 text-xs">
-                              {similarityScore != null && (
-                                <div className="flex items-center gap-1 text-muted-foreground">
-                                  <span className="font-medium">
-                                    Expertise:
-                                  </span>
-                                  <span>
-                                    {(similarityScore * 100).toFixed(0)}%
-                                  </span>
-                                </div>
-                              )}
-                              {reviewer.scores.availability != null && (
-                                <div className="flex items-center gap-1 text-muted-foreground">
-                                  <span className="font-medium">
-                                    Availability:
-                                  </span>
-                                  <span>
-                                    {(
-                                      reviewer.scores.availability * 100
-                                    ).toFixed(0)}
-                                    %
-                                  </span>
-                                </div>
-                              )}
-                              {reviewer.scores.quality != null && (
-                                <div className="flex items-center gap-1 text-muted-foreground">
-                                  <span className="font-medium">Quality:</span>
-                                  <span>
-                                    {(reviewer.scores.quality * 100).toFixed(0)}
-                                    %
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          {reviewer.expertise_areas &&
-                            reviewer.expertise_areas.length > 0 && (
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {reviewer.expertise_areas.map((area, idx) => (
-                                  <Badge
-                                    key={idx}
-                                    variant="outline"
-                                    className="text-xs"
-                                  >
-                                    {area}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                        </div>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleAssignReviewer(reviewer.reviewer_id)
-                          }
-                          disabled={
-                            assigningReviewerId === reviewer.reviewer_id &&
-                            assignReviewerMutation.isPending
-                          }
-                        >
-                          {assigningReviewerId === reviewer.reviewer_id &&
-                          assignReviewerMutation.isPending ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Assigning...
-                            </>
-                          ) : (
-                            "Assign"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <ReviewerRecommendations
+        recommendations={recommendations}
+        isRecommendationsPending={isRecommendationsPending}
+        recommendationsError={recommendationsError}
+        assigningReviewerId={assigningReviewerId}
+        assignReviewerMutation={assignReviewerMutation}
+        onAssignReviewer={handleAssignReviewer}
+      />
 
       {/* Invited Reviewers Section */}
-      {submission.review_assignments &&
-        submission.review_assignments.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Invited Reviewers</CardTitle>
-              <CardDescription>
-                Reviewers who have been invited to review this submission
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {submission.review_assignments.map((assignment) => (
-                  <div
-                    key={assignment.id}
-                    className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-semibold">
-                            {assignment.reviewer_name}
-                          </h4>
-                          <Badge
-                            variant={
-                              assignment.status === "ACCEPTED"
-                                ? "default"
-                                : assignment.status === "DECLINED"
-                                ? "destructive"
-                                : assignment.status === "COMPLETED"
-                                ? "secondary"
-                                : "outline"
-                            }
-                          >
-                            {assignment.status_display}
-                          </Badge>
-                          {assignment.is_overdue &&
-                            assignment.status === "ACCEPTED" && (
-                              <Badge variant="destructive">Overdue</Badge>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Mail className="h-4 w-4" />
-                          {assignment.reviewer_email}
-                        </div>
-
-                        {assignment.reviewer_affiliation && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Building2 className="h-4 w-4" />
-                            {assignment.reviewer_affiliation}
-                          </div>
-                        )}
-
-                        <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>
-                              Invited:{" "}
-                              {format(new Date(assignment.invited_at), "PPP")}
-                            </span>
-                          </div>
-                          <span>•</span>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>
-                              Due:{" "}
-                              {format(new Date(assignment.due_date), "PPP")}
-                            </span>
-                          </div>
-                          {assignment.status === "ACCEPTED" &&
-                            assignment.days_remaining != null && (
-                              <>
-                                <span>•</span>
-                                <span
-                                  className={
-                                    assignment.days_remaining < 0
-                                      ? "text-destructive font-medium"
-                                      : ""
-                                  }
-                                >
-                                  {assignment.days_remaining < 0
-                                    ? `${Math.abs(
-                                        assignment.days_remaining
-                                      )} days overdue`
-                                    : `${assignment.days_remaining} days remaining`}
-                                </span>
-                              </>
-                            )}
-                        </div>
-
-                        {assignment.status === "ACCEPTED" &&
-                          assignment.accepted_at && (
-                            <p className="text-xs text-muted-foreground">
-                              Accepted on{" "}
-                              {format(new Date(assignment.accepted_at), "PPP")}
-                            </p>
-                          )}
-
-                        {assignment.status === "DECLINED" &&
-                          assignment.declined_at && (
-                            <div className="text-xs">
-                              <p className="text-muted-foreground">
-                                Declined on{" "}
-                                {format(
-                                  new Date(assignment.declined_at),
-                                  "PPP"
-                                )}
-                              </p>
-                              {assignment.decline_reason && (
-                                <p className="mt-1 text-destructive">
-                                  Reason: {assignment.decline_reason}
-                                </p>
-                              )}
-                            </div>
-                          )}
-
-                        {assignment.status === "COMPLETED" &&
-                          assignment.completed_at && (
-                            <p className="text-xs text-muted-foreground">
-                              Completed on{" "}
-                              {format(new Date(assignment.completed_at), "PPP")}
-                            </p>
-                          )}
-
-                        <p className="text-xs text-muted-foreground">
-                          Assigned by: {assignment.assigned_by_name}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+      <InvitedReviewersCard submission={submission} />
 
       {/* Editorial Decision Section - Only for final publishing after reviewers accept */}
       {reviews.length > 0 && (
@@ -818,6 +403,21 @@ export default function AdminSubmissionDetailPage() {
             </CardContent>
           </Card>
         )}
+
+      {/* Sync to OJS Confirmation Dialog */}
+      <ConfirmationPopup
+        open={isSyncDialogOpen}
+        onOpenChange={setIsSyncDialogOpen}
+        title="Sync Submission to OJS"
+        description="This will sync the current submission data to Open Journal Systems (OJS). Any changes made here will be reflected in OJS."
+        confirmText="Sync Now"
+        cancelText="Cancel"
+        variant="primary"
+        onConfirm={handleSyncToOJS}
+        isPending={isSyncing}
+        isSuccess={syncSuccess}
+        loadingText="Syncing to OJS..."
+      />
     </div>
   );
 }

@@ -32,7 +32,7 @@ export default function ReviewDetailPage() {
   // Fetch assignment details
   const {
     data: assignment,
-    isLoading,
+    isPending: isLoading,
     error,
     refetch,
   } = useGetReviewAssignmentById(assignmentId);
@@ -243,7 +243,10 @@ export default function ReviewDetailPage() {
           </TabsList>
 
           <TabsContent value="details" className="space-y-4 mt-4">
-            <SubmissionDetailsTab submission={submission} />
+            <SubmissionDetailsTab
+              submission={submission}
+              isPending={isLoading}
+            />
           </TabsContent>
 
           <TabsContent value="documents" className="space-y-4 mt-4">

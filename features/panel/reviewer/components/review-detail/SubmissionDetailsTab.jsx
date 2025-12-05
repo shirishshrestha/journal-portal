@@ -4,18 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Mail,
-  Building2,
-  FileText,
-  Hash,
-  BookOpen,
-  User,
-  Users,
-} from "lucide-react";
+import { Mail, Building2, BookOpen } from "lucide-react";
 import { JournalInfoCard } from "./JournalInfoCard";
 
-export function SubmissionDetailsTab({ submission }) {
+export function SubmissionDetailsTab({ submission, isPending }) {
   if (!submission) return null;
 
   return (
@@ -24,7 +16,10 @@ export function SubmissionDetailsTab({ submission }) {
       {submission.journal && (
         <Card>
           <CardContent>
-            <JournalInfoCard journal={submission.journal} />
+            <JournalInfoCard
+              journal={submission.journal}
+              isPending={isPending}
+            />
           </CardContent>
         </Card>
       )}

@@ -22,19 +22,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCreateEditorialDecision } from "../hooks/useCreateEditorialDecision";
 import { useGetDecisionLetterTemplates } from "../hooks/useGetDecisionLetterTemplates";
 import { Input } from "@/components/ui/input";
-import {
-  DecisionBadge,
-  reviewRecommendationConfig,
-  FormRichTextEditor,
-} from "@/features";
+import { FormRichTextEditor } from "@/features";
 import { stripHtmlTags } from "@/features/shared/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const decisionSchema = z.object({
   decision_type: z.enum(
@@ -86,7 +80,7 @@ const DECISION_OPTIONS = [
   },
 ];
 
-export default function EditorialDecisionForm({
+export function EditorialDecisionForm({
   submissionId,
   reviews = [],
   submission = [],

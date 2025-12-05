@@ -1,22 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useGetReviewerRecommendations } from "@/features/panel/author/hooks/query/useGetReviewerRecommendations";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import {
-  RoleBasedRoute,
   LoadingScreen,
   useGetSubmissionById,
   SubmissionDetailsCard,
   SubmissionDocumentsCard,
   CoAuthorsCard,
-  ReviewerRecommendationsCard,
   DocumentVersionsModal,
 } from "@/features";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter as useNextRouter } from "next/navigation";
+import { ReviewerRecommendations } from "@/features/panel/editor/submission/components/ReviewerRecommendationsCard";
 
 export default function UnassignedDetailPage() {
   const params = useParams();
@@ -104,7 +103,7 @@ export default function UnassignedDetailPage() {
         <CoAuthorsCard authorContributions={submission?.author_contributions} />
 
         {/* Recommended Reviewers Card */}
-        <ReviewerRecommendationsCard
+        <ReviewerRecommendations
           recommendations={recommendations}
           isLoading={isRecommendationsPending}
           error={recommendationsError}

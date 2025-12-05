@@ -1,5 +1,5 @@
+import { getTaxonomyTree } from "@/features/panel/editor/journal/api/journalsApi";
 import { useQuery } from "@tanstack/react-query";
-import { getTaxonomyTree } from "@/features/panel/admin/journal/api/journalsApi";
 
 export const useGetTaxonomyTree = (journalId) => {
   return useQuery({
