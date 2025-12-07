@@ -3,7 +3,13 @@
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { ArrowLeft, Loader2, RefreshCw, Calendar } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  RefreshCw,
+  Calendar,
+  FileEdit,
+} from "lucide-react";
 import { useGetSubmissionReviews } from "@/features/panel/editor/submission/hooks/useGetSubmissionReviews";
 import { useGetSubmissionDecisions } from "@/features/panel/editor/submission/hooks/useGetSubmissionDecisions";
 import { Button } from "@/components/ui/button";
@@ -196,7 +202,15 @@ export default function EditorSubmissionDetailPage() {
           <p className="text-muted-foreground">Review and manage submission</p>
         </div>
         <div className="flex items-center gap-3">
-          {submission.journal.ojs_connection_status.connected && (
+          <Button
+            onClick={() =>
+              router.push(`/editor/submissions/${submissionId}/copyediting`)
+            }
+          >
+            <FileEdit className="h-4 w-4 mr-2" />
+            Copyediting Workflow
+          </Button>
+          {submission?.journal?.ojs_connection_status?.configured && (
             <Button
               variant="secondary"
               size="sm"

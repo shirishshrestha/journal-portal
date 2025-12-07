@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   Bug,
   LogsIcon,
+  BookCheck,
 } from "lucide-react";
 
 // Sidebar configuration for each role
@@ -168,9 +169,14 @@ export const sidebarConfig = {
     },
 
     {
-      name: "Journals",
+      name: "All Journals",
       path: "/editor/journals",
       icon: Book,
+    },
+    {
+      name: "Assigned Journals",
+      path: "/editor/my-journals",
+      icon: BookCheck,
     },
     {
       name: "Verification Requests",

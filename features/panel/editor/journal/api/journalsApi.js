@@ -418,3 +418,16 @@ export const getJournalStatistics = async (journalId) => {
   );
   return response.data;
 };
+
+/**
+ * Get journals where the current user is assigned as a staff member
+ * This includes Managing Editor, Associate Editor, Section Editor, Guest Editor, Reviewer roles
+ * @param {Object} params - Query parameters
+ * @returns {Promise} API response
+ */
+export const getMyAssignedJournals = async (params = {}) => {
+  const response = await instance.get("journals/journals/my-assigned/", {
+    params,
+  });
+  return response.data;
+};
