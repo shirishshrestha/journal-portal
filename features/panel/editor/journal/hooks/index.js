@@ -4,6 +4,7 @@ export { useGetTaxonomyTree } from "./query/useGetTaxonomyTree";
 export { useGetJournalStaff } from "./query/useGetJournalStaff";
 export { useGetJournalSubmissions } from "./query/useGetJournalSubmissions";
 export { useGetJournalStatistics } from "./query/useGetJournalStatistics";
+export { useGetMyAssignedJournals } from "./query/useGetMyAssignedJournals";
 export { useCreateJournal } from "./mutation/useCreateJournal";
 export { useUpdateJournal } from "./mutation/useUpdateJournal";
 export { useDeleteJournal } from "./mutation/useDeleteJournal";

@@ -51,12 +51,6 @@ export const getReviewerRecommendations = async (id) => {
  * @returns {Promise} API response
  */
 export const syncSubmissionToOJS = async (id) => {
-  const response = await instance.post(
-    `submissions/${id}/sync-to-ojs/`,
-    {},
-    {
-      timeout: 60000, // 60 seconds
-    }
-  );
+  const response = await instance.post(`submissions/${id}/sync-to-ojs/`, {});
   return response.data;
 };
