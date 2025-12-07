@@ -22,30 +22,43 @@ export default function EditorVerificationsPage() {
   const currentPage = pageParam ? parseInt(pageParam) : 1;
   const searchParam = searchParams.get("search");
   const status = searchParams.get("status");
-  const journal = searchParams.get("journal");
+  const journalParam = searchParams.get("journal");
+
+  // Get editor's journals
+  const { data: journalsData, isPending: isJournalsLoading } =
+    useGetEditorJournals();
+
+  const journals = useMemo(() => journalsData?.results || [], [journalsData]);
+
+  // Select first journal by default or use the one from query params
+  const [selectedJournalId, setSelectedJournalId] = useState(
+    journalParam || null
+  );
+
+  // Set default journal when journals are loaded
+  useMemo(() => {
+    if (!selectedJournalId && journals.length > 0) {
+      setSelectedJournalId(journals[0].id);
+    }
+  }, [journals, selectedJournalId]);
 
   const params = {
-    search: searchParam,
     status: status,
-    journal: journal,
-    page: pageParam,
   };
 
   const {
     data: verificationsData,
     isPending: isVerificationRequestsPending,
     error,
-  } = useGetEditorVerificationRequests({ params });
-
-  const { data: journalsData, isPending: isJournalsLoading } =
-    useGetEditorJournals();
+  } = useGetEditorVerificationRequests({
+    journalId: selectedJournalId,
+    params,
+  });
 
   const verifications = useMemo(
-    () => verificationsData?.results || [],
+    () => verificationsData?.verification_requests || [],
     [verificationsData]
   );
-
-  const journals = useMemo(() => journalsData?.results || [], [journalsData]);
 
   // Mutations
   const { mutate: approveVerification, isPending: isApproving } =
@@ -55,9 +68,7 @@ export default function EditorVerificationsPage() {
   const { mutate: requestInfoVerification, isPending: isRequestingInfo } =
     useRequestInfoEditorVerification();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [journalFilter, setJournalFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(status || "all");
   const [selectedVerification, setSelectedVerification] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -85,11 +96,12 @@ export default function EditorVerificationsPage() {
 
   // These handlers receive form values from ActionConfirmationPopup
   const handleApproveConfirm = (values) => {
-    if (!selectedVerification?.id) return;
+    if (!selectedVerification?.id || !selectedJournalId) return;
 
     approveVerification(
       {
-        id: selectedVerification.id,
+        journalId: selectedJournalId,
+        requestId: selectedVerification.id,
         data: values,
       },
       {
@@ -103,11 +115,12 @@ export default function EditorVerificationsPage() {
   };
 
   const handleRequestInfoConfirm = (values) => {
-    if (!selectedVerification?.id) return;
+    if (!selectedVerification?.id || !selectedJournalId) return;
 
     requestInfoVerification(
       {
-        id: selectedVerification.id,
+        journalId: selectedJournalId,
+        requestId: selectedVerification.id,
         data: values,
       },
       {
@@ -121,11 +134,12 @@ export default function EditorVerificationsPage() {
   };
 
   const handleRejectConfirm = (values) => {
-    if (!selectedVerification?.id) return;
+    if (!selectedVerification?.id || !selectedJournalId) return;
 
     rejectVerification(
       {
-        id: selectedVerification.id,
+        journalId: selectedJournalId,
+        requestId: selectedVerification.id,
         data: values,
       },
       {
@@ -138,16 +152,18 @@ export default function EditorVerificationsPage() {
     );
   };
 
-  const handlePageChange = (page) => {
+  const handleJournalChange = (value) => {
+    setSelectedJournalId(value);
     const params = new URLSearchParams(searchParams.toString());
-    params.set("page", page.toString());
+    params.set("journal", value);
+    params.delete("page"); // Reset page when changing journal
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  const journalOptions = [
-    { value: "all", label: "All Journals" },
-    ...journals.map((j) => ({ value: j.id.toString(), label: j.name })),
-  ];
+  const journalOptions = journals.map((j) => ({
+    value: j.id.toString(),
+    label: j.title,
+  }));
 
   return (
     <div className="space-y-6">
@@ -162,22 +178,16 @@ export default function EditorVerificationsPage() {
         </p>
       </div>
 
-      {/* Filters and Search */}
+      {/* Journal and Status Filters */}
       <FilterToolbar>
-        <FilterToolbar.Search
-          paramName="search"
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search by name or email..."
-          label="Search"
-        />
         <FilterToolbar.Select
           paramName="journal"
           label="Journal"
-          value={journalFilter}
-          onChange={setJournalFilter}
+          value={selectedJournalId || ""}
+          onChange={handleJournalChange}
           options={journalOptions}
           disabled={isJournalsLoading}
+          placeholder="Select a journal"
         />
         <FilterToolbar.Select
           paramName="status"
@@ -193,6 +203,26 @@ export default function EditorVerificationsPage() {
           ]}
         />
       </FilterToolbar>
+
+      {/* Journal Info */}
+      {verificationsData && (
+        <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">{verificationsData.journal?.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                Total imported users:{" "}
+                {verificationsData.total_imported_users || 0}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">
+                Verification requests: {verifications.length}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Verifications Table */}
       <EditorVerificationRequestsTable
@@ -226,18 +256,6 @@ export default function EditorVerificationsPage() {
         }}
         isLoading={isApproving || isRejecting || isRequestingInfo}
       />
-
-      {/* Pagination */}
-      {verificationsData && verificationsData.count > 0 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={Math.ceil(verificationsData.count / 10)}
-          totalCount={verificationsData.count}
-          pageSize={10}
-          onPageChange={handlePageChange}
-          showPageSizeSelector={false}
-        />
-      )}
     </div>
   );
 }

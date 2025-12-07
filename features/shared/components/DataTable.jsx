@@ -121,7 +121,7 @@ export default function DataTable({
     }
 
     // If value is a string and longer than 45 chars, show ellipsis and shadcn tooltip
-    if (typeof value === "string" && value.length > 45) {
+    if (typeof value === "string" && value.length > 35) {
       return (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -134,7 +134,7 @@ export default function DataTable({
                 maxWidth: 180,
               }}
             >
-              {value.slice(0, 45)}...
+              {value.slice(0, 35)}...
             </span>
           </TooltipTrigger>
           <TooltipContent>{value}</TooltipContent>

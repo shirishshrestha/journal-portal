@@ -1,15 +1,17 @@
 import { instance } from "@/lib/instance";
 
 /**
- * Get editor verification requests for all their journals
- * @param {object} params - Query parameters (search, status, journal, page)
+ * Get editor verification requests for a specific journal
+ * @param {string} journalId - Journal ID
+ * @param {object} params - Query parameters (status)
  * @returns {Promise<Object>} Verification requests data
  */
-export const getEditorVerificationRequests = async (params) => {
+export const getEditorVerificationRequests = async (journalId, params = {}) => {
   try {
-    const response = await instance.get(`editor/verifications/`, {
-      params,
-    });
+    const response = await instance.get(
+      `journals/journals/${journalId}/verification-requests/`,
+      { params }
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -18,14 +20,15 @@ export const getEditorVerificationRequests = async (params) => {
 
 /**
  * Approve a verification request
- * @param {number} id - Verification request ID
+ * @param {string} journalId - Journal ID
+ * @param {string} requestId - Verification request ID
  * @param {object} data - Approval data (admin_notes)
  * @returns {Promise<Object>} Updated verification request
  */
-export const approveEditorVerification = async (id, data) => {
+export const approveEditorVerification = async (journalId, requestId, data) => {
   try {
     const response = await instance.post(
-      `editor/verifications/${id}/approve/`,
+      `journals/journals/${journalId}/verification-requests/${requestId}/approve/`,
       data
     );
     return response.data;
@@ -36,14 +39,15 @@ export const approveEditorVerification = async (id, data) => {
 
 /**
  * Reject a verification request
- * @param {number} id - Verification request ID
- * @param {object} data - Rejection data (admin_notes)
+ * @param {string} journalId - Journal ID
+ * @param {string} requestId - Verification request ID
+ * @param {object} data - Rejection data (rejection_reason, admin_notes)
  * @returns {Promise<Object>} Updated verification request
  */
-export const rejectEditorVerification = async (id, data) => {
+export const rejectEditorVerification = async (journalId, requestId, data) => {
   try {
     const response = await instance.post(
-      `editor/verifications/${id}/reject/`,
+      `journals/journals/${journalId}/verification-requests/${requestId}/reject/`,
       data
     );
     return response.data;
@@ -52,17 +56,21 @@ export const rejectEditorVerification = async (id, data) => {
   }
 };
 
-/**
 /**
  * Request more information for a verification request
- * @param {number} id - Verification request ID
- * @param {object} data - Request info data (admin_notes)
+ * @param {string} journalId - Journal ID
+ * @param {string} requestId - Verification request ID
+ * @param {object} data - Request info data (info_request)
  * @returns {Promise<Object>} Updated verification request
  */
-export const requestInfoEditorVerification = async (id, data) => {
+export const requestInfoEditorVerification = async (
+  journalId,
+  requestId,
+  data
+) => {
   try {
     const response = await instance.post(
-      `editor/verifications/${id}/request_info/`,
+      `journals/journals/${journalId}/verification-requests/${requestId}/request-info/`,
       data
     );
     return response.data;
@@ -72,12 +80,14 @@ export const requestInfoEditorVerification = async (id, data) => {
 };
 
 /**
- * Get editor's journals list for filtering
+ * Get editor's journals list
  * @returns {Promise<Array>} List of editor's journals
  */
 export const getEditorJournals = async () => {
   try {
-    const response = await instance.get(`editor/journals/`);
+    const response = await instance.get(`journals/journals/`, {
+      params: { role: "editor" },
+    });
     return response.data;
   } catch (error) {
     throw error;

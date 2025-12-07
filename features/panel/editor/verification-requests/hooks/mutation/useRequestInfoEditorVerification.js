@@ -9,16 +9,17 @@ export const useRequestInfoEditorVerification = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }) => requestInfoEditorVerification(id, data),
-    onSuccess: () => {
+    mutationFn: ({ journalId, requestId, data }) =>
+      requestInfoEditorVerification(journalId, requestId, data),
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["editor-verification-requests"],
+        queryKey: ["editor-verification-requests", variables.journalId],
       });
       toast.success("Information request sent successfully");
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Failed to request more information"
+        error?.response?.data?.detail || "Failed to request more information"
       );
     },
   });

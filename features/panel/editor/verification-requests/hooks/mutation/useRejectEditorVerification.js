@@ -9,17 +9,17 @@ export const useRejectEditorVerification = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }) => rejectEditorVerification(id, data),
-    onSuccess: () => {
+    mutationFn: ({ journalId, requestId, data }) =>
+      rejectEditorVerification(journalId, requestId, data),
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["editor-verification-requests"],
+        queryKey: ["editor-verification-requests", variables.journalId],
       });
       toast.success("Verification request rejected successfully");
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message ||
-          "Failed to reject verification request"
+        error?.response?.data?.detail || "Failed to reject verification request"
       );
     },
   });
