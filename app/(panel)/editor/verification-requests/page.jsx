@@ -206,7 +206,7 @@ export default function EditorVerificationsPage() {
 
       {/* Journal Info */}
       {verificationsData && (
-        <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+        <div className="bg-muted/50 rounded-lg space-y-2">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">{verificationsData.journal?.name}</h3>

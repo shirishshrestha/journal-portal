@@ -426,7 +426,7 @@ export const getJournalStatistics = async (journalId) => {
  * @returns {Promise} API response
  */
 export const getMyAssignedJournals = async (params = {}) => {
-  const response = await instance.get("journals/journals/my-assigned/", {
+  const response = await instance.get("journals/journals/assigned-journals/", {
     params,
   });
   return response.data;

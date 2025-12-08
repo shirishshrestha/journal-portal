@@ -7,7 +7,7 @@ import { getMyAssignedJournals } from "../../api/journalsApi";
  */
 export const useGetMyAssignedJournals = (params = {}, options = {}) => {
   return useQuery({
-    queryKey: ["my-assigned-journals", params],
+    queryKey: ["assigned-journals", params],
     queryFn: () => getMyAssignedJournals(params),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes

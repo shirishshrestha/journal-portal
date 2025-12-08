@@ -23,7 +23,7 @@ export default function MyAssignedJournalsPage() {
     isPending: isJournalsPending,
     error: journalsError,
     refetch: refetchJournals,
-  } = useGetJournals();
+  } = useGetMyAssignedJournals();
 
   const journals = journalsData?.results || journalsData || [];
 
