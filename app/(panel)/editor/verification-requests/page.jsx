@@ -30,17 +30,17 @@ export default function EditorVerificationsPage() {
 
   const journals = useMemo(() => journalsData?.results || [], [journalsData]);
 
-  // Select first journal by default or use the one from query params
-  const [selectedJournalId, setSelectedJournalId] = useState(
-    journalParam || null
-  );
+  // Store user's explicit selection (null = no selection yet)
+  const [userSelectedJournalId, setUserSelectedJournalId] =
+    useState(journalParam);
 
-  // Set default journal when journals are loaded
-  useMemo(() => {
-    if (!selectedJournalId && journals.length > 0) {
-      setSelectedJournalId(journals[0].id);
-    }
-  }, [journals, selectedJournalId]);
+  // Derive the effective selected journal ID
+  // Priority: URL param > user selection > first journal > null
+  const selectedJournalId = useMemo(() => {
+    if (journalParam) return journalParam;
+    if (userSelectedJournalId) return userSelectedJournalId;
+    return journals.length > 0 ? journals[0].id : null;
+  }, [journalParam, userSelectedJournalId, journals]);
 
   const params = {
     status: status,
@@ -153,21 +153,26 @@ export default function EditorVerificationsPage() {
   };
 
   const handleJournalChange = (value) => {
-    setSelectedJournalId(value);
+    setUserSelectedJournalId(value);
     const params = new URLSearchParams(searchParams.toString());
     params.set("journal", value);
     params.delete("page"); // Reset page when changing journal
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  const journalOptions = journals.map((j) => ({
-    value: j.id.toString(),
-    label: j.title,
-  }));
+  const journalOptions = useMemo(
+    () =>
+      journals.map((j) => ({
+        value: j.id.toString(),
+        label: j.title,
+      })),
+    [journals]
+  );
 
   return (
     <div className="space-y-6">
       {isVerificationRequestsPending && <LoadingScreen />}
+
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-foreground">
@@ -206,7 +211,7 @@ export default function EditorVerificationsPage() {
 
       {/* Journal Info */}
       {verificationsData && (
-        <div className="bg-muted/50 rounded-lg space-y-2">
+        <div className="bg-card border border-border rounded-lg p-4 space-y-2">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">{verificationsData.journal?.name}</h3>
