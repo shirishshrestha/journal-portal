@@ -97,14 +97,16 @@ export default function JournalsPage() {
             Manage all academic journals and their submission settings.
           </p>
         </div>
-        <Button
-          variant="secondary"
-          onClick={() => setIsFormOpen(true)}
-          className="gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Create Journal
-        </Button>
+        {journals?.length < 1 && (
+          <Button
+            variant="secondary"
+            onClick={() => setIsFormOpen(true)}
+            className="gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Create Journal
+          </Button>
+        )}
       </div>
 
       {/* Toolbar */}

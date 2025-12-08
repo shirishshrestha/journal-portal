@@ -169,7 +169,7 @@ export const sidebarConfig = {
     },
 
     {
-      name: "All Journals",
+      name: "Journal",
       path: "/editor/journals",
       icon: Book,
     },

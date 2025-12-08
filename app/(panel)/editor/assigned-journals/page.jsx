@@ -157,7 +157,7 @@ export default function MyAssignedJournalsPage() {
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold text-foreground">
-            My Assigned Journals
+            Assigned Journals
           </h1>
           <p className="text-muted-foreground">
             Journals where you are assigned as a staff member
