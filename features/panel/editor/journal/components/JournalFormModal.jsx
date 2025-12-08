@@ -84,7 +84,7 @@ const defaultValues = {
   description: "",
   website_url: "",
   contact_email: "",
-  is_active: true,
+  is_active: false,
   is_accepting_submissions: true,
 };
 
@@ -345,26 +345,6 @@ export function JournalFormModal({
                     Status Settings
                   </h3>
                   <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
-                    <FormField
-                      control={form.control}
-                      name="is_active"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between space-y-0">
-                          <div className="space-y-0.5">
-                            <FormLabel>Active Status</FormLabel>
-                            <p className="text-xs text-muted-foreground">
-                              Journal is visible and operational
-                            </p>
-                          </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
                     <FormField
                       control={form.control}
                       name="is_accepting_submissions"

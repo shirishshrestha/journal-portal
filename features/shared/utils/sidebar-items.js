@@ -20,7 +20,9 @@ import {
   Bug,
   LogsIcon,
   BookCheck,
+  BookA,
 } from "lucide-react";
+import path from "path";
 
 // Sidebar configuration for each role
 export const sidebarConfig = {
@@ -238,8 +240,21 @@ export const sidebarConfig = {
     {
       name: "Journals",
       path: "/admin/journals",
-      icon: BookOpen,
+      icon: Book,
+      children: [
+        {
+          name: "Journal Management",
+          path: "/admin/journals",
+          icon: BookOpen,
+        },
+        {
+          name: "Verify Journals",
+          path: "/admin/inactive-journals",
+          icon: BookCheck,
+        },
+      ],
     },
+
     {
       name: "Anomaly Detection",
       path: "/admin/anomaly-detection",
