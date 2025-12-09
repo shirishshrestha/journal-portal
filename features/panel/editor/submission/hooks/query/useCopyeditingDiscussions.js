@@ -7,11 +7,13 @@ import {
 /**
  * Hook to fetch copyediting discussions list
  */
-export function useCopyeditingDiscussions(params = {}, options = {}) {
+export function useCopyeditingDiscussions({ assignmentId }, options = {}) {
   return useQuery({
-    queryKey: ["copyediting-discussions", params],
-    queryFn: () => listCopyeditingDiscussions(params),
+    queryKey: ["copyediting-discussions", assignmentId],
+    queryFn: () => listCopyeditingDiscussions(assignmentId),
     ...options,
+    enabled: !!assignmentId,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
 
@@ -24,5 +26,7 @@ export function useCopyeditingDiscussion(discussionId, options = {}) {
     queryFn: () => getCopyeditingDiscussion(discussionId),
     enabled: !!discussionId && options.enabled !== false,
     ...options,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+
   });
 }

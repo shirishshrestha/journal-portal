@@ -9,6 +9,7 @@ export function useProductionFiles(params = {}, options = {}) {
     queryKey: ["production-files", params],
     queryFn: () => listProductionFiles(params),
     ...options,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
 
@@ -21,5 +22,6 @@ export function useProductionFile(fileId, options = {}) {
     queryFn: () => getProductionFile(fileId),
     enabled: !!fileId && options.enabled !== false,
     ...options,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }

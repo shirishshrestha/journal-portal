@@ -8,6 +8,8 @@ import {
   UserPlus,
   MessageSquare,
   FileText,
+  Play,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,13 +26,17 @@ import {
 import {
   ErrorCard,
   LoadingScreen,
+  useCopyeditingAssignments,
   useGetEditorSubmissionById,
+  useStartCopyeditingAssignment,
 } from "@/features";
 import { CopyeditingDraftFiles } from "@/features/panel/editor/submission/components/copyediting/CopyeditingDraftFiles";
 import { CopyeditedFiles } from "@/features/panel/editor/submission/components/copyediting/CopyeditedFiles";
 import { AssignCopyeditorDialog } from "@/features/panel/editor/submission/components/copyediting/AssignCopyeditorDialog";
 import { CopyeditingParticipants } from "@/features/panel/editor/submission/components/copyediting/CopyeditingParticipants";
 import { CopyeditingDiscussions } from "@/features/panel/editor/submission/components";
+import { CopyeditingAssignmentCard } from "@/features/panel/editor/submission/components/copyediting/CopyeditingAssignmentCard";
+import { Card } from "@/components/ui/card";
 
 export default function CopyeditingWorkflowPage() {
   const params = useParams();
@@ -46,9 +52,25 @@ export default function CopyeditingWorkflowPage() {
     refetch: refetchSubmission,
   } = useGetEditorSubmissionById(submissionId);
 
-  // if (isSubmissionLoading) {
-  //   return <LoadingScreen />;
-  // }
+  const {
+    data: assignmentsData,
+    isPending: isAssignmentsPending,
+    error: isAssignmentsError,
+  } = useCopyeditingAssignments({ submission: submissionId });
+
+  // Get the first (active) assignment
+  const assignment = assignmentsData?.results?.[0];
+  const assignmentId = assignment?.id;
+  console.log(assignment);
+
+  // Start copyediting mutation
+  const startMutation = useStartCopyeditingAssignment();
+
+  const handleStartCopyediting = () => {
+    if (assignmentId) {
+      startMutation.mutate(assignmentId);
+    }
+  };
 
   if (submissionError) {
     return (
@@ -64,7 +86,7 @@ export default function CopyeditingWorkflowPage() {
   return (
     <div className=" space-y-6">
       {/* Header with breadcrumbs and actions */}
-      {isSubmissionLoading && <LoadingScreen />}
+      {(isSubmissionLoading || isAssignmentsPending) && <LoadingScreen />}
       <div className="flex flex-col gap-4">
         <Button
           variant="ghost"
@@ -89,9 +111,27 @@ export default function CopyeditingWorkflowPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {assignment && assignment.status === "PENDING" && (
+              <Button
+                onClick={handleStartCopyediting}
+                disabled={startMutation.isPending}
+              >
+                {startMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Starting...
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4 mr-2" />
+                    Start Copyediting
+                  </>
+                )}
+              </Button>
+            )}
             <Button
               onClick={() => setIsAssignDialogOpen(true)}
-              variant="default"
+              variant="outline"
             >
               <UserPlus className="h-4 w-4 mr-2" />
               Assign Copyeditor
@@ -215,9 +255,17 @@ export default function CopyeditingWorkflowPage() {
 
       <Separator />
 
+      {/* Assignment Info Card */}
+      <Card className="p-6">
+        <CopyeditingAssignmentCard
+          assignment={assignment}
+          isPending={isAssignmentsPending}
+        />
+      </Card>
+
       {/* Main Content Tabs */}
       <Tabs defaultValue="draft" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3">
           <TabsTrigger value="draft" className="gap-2">
             <FileText className="h-4 w-4" />
             <span className="hidden sm:inline">Draft Files</span>
@@ -233,33 +281,50 @@ export default function CopyeditingWorkflowPage() {
             <span className="hidden sm:inline">Copyedited Files</span>
             <span className="sm:hidden">Edited</span>
           </TabsTrigger>
-          <TabsTrigger value="participants" className="gap-2">
-            <UserPlus className="h-4 w-4" />
-            <span className="hidden sm:inline">Participants</span>
-            <span className="sm:hidden">Team</span>
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="draft" className="space-y-4">
-          <CopyeditingDraftFiles
-            submission={submission}
-            submissionId={submissionId}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <CopyeditingDraftFiles
+                assignmentId={assignmentId}
+                submission={submission}
+                submissionId={submissionId}
+              />
+            </div>
+            <div>
+              <CopyeditingParticipants assignmentId={assignmentId} />
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="discussions" className="space-y-4">
-          <CopyeditingDiscussions submissionId={submissionId} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <CopyeditingDiscussions
+                assignmentId={assignmentId}
+                submissionId={submissionId}
+              />
+            </div>
+            <div>
+              <CopyeditingParticipants assignmentId={assignmentId} />
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="copyedited" className="space-y-4">
-          <CopyeditedFiles
-            submission={submission}
-            submissionId={submissionId}
-          />
-        </TabsContent>
-
-        <TabsContent value="participants" className="space-y-4">
-          <CopyeditingParticipants submissionId={submissionId} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <CopyeditedFiles
+                assignmentId={assignmentId}
+                submission={submission}
+                submissionId={submissionId}
+              />
+            </div>
+            <div>
+              <CopyeditingParticipants assignmentId={assignmentId} />
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
 

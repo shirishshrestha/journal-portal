@@ -6,3 +6,4 @@ export { CopyeditingParticipants } from "./CopyeditingParticipants";
 export { AssignCopyeditorDialog } from "./AssignCopyeditorDialog";
 export { AddDiscussionDialog } from "./AddDiscussionDialog";
 export { DiscussionThreadDialog } from "./DiscussionThreadDialog";
+export { CreateCopyeditingDialog } from "./CreateCopyeditingDialog";

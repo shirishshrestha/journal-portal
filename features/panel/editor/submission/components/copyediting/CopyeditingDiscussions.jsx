@@ -30,7 +30,7 @@ export function CopyeditingDiscussions({ assignmentId }) {
     data: discussions = [],
     isLoading,
     error,
-  } = useCopyeditingDiscussions(assignmentId);
+  } = useCopyeditingDiscussions({ assignmentId });
 
   const handleViewThread = (discussion) => {
     setSelectedDiscussion(discussion);
@@ -75,7 +75,7 @@ export function CopyeditingDiscussions({ assignmentId }) {
             <div className="text-center py-8 text-destructive">
               <p>Error loading discussions</p>
             </div>
-          ) : discussions?.results?.length === 0 ? (
+          ) : discussions?.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed rounded-lg">
               <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="font-semibold mb-2">No discussions yet</h3>
@@ -92,7 +92,7 @@ export function CopyeditingDiscussions({ assignmentId }) {
             </div>
           ) : (
             <div className="space-y-3">
-              {discussions?.results?.map((discussion) => (
+              {discussions?.map((discussion) => (
                 <div
                   key={discussion.id}
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3 cursor-pointer"
@@ -153,7 +153,7 @@ export function CopyeditingDiscussions({ assignmentId }) {
             </div>
           )}
 
-          {discussions?.results?.length > 0 && (
+          {discussions?.length > 0 && (
             <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-dashed">
               <h4 className="font-medium text-sm mb-2">Discussion Tips:</h4>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">

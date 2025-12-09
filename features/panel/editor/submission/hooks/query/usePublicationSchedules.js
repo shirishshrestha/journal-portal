@@ -9,6 +9,7 @@ export function usePublicationSchedules(params = {}, options = {}) {
     queryKey: ["publication-schedules", params],
     queryFn: () => listPublicationSchedules(params),
     ...options,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
 
@@ -21,5 +22,6 @@ export function usePublicationSchedule(scheduleId, options = {}) {
     queryFn: () => getPublicationSchedule(scheduleId),
     enabled: !!scheduleId && options.enabled !== false,
     ...options,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }

@@ -50,7 +50,7 @@ export function DiscussionThreadDialog({
   discussion,
   assignmentId,
 }) {
-  const queryClient = useQueryClient();
+
 
   // Fetch discussion with messages
   const { data: discussionData, isLoading } = useCopyeditingDiscussion(
