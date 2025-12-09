@@ -13,6 +13,6 @@ export const useGetDocumentVersions = (documentId, open = true) => {
     queryKey: ["document-versions", documentId, open],
     queryFn: () => fetchDocumentVersions(documentId),
     enabled: open && !!documentId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

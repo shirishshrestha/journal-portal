@@ -15,7 +15,7 @@ export function useCopyeditingAssignments(params = {}, options = {}) {
     queryKey: ["copyediting-assignments", params],
     queryFn: () => listCopyeditingAssignments(params),
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -28,7 +28,7 @@ export function useCopyeditingAssignment(assignmentId, options = {}) {
     queryFn: () => getCopyeditingAssignment(assignmentId),
     enabled: !!assignmentId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -41,7 +41,7 @@ export function useCopyeditingAssignmentFiles(assignmentId, options = {}) {
     queryFn: () => getCopyeditingAssignmentFiles(assignmentId),
     enabled: !!assignmentId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -57,7 +57,7 @@ export function useCopyeditingAssignmentDiscussions(
     queryFn: () => getCopyeditingAssignmentDiscussions(assignmentId),
     enabled: !!assignmentId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -73,6 +73,6 @@ export function useCopyeditingAssignmentParticipants(
     queryFn: () => getCopyeditingAssignmentParticipants(assignmentId),
     enabled: !!assignmentId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

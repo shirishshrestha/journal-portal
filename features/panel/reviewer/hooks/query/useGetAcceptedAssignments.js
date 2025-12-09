@@ -12,7 +12,7 @@ export const useGetAcceptedAssignments = (
   return useQuery({
     queryKey: ["reviewAssignments", "accepted", params],
     queryFn: () => getAcceptedReviewAssignments(params),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: true,
     ...options,
   });

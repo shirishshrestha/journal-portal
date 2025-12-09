@@ -8,7 +8,7 @@ export const useGetActiveSubmissions = ({ params = {} } = {}) => {
   return useQuery({
     queryKey: ["submissions", "active", params],
     queryFn: () => getActiveSubmissions(params),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });

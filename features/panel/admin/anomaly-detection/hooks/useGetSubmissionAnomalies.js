@@ -9,6 +9,6 @@ export const useGetSubmissionAnomalies = (submissionId, enabled = true) => {
     queryKey: ["submissionAnomalies", submissionId],
     queryFn: () => getSubmissionAnomalies(submissionId),
     enabled: enabled && !!submissionId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

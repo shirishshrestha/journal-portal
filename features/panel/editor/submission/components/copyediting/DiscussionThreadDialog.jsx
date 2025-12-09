@@ -50,20 +50,14 @@ export function DiscussionThreadDialog({
   discussion,
   assignmentId,
 }) {
-
-
   // Fetch discussion with messages
   const { data: discussionData, isLoading } = useCopyeditingDiscussion(
-    assignmentId,
     discussion?.id,
     { enabled: isOpen && !!discussion?.id }
   );
 
   // Mutations
-  const addMessageMutation = useAddCopyeditingMessage(
-    assignmentId,
-    discussion?.id
-  );
+  const addMessageMutation = useAddCopyeditingMessage(discussion?.id);
   const closeMutation = useCloseCopyeditingDiscussion(assignmentId);
 
   const form = useForm({
@@ -72,18 +66,6 @@ export function DiscussionThreadDialog({
       message: "",
     },
   });
-
-  // TODO: Fetch thread messages from API
-  const messages = [
-    // Example structure:
-    // {
-    //   id: 1,
-    //   author: { name: "John Doe", email: "john@example.com", avatar: null },
-    //   message: "<p>This is the initial message...</p>",
-    //   created_at: "2024-01-20T10:30:00Z",
-    //   is_author: false,
-    // },
-  ];
 
   const onSubmit = async (data) => {
     // Validate that message has content (not just empty HTML)
@@ -94,10 +76,13 @@ export function DiscussionThreadDialog({
     }
 
     addMessageMutation.mutate(
-      { message: data.message },
+      {
+        discussion: discussion?.id,
+        message: data.message,
+      },
       {
         onSuccess: () => {
-          form.reset();
+          form.setValue();
         },
       }
     );
@@ -182,16 +167,16 @@ export function DiscussionThreadDialog({
                     <Avatar className="shrink-0">
                       <AvatarImage
                         src={msg.author?.avatar}
-                        alt={msg.author?.name || "User"}
+                        alt={msg.author?.user_name || "User"}
                       />
                       <AvatarFallback>
-                        {getInitials(msg.author?.name)}
+                        {getInitials(msg.author?.user_name)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <p className="font-medium">
-                          {msg.author?.name || "Unknown User"}
+                          {msg.author?.user_name || "Unknown User"}
                         </p>
                         <span className="text-xs text-muted-foreground">
                           {msg.created_at

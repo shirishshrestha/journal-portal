@@ -9,7 +9,7 @@ export function useProductionDiscussions(params = {}, options = {}) {
     queryKey: ["production-discussions", params],
     queryFn: () => listProductionDiscussions(params),
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -22,6 +22,6 @@ export function useProductionDiscussion(discussionId, options = {}) {
     queryFn: () => getProductionDiscussion(discussionId),
     enabled: !!discussionId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

@@ -111,7 +111,7 @@ export const useGetResource = ({ params = {} } = {}, options = {}) => {
   return useQuery({
     queryKey: ["resource-key", params],
     queryFn: () => getResource(params),
-    staleTime: 2 * 60 * 1000,
+    staleTime: 1000 * 60 * 5,
     ...options,
   });
 };

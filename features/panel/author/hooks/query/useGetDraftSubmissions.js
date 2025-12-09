@@ -9,7 +9,7 @@ export const useGetDraftSubmissions = ({ params = {} } = {}, options = {}) => {
   return useQuery({
     queryKey: ["submissions", "drafts", params],
     queryFn: () => getDraftSubmissions(params),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     ...options,

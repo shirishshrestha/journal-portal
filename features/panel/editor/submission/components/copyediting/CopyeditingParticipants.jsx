@@ -39,7 +39,7 @@ export function CopyeditingParticipants({ assignmentId }) {
   // Fetch participants from API
   const {
     data: participants = [],
-    isLoading,
+    isPending,
     error,
   } = useCopyeditingAssignmentParticipants(assignmentId);
 
@@ -142,7 +142,7 @@ export function CopyeditingParticipants({ assignmentId }) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {isPending ? (
               <div className="text-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
                 <p className="text-sm text-muted-foreground mt-2">

@@ -8,7 +8,7 @@ export const useGetArchivedSubmissions = ({ params = {} } = {}) => {
   return useQuery({
     queryKey: ["submissions", "archived", params],
     queryFn: () => getArchivedSubmissions(params),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });

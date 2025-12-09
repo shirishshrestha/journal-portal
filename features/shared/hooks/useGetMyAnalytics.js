@@ -5,7 +5,7 @@ export const useGetMyAnalytics = (options = {}) => {
   return useQuery({
     queryKey: ["my-analytics"],
     queryFn: getMyAnalytics,
-    staleTime: 2 * 60 * 1000, // 2 minutes - analytics can change
+    staleTime: 1000 * 60 * 5, // 5 minutes - analytics can change
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: true, // Refetch to get latest stats
     refetchOnMount: true,

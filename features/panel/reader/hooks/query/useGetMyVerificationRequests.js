@@ -5,7 +5,7 @@ export const useGetMyVerificationRequests = (options = {}) => {
   return useQuery({
     queryKey: ["my-verification-requests"],
     queryFn: () => getUserVerificationRequests(),
-    staleTime: 2 * 60 * 1000, // 2 minutes - requests status can change when admin approves/rejects
+    staleTime: 1000 * 60 * 5, // 5 minutes - requests status can change when admin approves/rejects
     gcTime: 5 * 60 * 1000, // 5 minutes - keep in cache
     refetchOnWindowFocus: true, // Refetch when user returns to check for status updates
     refetchOnMount: true, // Refetch when component mounts

@@ -9,6 +9,6 @@ export const useGetSubmissionDecisions = (submissionId) => {
     queryKey: ["submissionDecisions", submissionId],
     queryFn: () => getSubmissionDecisions(submissionId),
     enabled: !!submissionId,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

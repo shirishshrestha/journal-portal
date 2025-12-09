@@ -9,6 +9,6 @@ export const useGetReviewerAnomalies = (reviewerId, enabled = true) => {
     queryKey: ["reviewerAnomalies", reviewerId],
     queryFn: () => getReviewerAnomalies(reviewerId),
     enabled: enabled && !!reviewerId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

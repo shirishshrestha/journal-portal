@@ -81,6 +81,9 @@ export function useStartCopyeditingAssignment() {
       queryClient.invalidateQueries({
         queryKey: ["copyediting-assignment", data.id],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["copyediting-files"],
+      });
     },
     onError: (error) => {
       const message =

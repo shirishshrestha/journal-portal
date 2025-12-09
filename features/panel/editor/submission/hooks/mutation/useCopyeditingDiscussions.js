@@ -67,19 +67,18 @@ export function useUpdateCopyeditingDiscussion() {
 /**
  * Hook to add a message to a copyediting discussion
  */
-export function useAddCopyeditingMessage() {
+export function useAddCopyeditingMessage(discussionId) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ discussionId, data }) =>
-      addCopyeditingMessage(discussionId, data),
+    mutationFn: (data) => addCopyeditingMessage(discussionId, data),
     onSuccess: (data, variables) => {
       toast.success("Message added successfully");
       queryClient.invalidateQueries({
         queryKey: ["copyediting-discussions"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["copyediting-discussion", variables.discussionId],
+        queryKey: ["copyediting-discussion"],
       });
     },
     onError: (error) => {

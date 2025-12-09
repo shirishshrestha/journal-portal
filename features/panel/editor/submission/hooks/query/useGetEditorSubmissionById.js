@@ -11,7 +11,7 @@ export const useGetEditorSubmissionById = (id) => {
     queryKey: ["editor-submission", id],
     queryFn: () => getSubmissionById(id),
     enabled: !!id,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: true,
     refetchOnMount: true,

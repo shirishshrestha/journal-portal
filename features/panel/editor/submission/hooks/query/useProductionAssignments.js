@@ -15,7 +15,7 @@ export function useProductionAssignments(params = {}, options = {}) {
     queryKey: ["production-assignments", params],
     queryFn: () => listProductionAssignments(params),
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -28,7 +28,7 @@ export function useProductionAssignment(assignmentId, options = {}) {
     queryFn: () => getProductionAssignment(assignmentId),
     enabled: !!assignmentId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -41,7 +41,7 @@ export function useProductionAssignmentFiles(assignmentId, options = {}) {
     queryFn: () => getProductionAssignmentFiles(assignmentId),
     enabled: !!assignmentId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -54,7 +54,7 @@ export function useProductionAssignmentDiscussions(assignmentId, options = {}) {
     queryFn: () => getProductionAssignmentDiscussions(assignmentId),
     enabled: !!assignmentId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -70,6 +70,6 @@ export function useProductionAssignmentParticipants(
     queryFn: () => getProductionAssignmentParticipants(assignmentId),
     enabled: !!assignmentId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

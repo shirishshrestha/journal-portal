@@ -11,7 +11,7 @@ export function useCopyeditingFiles({ assignmentId }, options = {}) {
     queryFn: () => listCopyeditingFiles(assignmentId),
     ...options,
     enabled: !!assignmentId,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -24,6 +24,6 @@ export function useCopyeditingFile(fileId, options = {}) {
     queryFn: () => getCopyeditingFile(fileId),
     enabled: !!fileId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

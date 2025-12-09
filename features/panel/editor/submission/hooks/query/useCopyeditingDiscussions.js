@@ -13,7 +13,7 @@ export function useCopyeditingDiscussions({ assignmentId }, options = {}) {
     queryFn: () => listCopyeditingDiscussions(assignmentId),
     ...options,
     enabled: !!assignmentId,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -26,7 +26,6 @@ export function useCopyeditingDiscussion(discussionId, options = {}) {
     queryFn: () => getCopyeditingDiscussion(discussionId),
     enabled: !!discussionId && options.enabled !== false,
     ...options,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

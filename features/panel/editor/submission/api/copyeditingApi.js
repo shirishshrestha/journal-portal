@@ -254,7 +254,7 @@ export const createCopyeditingDiscussion = async (data) => {
  */
 export const getCopyeditingDiscussion = async (discussionId) => {
   const response = await instance.get(
-    `submissions/copyediting/assignments/${discussionId}/discussion`
+    `submissions/copyediting/discussions/${discussionId}`
   );
   return response.data;
 };

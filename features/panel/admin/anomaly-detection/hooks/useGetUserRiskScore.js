@@ -9,6 +9,6 @@ export const useGetUserRiskScore = (userId, enabled = true) => {
     queryKey: ["userRiskScore", userId],
     queryFn: () => getUserRiskScore(userId),
     enabled: enabled && !!userId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

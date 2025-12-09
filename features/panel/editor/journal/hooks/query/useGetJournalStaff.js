@@ -6,7 +6,7 @@ export const useGetJournalStaff = (journalId, options = {}) => {
     queryKey: ["journal-staff", journalId],
     queryFn: () => getJournalStaff(journalId),
     enabled: !!journalId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 1000 * 60 * 5,
     gcTime: 5 * 60 * 1000,
     retry: 2,
     ...options,

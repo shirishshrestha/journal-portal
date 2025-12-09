@@ -8,7 +8,7 @@ export const useGetReviewAssignments = () => {
   return useQuery({
     queryKey: ["reviewAssignments"],
     queryFn: getReviewAssignments,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: true,
   });
 };

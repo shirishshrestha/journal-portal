@@ -8,7 +8,7 @@ export const useGetUnassignedSubmissions = ({ params = {} } = {}) => {
   return useQuery({
     queryKey: ["submissions", "unassigned", params],
     queryFn: () => getUnassignedSubmissions(params),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });

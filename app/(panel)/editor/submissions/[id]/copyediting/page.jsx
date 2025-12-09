@@ -61,7 +61,6 @@ export default function CopyeditingWorkflowPage() {
   // Get the first (active) assignment
   const assignment = assignmentsData?.results?.[0];
   const assignmentId = assignment?.id;
-  console.log(assignment);
 
   // Start copyediting mutation
   const startMutation = useStartCopyeditingAssignment();

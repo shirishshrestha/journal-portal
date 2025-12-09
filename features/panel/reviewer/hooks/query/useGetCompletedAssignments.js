@@ -12,7 +12,7 @@ export const useGetCompletedAssignments = (
   return useQuery({
     queryKey: ["reviewAssignments", "completed", params],
     queryFn: () => getCompletedReviewAssignments(params),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: true,
     ...options,
   });
