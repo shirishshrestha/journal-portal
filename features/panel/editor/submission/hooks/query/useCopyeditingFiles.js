@@ -4,11 +4,14 @@ import { listCopyeditingFiles, getCopyeditingFile } from "../../api";
 /**
  * Hook to fetch copyediting files list
  */
-export function useCopyeditingFiles(params = {}, options = {}) {
+export function useCopyeditingFiles({ assignmentId }, options = {}) {
+  console.log("hook", assignmentId);
   return useQuery({
-    queryKey: ["copyediting-files", params],
-    queryFn: () => listCopyeditingFiles(params),
+    queryKey: ["copyediting-files", assignmentId],
+    queryFn: () => listCopyeditingFiles(assignmentId),
     ...options,
+    enabled: !!assignmentId,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
 
@@ -21,5 +24,6 @@ export function useCopyeditingFile(fileId, options = {}) {
     queryFn: () => getCopyeditingFile(fileId),
     enabled: !!fileId && options.enabled !== false,
     ...options,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }

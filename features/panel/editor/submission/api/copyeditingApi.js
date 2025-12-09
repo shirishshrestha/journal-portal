@@ -137,10 +137,10 @@ export const getCopyeditingAssignmentParticipants = async (assignmentId) => {
  * @param {string} params.search - Search term
  * @returns {Promise} API response with files list
  */
-export const listCopyeditingFiles = async (params = {}) => {
-  const response = await instance.get("submissions/copyediting/files/", {
-    params,
-  });
+export const listCopyeditingFiles = async (assignmentId) => {
+  const response = await instance.get(
+    `submissions/copyediting/assignments/${assignmentId}/files/`
+  );
   return response.data;
 };
 
@@ -223,10 +223,10 @@ export const deleteCopyeditingFile = async (fileId) => {
  * @param {string} params.search - Search term
  * @returns {Promise} API response with discussions list
  */
-export const listCopyeditingDiscussions = async (params = {}) => {
-  const response = await instance.get("submissions/copyediting/discussions/", {
-    params,
-  });
+export const listCopyeditingDiscussions = async (id) => {
+  const response = await instance.get(
+    `submissions/copyediting/assignments/${id}/discussions`
+  );
   return response.data;
 };
 
@@ -254,7 +254,7 @@ export const createCopyeditingDiscussion = async (data) => {
  */
 export const getCopyeditingDiscussion = async (discussionId) => {
   const response = await instance.get(
-    `submissions/copyediting/discussions/${discussionId}/`
+    `submissions/copyediting/assignments/${discussionId}/discussion`
   );
   return response.data;
 };

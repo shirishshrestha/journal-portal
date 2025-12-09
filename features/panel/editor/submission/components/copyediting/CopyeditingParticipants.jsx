@@ -161,14 +161,14 @@ export function CopyeditingParticipants({ assignmentId }) {
               />
             ) : (
               <div className="space-y-3">
-                {participants.map((participant) => (
+                {participants?.map((participant, index) => (
                   <ParticipantCard
-                    key={participant.id}
+                    key={`${participant.id} ${index}`}
                     user={{
                       id: participant.id,
-                      name: `${participant.user?.first_name} ${participant.user?.last_name}`,
-                      email: participant.user?.email,
-                      avatar: participant.user?.avatar,
+                      name: `${participant.user_name}`,
+                      email: participant.user_email,
+                      avatar: participant.avatar,
                       role: participant.role_display || participant.role,
                       assigned_date: participant.assigned_at,
                     }}

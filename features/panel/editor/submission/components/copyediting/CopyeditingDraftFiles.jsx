@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -21,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Download, Upload, Loader2 } from "lucide-react";
+import { FileText, Download, Upload, Loader2, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import {
@@ -34,7 +35,13 @@ import {
  * Component to display draft files in copyediting workflow
  * Shows original submission files for copyeditor reference
  */
-export function CopyeditingDraftFiles({ assignmentId }) {
+export function CopyeditingDraftFiles({
+  assignmentId,
+  submission,
+  submissionId,
+}) {
+  const router = useRouter();
+
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadData, setUploadData] = useState({
     file_type: "DRAFT",
@@ -47,43 +54,10 @@ export function CopyeditingDraftFiles({ assignmentId }) {
     data: files = [],
     isLoading,
     error,
-  } = useCopyeditingFiles(assignmentId, {
-    file_type: "DRAFT",
-  });
-
-  // Upload mutation
-  const uploadMutation = useUploadCopyeditingFile(assignmentId);
+  } = useCopyeditingFiles({ assignmentId });
 
   // Delete mutation
   const deleteMutation = useDeleteCopyeditingFile(assignmentId);
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadData({ ...uploadData, file });
-    }
-  };
-
-  const handleUpload = () => {
-    if (!uploadData.file) {
-      toast.error("Please select a file");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", uploadData.file);
-    formData.append("file_type", uploadData.file_type);
-    if (uploadData.description) {
-      formData.append("description", uploadData.description);
-    }
-
-    uploadMutation.mutate(formData, {
-      onSuccess: () => {
-        setIsUploadModalOpen(false);
-        setUploadData({ file_type: "DRAFT", description: "", file: null });
-      },
-    });
-  };
 
   const handleDownload = (fileUrl, fileName) => {
     const link = document.createElement("a");
@@ -112,14 +86,6 @@ export function CopyeditingDraftFiles({ assignmentId }) {
                 the base for copyediting.
               </CardDescription>
             </div>
-            <Button
-              onClick={() => setIsUploadModalOpen(true)}
-              size="sm"
-              variant="outline"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload File
-            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -134,25 +100,18 @@ export function CopyeditingDraftFiles({ assignmentId }) {
             <div className="text-center py-8 text-destructive">
               <p>Error loading draft files</p>
             </div>
-          ) : files?.results?.length === 0 ? (
+          ) : files?.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed rounded-lg">
               <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="font-semibold mb-2">No draft files found</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Upload the original submission files to begin copyediting
+                Start the copyediting sync file from submission
               </p>
-              <Button
-                onClick={() => setIsUploadModalOpen(true)}
-                variant="outline"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Upload First File
-              </Button>
             </div>
           ) : (
             <div className="space-y-3">
               {files &&
-                files?.results?.map((file) => (
+                files?.map((file) => (
                   <div
                     key={file.id}
                     className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3"
@@ -213,6 +172,19 @@ export function CopyeditingDraftFiles({ assignmentId }) {
                         variant="ghost"
                         size="sm"
                         onClick={() =>
+                          router.push(
+                            `/editor/submissions/${submissionId}/copyediting/edit/${file.id}`
+                          )
+                        }
+                        title="Edit in SuperDoc"
+                      >
+                        <Edit className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Edit</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
                           handleDownload(file.file, file.original_filename)
                         }
                         title="Download file"
@@ -227,68 +199,6 @@ export function CopyeditingDraftFiles({ assignmentId }) {
           )}
         </CardContent>
       </Card>
-
-      {/* Upload Dialog */}
-      <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Upload Draft File</DialogTitle>
-            <DialogDescription>
-              Upload original submission files for copyediting reference
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="file">File</Label>
-              <Input
-                id="file"
-                type="file"
-                onChange={handleFileSelect}
-                accept=".pdf,.doc,.docx,.txt"
-              />
-              <p className="text-xs text-muted-foreground">
-                Supported formats: PDF, DOC, DOCX, TXT
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description (optional)</Label>
-              <Textarea
-                id="description"
-                placeholder="Add notes about this file..."
-                value={uploadData.description}
-                onChange={(e) =>
-                  setUploadData({ ...uploadData, description: e.target.value })
-                }
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsUploadModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleUpload}
-              disabled={!uploadData.file || uploadMutation.isPending}
-            >
-              {uploadMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

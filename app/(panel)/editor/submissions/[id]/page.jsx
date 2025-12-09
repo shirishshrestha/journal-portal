@@ -42,6 +42,7 @@ import { SubmissionCoAuthorsCard } from "@/features/panel/editor/submission/comp
 import { ReviewerRecommendations } from "@/features/panel/editor/submission/components/ReviewerRecommendationsCard";
 import { InvitedReviewersCard } from "@/features/panel/editor/submission/components/InvitedReviewersCard";
 import { EditorialDecisionForm } from "@/features/panel/editor/submission/components/EditorialDecisionForm";
+import { CreateCopyeditingDialog } from "@/features/panel/editor/submission/components";
 
 export default function EditorSubmissionDetailPage() {
   const params = useParams();
@@ -49,6 +50,7 @@ export default function EditorSubmissionDetailPage() {
   const submissionId = params?.id;
   const [assigningReviewerId, setAssigningReviewerId] = useState(null);
   const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false);
+  const [isCreateCopyeditingOpen, setIsCreateCopyeditingOpen] = useState(false);
 
   // Fetch submission details
   const {
@@ -206,6 +208,15 @@ export default function EditorSubmissionDetailPage() {
         </div>
         <div className="flex items-center gap-3">
           {submission?.status === "ACCEPTED" && (
+            <Button
+              onClick={() => setIsCreateCopyeditingOpen(true)}
+              variant="default"
+            >
+              <FileEdit className="h-4 w-4 mr-2" />
+              Initiate Copyediting
+            </Button>
+          )}
+          {submission?.status === "COPYEDITING" && (
             <Button
               onClick={() =>
                 router.push(`/editor/submissions/${submissionId}/copyediting`)
@@ -446,6 +457,14 @@ export default function EditorSubmissionDetailPage() {
         isPending={isSyncing}
         isSuccess={syncSuccess}
         loadingText="Syncing to OJS..."
+      />
+
+      {/* Create Copyediting Assignment Dialog */}
+      <CreateCopyeditingDialog
+        isOpen={isCreateCopyeditingOpen}
+        onClose={() => setIsCreateCopyeditingOpen(false)}
+        submissionId={submissionId}
+        submission={submission}
       />
     </div>
   );

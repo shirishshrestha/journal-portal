@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -35,6 +36,7 @@ import {
   Upload,
   CheckCircle,
   Loader2,
+  Edit,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -48,6 +50,10 @@ import {
  * Shows edited manuscript files with tracking and version history
  */
 export function CopyeditedFiles({ submission, submissionId, assignmentId }) {
+  const router = useRouter();
+  const params = useParams();
+  const submissionIdFromParams = params?.id;
+
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadData, setUploadData] = useState({
     file_type: "COPYEDITED",
@@ -230,6 +236,19 @@ export function CopyeditedFiles({ submission, submissionId, assignmentId }) {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          router.push(
+                            `/editor/submissions/${submissionIdFromParams}/copyediting/edit/${file.id}`
+                          )
+                        }
+                        title="Edit in SuperDoc"
+                      >
+                        <Edit className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Edit</span>
+                      </Button>
                       {!file.is_approved && (
                         <Button
                           variant="outline"
