@@ -43,9 +43,13 @@ export function AssignCopyeditorDialog({ isOpen, onClose, submissionId }) {
   // Transform users data to options for SearchableSelect
   const userOptions =
     usersData?.results?.map((user) => ({
-      value: user.id.toString(),
-      label: `${user.display_name || user.user_name} (${user.user_email})`,
+      value: user?.profile?.id.toString(),
+      label: `${user.profile.display_name || user.profile.user_name} (${
+        user.email
+      })`,
     })) || [];
+
+  console.log("User Options:", userOptions);
 
   // Use the create assignment hook
   const createAssignment = useCreateCopyeditingAssignment();

@@ -42,6 +42,7 @@ export default function JournalSubmissionsPage() {
   const submissionParams = {
     search: search,
     page: currentPage,
+    status: statusParam,
   };
 
   const journalId = params.id;
