@@ -34,6 +34,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/features/shared/components/RichTextEditor";
 import { stripHtmlTags } from "@/features/shared/utils";
+import { useCreateCopyeditingDiscussion } from "../../hooks";
 
 // Form validation schema
 const discussionSchema = z.object({
@@ -46,9 +47,9 @@ const discussionSchema = z.object({
 /**
  * Dialog to create a new discussion thread
  */
-export function AddDiscussionDialog({ isOpen, onClose, submissionId }) {
+export function AddDiscussionDialog({ isOpen, onClose, assignmentId }) {
   const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const createMutation = useCreateCopyeditingDiscussion(assignmentId);
 
   const form = useForm({
     resolver: zodResolver(discussionSchema),
@@ -69,45 +70,26 @@ export function AddDiscussionDialog({ isOpen, onClose, submissionId }) {
   ];
 
   const onSubmit = async (data) => {
-    try {
-      setIsSubmitting(true);
-
-      // Validate that message has content (not just empty HTML)
-      const plainText = stripHtmlTags(data.message);
-      if (!plainText || plainText.trim().length < 10) {
-        toast.error("Message must contain at least 10 characters of text");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // TODO: Implement API call to create discussion
-      // await createDiscussion({
-      //   submissionId,
-      //   subject: data.subject,
-      //   message: data.message,
-      //   participants: data.participants,
-      //   status: data.status,
-      // });
-
-      toast.success("Discussion started successfully");
-
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({
-        queryKey: ["copyediting-discussions", submissionId],
-      });
-
-      // Reset form and close
-      form.reset();
-      onClose();
-    } catch (error) {
-      const message =
-        error?.response?.data?.detail ||
-        error?.message ||
-        "Failed to create discussion.";
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
+    // Validate that message has content (not just empty HTML)
+    const plainText = stripHtmlTags(data.message);
+    if (!plainText || plainText.trim().length < 10) {
+      toast.error("Message must contain at least 10 characters of text");
+      return;
     }
+
+    createMutation.mutate(
+      {
+        subject: data.subject,
+        topic: "GENERAL",
+        initial_message: data.message,
+      },
+      {
+        onSuccess: () => {
+          form.reset();
+          onClose();
+        },
+      }
+    );
   };
 
   const handleClose = () => {
@@ -139,7 +121,7 @@ export function AddDiscussionDialog({ isOpen, onClose, submissionId }) {
                     <Input
                       placeholder="e.g., Query about methodology section"
                       {...field}
-                      disabled={isSubmitting}
+                      disabled={createMutation.isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -164,7 +146,6 @@ export function AddDiscussionDialog({ isOpen, onClose, submissionId }) {
                           field.onChange([...current, value]);
                         }
                       }}
-                      disabled={isSubmitting}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Add participants..." />
@@ -221,12 +202,12 @@ export function AddDiscussionDialog({ isOpen, onClose, submissionId }) {
                 type="button"
                 variant="outline"
                 onClick={handleClose}
-                disabled={isSubmitting}
+                disabled={createMutation.isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && (
+              <Button type="submit" disabled={createMutation.isPending}>
+                {createMutation.isPending && (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 )}
                 Start Discussion

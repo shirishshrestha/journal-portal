@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Mail, Trash2, UserPlus } from "lucide-react";
+import { User, Mail, Trash2, UserPlus, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,38 +24,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useCopyeditingAssignmentParticipants } from "../../hooks";
 
 /**
  * Component to display and manage copyediting participants
  * Shows assigned copyeditors, authors, and editors
  */
-export function CopyeditingParticipants({ submissionId }) {
+export function CopyeditingParticipants({ assignmentId }) {
   const queryClient = useQueryClient();
   const [removingUserId, setRemovingUserId] = useState(null);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [userToRemove, setUserToRemove] = useState(null);
 
-  // TODO: Fetch actual participants from API
-  // For now, using mock data structure
-  const participants = {
-    copyeditors: [
-      // Example structure - replace with real API data
-      // {
-      //   id: 1,
-      //   name: "John Doe",
-      //   email: "john@example.com",
-      //   avatar: null,
-      //   assigned_date: "2024-01-15",
-      //   role: "COPY_EDITOR",
-      // }
-    ],
-    editors: [
-      // Example: Managing editor overseeing the process
-    ],
-    authors: [
-      // Example: Primary author and co-authors
-    ],
-  };
+  // Fetch participants from API
+  const {
+    data: participants = [],
+    isLoading,
+    error,
+  } = useCopyeditingAssignmentParticipants(assignmentId);
 
   const handleRemoveClick = (user) => {
     setUserToRemove(user);
@@ -147,85 +133,45 @@ export function CopyeditingParticipants({ submissionId }) {
   return (
     <>
       <div className="space-y-6">
-        {/* Copyeditors Section */}
+        {/* Participants Section */}
         <Card>
           <CardHeader>
-            <CardTitle>Assigned Copyeditors</CardTitle>
+            <CardTitle>Participants</CardTitle>
             <CardDescription>
-              Users responsible for copyediting this manuscript
+              All users involved in the copyediting workflow
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {participants.copyeditors.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                <p className="text-sm text-muted-foreground mt-2">
+                  Loading participants...
+                </p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-destructive">
+                <p>Error loading participants</p>
+              </div>
+            ) : participants.length === 0 ? (
               <EmptyState
                 icon={UserPlus}
-                title="No copyeditors assigned"
-                description="Click 'Assign Copyeditor' to add a copyeditor to this submission"
+                title="No participants assigned"
+                description="Participants will appear here once assigned to the copyediting workflow"
               />
             ) : (
               <div className="space-y-3">
-                {participants.copyeditors.map((copyeditor) => (
+                {participants.map((participant) => (
                   <ParticipantCard
-                    key={copyeditor.id}
-                    user={copyeditor}
-                    canRemove={true}
-                  />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Editors Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Managing Editors</CardTitle>
-            <CardDescription>
-              Editors overseeing the copyediting process
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {participants.editors.length === 0 ? (
-              <EmptyState
-                icon={User}
-                title="No editors assigned"
-                description="Editors are automatically included based on submission assignments"
-              />
-            ) : (
-              <div className="space-y-3">
-                {participants.editors.map((editor) => (
-                  <ParticipantCard
-                    key={editor.id}
-                    user={editor}
-                    canRemove={false}
-                  />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Authors Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Authors</CardTitle>
-            <CardDescription>
-              Manuscript authors involved in the copyediting process
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {participants.authors.length === 0 ? (
-              <EmptyState
-                icon={User}
-                title="No authors found"
-                description="Authors are automatically included from submission data"
-              />
-            ) : (
-              <div className="space-y-3">
-                {participants.authors.map((author) => (
-                  <ParticipantCard
-                    key={author.id}
-                    user={author}
+                    key={participant.id}
+                    user={{
+                      id: participant.id,
+                      name: `${participant.user?.first_name} ${participant.user?.last_name}`,
+                      email: participant.user?.email,
+                      avatar: participant.user?.avatar,
+                      role: participant.role_display || participant.role,
+                      assigned_date: participant.assigned_at,
+                    }}
                     canRemove={false}
                   />
                 ))}

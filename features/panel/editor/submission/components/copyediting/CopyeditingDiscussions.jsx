@@ -10,34 +10,27 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Plus, Reply, User } from "lucide-react";
+import { MessageSquare, Plus, Reply, User, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { DiscussionThreadDialog } from "./DiscussionThreadDialog";
 import { AddDiscussionDialog } from "./AddDiscussionDialog";
+import { useCopyeditingDiscussions } from "../../hooks";
 
 /**
  * Component to display and manage copyediting discussions
  * Shows discussion threads between copyeditors, editors, and authors
  */
-export function CopyeditingDiscussions({ submissionId }) {
+export function CopyeditingDiscussions({ assignmentId }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
   const [isThreadDialogOpen, setIsThreadDialogOpen] = useState(false);
 
-  // TODO: Fetch discussions from API
-  // For now, using mock data
-  const discussions = [
-    // Example structure:
-    {
-      id: 1,
-      subject: "Query about methodology section",
-      from: { name: "John Doe", email: "john@example.com" },
-      last_reply: "2024-01-20T10:30:00Z",
-      replies_count: 3,
-      status: "OPEN", // OPEN, RESOLVED, CLOSED
-      participants: ["Author", "Copyeditor"],
-    },
-  ];
+  // Fetch discussions from API
+  const {
+    data: discussions = [],
+    isLoading,
+    error,
+  } = useCopyeditingDiscussions(assignmentId);
 
   const handleViewThread = (discussion) => {
     setSelectedDiscussion(discussion);
@@ -71,7 +64,18 @@ export function CopyeditingDiscussions({ submissionId }) {
           </div>
         </CardHeader>
         <CardContent>
-          {discussions.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+              <p className="text-sm text-muted-foreground mt-2">
+                Loading discussions...
+              </p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-8 text-destructive">
+              <p>Error loading discussions</p>
+            </div>
+          ) : discussions?.results?.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed rounded-lg">
               <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="font-semibold mb-2">No discussions yet</h3>
@@ -88,7 +92,7 @@ export function CopyeditingDiscussions({ submissionId }) {
             </div>
           ) : (
             <div className="space-y-3">
-              {discussions.map((discussion) => (
+              {discussions?.results?.map((discussion) => (
                 <div
                   key={discussion.id}
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3 cursor-pointer"
@@ -113,35 +117,35 @@ export function CopyeditingDiscussions({ submissionId }) {
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <User className="h-3 w-3" />
-                          From: {discussion.from?.name || "Unknown"}
+                          From: {discussion.created_by?.user?.first_name}{" "}
+                          {discussion.created_by?.user?.last_name}
                         </span>
                         <span className="hidden sm:inline">•</span>
                         <span className="flex items-center gap-1">
                           <Reply className="h-3 w-3" />
-                          {discussion.replies_count || 0}{" "}
-                          {(discussion.replies_count || 0) === 1
+                          {discussion.messages?.length || 0}{" "}
+                          {(discussion.messages?.length || 0) === 1
                             ? "reply"
                             : "replies"}
                         </span>
-                        {discussion.last_reply && (
+                        {discussion.updated_at && (
                           <>
                             <span className="hidden sm:inline">•</span>
                             <span>
                               Last reply:{" "}
                               {format(
-                                new Date(discussion.last_reply),
+                                new Date(discussion.updated_at),
                                 "MMM d, yyyy"
                               )}
                             </span>
                           </>
                         )}
                       </div>
-                      {discussion.participants &&
-                        Array.isArray(discussion.participants) && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Participants: {discussion.participants.join(", ")}
-                          </p>
-                        )}
+                      {discussion.topic && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Topic: {discussion.topic_display || discussion.topic}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -149,7 +153,7 @@ export function CopyeditingDiscussions({ submissionId }) {
             </div>
           )}
 
-          {discussions.length > 0 && (
+          {discussions?.results?.length > 0 && (
             <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-dashed">
               <h4 className="font-medium text-sm mb-2">Discussion Tips:</h4>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
@@ -177,7 +181,7 @@ export function CopyeditingDiscussions({ submissionId }) {
       <AddDiscussionDialog
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
-        submissionId={submissionId}
+        assignmentId={assignmentId}
       />
 
       {/* Discussion Thread Dialog */}
@@ -189,7 +193,7 @@ export function CopyeditingDiscussions({ submissionId }) {
             setSelectedDiscussion(null);
           }}
           discussion={selectedDiscussion}
-          submissionId={submissionId}
+          assignmentId={assignmentId}
         />
       )}
     </>

@@ -1,4 +1,7 @@
 export { ProductionReadyFiles } from "./ProductionReadyFiles";
+export { ProductionGalleys } from "./ProductionGalleys";
 export { ProductionDiscussions } from "./ProductionDiscussions";
 export { ProductionParticipants } from "./ProductionParticipants";
+export { PublicationSchedule } from "./PublicationSchedule";
 export { AssignProductionAssistantDialog } from "./AssignProductionAssistantDialog";
+export { AddProductionDiscussionDialog } from "./AddProductionDiscussionDialog";

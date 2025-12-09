@@ -34,6 +34,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/features/shared/components/RichTextEditor";
 import { stripHtmlTags } from "@/features/shared/utils";
+import { useCreateProductionDiscussion } from "../../hooks";
 
 // Form validation schema
 const productionDiscussionSchema = z.object({
@@ -46,10 +47,10 @@ const productionDiscussionSchema = z.object({
 export function AddProductionDiscussionDialog({
   isOpen,
   onClose,
-  submissionId,
+  assignmentId,
 }) {
   const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const createMutation = useCreateProductionDiscussion(assignmentId);
 
   const form = useForm({
     resolver: zodResolver(productionDiscussionSchema),
@@ -65,30 +66,25 @@ export function AddProductionDiscussionDialog({
   const availableParticipants = [];
 
   const onSubmit = async (data) => {
-    try {
-      setIsSubmitting(true);
-      const plainText = stripHtmlTags(data.message);
-      if (!plainText || plainText.trim().length < 10) {
-        toast.error("Message must contain at least 10 characters of text");
-        setIsSubmitting(false);
-        return;
-      }
-      // TODO: Implement API call to create production discussion
-      toast.success("Production discussion started successfully");
-      queryClient.invalidateQueries({
-        queryKey: ["production-discussions", submissionId],
-      });
-      form.reset();
-      onClose();
-    } catch (error) {
-      const message =
-        error?.response?.data?.detail ||
-        error?.message ||
-        "Failed to create production discussion.";
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
+    const plainText = stripHtmlTags(data.message);
+    if (!plainText || plainText.trim().length < 10) {
+      toast.error("Message must contain at least 10 characters of text");
+      return;
     }
+
+    createMutation.mutate(
+      {
+        subject: data.subject,
+        topic: "GENERAL",
+        initial_message: data.message,
+      },
+      {
+        onSuccess: () => {
+          form.reset();
+          onClose();
+        },
+      }
+    );
   };
 
   const handleClose = () => {
@@ -125,7 +121,6 @@ export function AddProductionDiscussionDialog({
                           field.onChange([...current, value]);
                         }
                       }}
-                      disabled={isSubmitting}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Add participants..." />
@@ -162,7 +157,6 @@ export function AddProductionDiscussionDialog({
                     <Input
                       placeholder="e.g., Galley file format clarification"
                       {...field}
-                      disabled={isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -201,7 +195,6 @@ export function AddProductionDiscussionDialog({
                       onChange={(e) => {
                         field.onChange(Array.from(e.target.files));
                       }}
-                      disabled={isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -213,12 +206,12 @@ export function AddProductionDiscussionDialog({
                 type="button"
                 variant="outline"
                 onClick={handleClose}
-                disabled={isSubmitting}
+                disabled={createMutation.isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && (
+              <Button type="submit" disabled={createMutation.isPending}>
+                {createMutation.isPending && (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 )}
                 Start Discussion

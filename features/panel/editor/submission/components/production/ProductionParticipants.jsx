@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Users, UserPlus, Mail, Shield, Trash2 } from "lucide-react";
+import { Users, UserPlus, Mail, Shield, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,14 +30,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useProductionAssignmentParticipants } from "../../hooks";
 
-export function ProductionParticipants({ submissionId }) {
+export function ProductionParticipants({ assignmentId }) {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [participantToRemove, setParticipantToRemove] = useState(null);
 
-  // Mock data - replace with actual API call
-  const participants = [];
-  const isLoading = false;
+  // Fetch participants from API
+  const {
+    data: participants = [],
+    isLoading,
+    error,
+  } = useProductionAssignmentParticipants(assignmentId);
 
   const handleRemoveParticipant = (participantId) => {
     setParticipantToRemove(participantId);
@@ -128,13 +132,16 @@ export function ProductionParticipants({ submissionId }) {
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           <Shield className="h-4 w-4 text-muted-foreground" />
-                          <span>{participant.name || "Unknown"}</span>
+                          <span>
+                            {participant.user?.first_name}{" "}
+                            {participant.user?.last_name}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Mail className="h-4 w-4" />
-                          <span>{participant.email || "N/A"}</span>
+                          <span>{participant.user?.email || "N/A"}</span>
                         </div>
                       </TableCell>
                       <TableCell>

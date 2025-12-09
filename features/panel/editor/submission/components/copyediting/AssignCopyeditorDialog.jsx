@@ -11,23 +11,24 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SearchableSelect } from "@/features/shared";
 import { useGetUsers } from "@/features";
+import { useCreateCopyeditingAssignment } from "../../hooks";
 
 /**
  * Dialog to assign a copyeditor to a submission
  * Reuses the pattern from StaffSettings AddStaffDialog
  */
 export function AssignCopyeditorDialog({ isOpen, onClose, submissionId }) {
-  const queryClient = useQueryClient();
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dueDate, setDueDate] = useState("");
+  const [instructions, setInstructions] = useState("");
 
   // Fetch users with COPY_EDITOR or EDITOR role
-  // Note: Adjust role based on your backend role naming
   const {
     data: usersData,
     isPending: loadingUsers,
@@ -46,6 +47,9 @@ export function AssignCopyeditorDialog({ isOpen, onClose, submissionId }) {
       label: `${user.display_name || user.user_name} (${user.user_email})`,
     })) || [];
 
+  // Use the create assignment hook
+  const createAssignment = useCreateCopyeditingAssignment();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,46 +58,40 @@ export function AssignCopyeditorDialog({ isOpen, onClose, submissionId }) {
       return;
     }
 
-    try {
-      setIsSubmitting(true);
+    // Set due date to 30 days from now if not specified
+    const assignmentDueDate =
+      dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-      // TODO: Implement the API call to assign copyeditor
-      // Example:
-      // await assignCopyeditor({ submissionId, userId: selectedUserId });
-
-      // For now, just show success message
-      toast.success("Copyeditor assigned successfully");
-
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({
-        queryKey: ["editor-submission", submissionId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["copyediting-participants", submissionId],
-      });
-
-      // Reset and close
-      setSelectedUserId("");
-      onClose();
-    } catch (error) {
-      const message =
-        error?.response?.data?.detail ||
-        error?.message ||
-        "Failed to assign copyeditor.";
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    createAssignment.mutate(
+      {
+        submission: submissionId,
+        copyeditor_id: selectedUserId,
+        due_date: assignmentDueDate,
+        instructions:
+          instructions || "Please review and copyedit this manuscript.",
+      },
+      {
+        onSuccess: () => {
+          // Reset and close
+          setSelectedUserId("");
+          setDueDate("");
+          setInstructions("");
+          onClose();
+        },
+      }
+    );
   };
 
   const handleClose = () => {
     setSelectedUserId("");
+    setDueDate("");
+    setInstructions("");
     onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Assign Copyeditor</DialogTitle>
           <DialogDescription>
@@ -118,11 +116,37 @@ export function AssignCopyeditorDialog({ isOpen, onClose, submissionId }) {
                   : "No user found."
               }
               searchPlaceholder="Search by name or email..."
-              disabled={loadingUsers || isSubmitting}
+              disabled={loadingUsers || createAssignment.isPending}
             />
             <p className="text-xs text-muted-foreground">
               Search for users by name or email address
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dueDate">Due Date (Optional)</Label>
+            <Input
+              id="dueDate"
+              type="datetime-local"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              disabled={createAssignment.isPending}
+            />
+            <p className="text-xs text-muted-foreground">
+              Defaults to 30 days from now if not specified
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="instructions">Instructions (Optional)</Label>
+            <Textarea
+              id="instructions"
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              placeholder="Provide specific instructions for the copyeditor..."
+              rows={3}
+              disabled={createAssignment.isPending}
+            />
           </div>
 
           <DialogFooter>
@@ -130,12 +154,15 @@ export function AssignCopyeditorDialog({ isOpen, onClose, submissionId }) {
               type="button"
               variant="outline"
               onClick={handleClose}
-              disabled={isSubmitting}
+              disabled={createAssignment.isPending}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={!selectedUserId || isSubmitting}>
-              {isSubmitting && (
+            <Button
+              type="submit"
+              disabled={!selectedUserId || createAssignment.isPending}
+            >
+              {createAssignment.isPending && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               )}
               Assign

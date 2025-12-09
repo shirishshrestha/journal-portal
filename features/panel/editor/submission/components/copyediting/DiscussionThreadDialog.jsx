@@ -30,6 +30,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/features/shared/components/RichTextEditor";
 import { stripHtmlTags } from "@/features/shared/utils";
+import {
+  useAddCopyeditingMessage,
+  useCloseCopyeditingDiscussion,
+  useCopyeditingDiscussion,
+} from "../../hooks";
 
 // Reply validation schema
 const replySchema = z.object({
@@ -43,11 +48,23 @@ export function DiscussionThreadDialog({
   isOpen,
   onClose,
   discussion,
-  submissionId,
+  assignmentId,
 }) {
   const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResolving, setIsResolving] = useState(false);
+
+  // Fetch discussion with messages
+  const { data: discussionData, isLoading } = useCopyeditingDiscussion(
+    assignmentId,
+    discussion?.id,
+    { enabled: isOpen && !!discussion?.id }
+  );
+
+  // Mutations
+  const addMessageMutation = useAddCopyeditingMessage(
+    assignmentId,
+    discussion?.id
+  );
+  const closeMutation = useCloseCopyeditingDiscussion(assignmentId);
 
   const form = useForm({
     resolver: zodResolver(replySchema),
@@ -69,69 +86,29 @@ export function DiscussionThreadDialog({
   ];
 
   const onSubmit = async (data) => {
-    try {
-      setIsSubmitting(true);
-
-      // Validate that message has content (not just empty HTML)
-      const plainText = stripHtmlTags(data.message);
-      if (!plainText || plainText.trim().length < 10) {
-        toast.error("Reply must contain at least 10 characters of text");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // TODO: Implement API call to add reply
-      // await addDiscussionReply({
-      //   discussionId: discussion.id,
-      //   message: data.message,
-      // });
-
-      toast.success("Reply sent successfully");
-
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({
-        queryKey: ["copyediting-discussions", submissionId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["discussion-thread", discussion.id],
-      });
-
-      // Reset form
-      form.reset();
-    } catch (error) {
-      const message =
-        error?.response?.data?.detail ||
-        error?.message ||
-        "Failed to send reply.";
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
+    // Validate that message has content (not just empty HTML)
+    const plainText = stripHtmlTags(data.message);
+    if (!plainText || plainText.trim().length < 10) {
+      toast.error("Reply must contain at least 10 characters of text");
+      return;
     }
+
+    addMessageMutation.mutate(
+      { message: data.message },
+      {
+        onSuccess: () => {
+          form.reset();
+        },
+      }
+    );
   };
 
   const handleResolve = async () => {
-    try {
-      setIsResolving(true);
-
-      // TODO: Implement API call to mark as resolved
-      // await updateDiscussionStatus({
-      //   discussionId: discussion.id,
-      //   status: "RESOLVED",
-      // });
-
-      toast.success("Discussion marked as resolved");
-
-      // Invalidate queries
-      queryClient.invalidateQueries({
-        queryKey: ["copyediting-discussions", submissionId],
-      });
-
-      onClose();
-    } catch (error) {
-      toast.error("Failed to resolve discussion");
-    } finally {
-      setIsResolving(false);
-    }
+    closeMutation.mutate(discussion.id, {
+      onSuccess: () => {
+        onClose();
+      },
+    });
   };
 
   const getStatusColor = (status) => {
@@ -169,7 +146,7 @@ export function DiscussionThreadDialog({
               <DialogDescription className="mt-2">
                 Started by {discussion.from?.name || "Unknown"} on{" "}
                 {format(
-                  new Date(discussion.last_reply || Date.now()),
+                  new Date(discussion.last_reply || discussion.created_at),
                   "MMM d, yyyy"
                 )}
               </DialogDescription>
@@ -188,12 +165,17 @@ export function DiscussionThreadDialog({
         {/* Thread Messages */}
         <ScrollArea className="flex-1 max-h-[400px] pr-4">
           <div className="space-y-4">
-            {messages.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+              </div>
+            ) : !discussionData?.messages ||
+              discussionData.messages.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <p>No messages yet. Be the first to reply!</p>
               </div>
             ) : (
-              messages.map((msg, index) => (
+              discussionData.messages.map((msg, index) => (
                 <div key={msg.id}>
                   {index > 0 && <Separator className="my-4" />}
                   <div className="flex gap-3">
@@ -262,10 +244,12 @@ export function DiscussionThreadDialog({
                       type="button"
                       variant="outline"
                       onClick={handleResolve}
-                      disabled={isResolving || isSubmitting}
+                      disabled={
+                        closeMutation.isPending || addMessageMutation.isPending
+                      }
                       size="sm"
                     >
-                      {isResolving ? (
+                      {closeMutation.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       ) : (
                         <CheckCircle className="h-4 w-4 mr-2" />
@@ -279,12 +263,12 @@ export function DiscussionThreadDialog({
                     type="button"
                     variant="outline"
                     onClick={onClose}
-                    disabled={isSubmitting}
+                    disabled={addMessageMutation.isPending}
                   >
                     Close
                   </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? (
+                  <Button type="submit" disabled={addMessageMutation.isPending}>
+                    {addMessageMutation.isPending ? (
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     ) : (
                       <Send className="h-4 w-4 mr-2" />

@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { useCreateProductionAssignment } from "../../hooks";
 
 export function AssignProductionAssistantDialog({
   isOpen,
@@ -31,27 +34,45 @@ export function AssignProductionAssistantDialog({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRole, setSelectedRole] = useState("PRODUCTION_ASSISTANT");
+  const [dueDate, setDueDate] = useState("");
+  const [instructions, setInstructions] = useState("");
 
-  // Mock data - replace with actual API call
+  // Mock data - replace with actual API call for users
   const users = [];
   const isLoading = false;
-  const isAssigning = false;
+
+  // Mutation hook
+  const createMutation = useCreateProductionAssignment(submissionId);
 
   const handleAssign = () => {
-    if (!selectedUser) return;
+    if (!selectedUser) {
+      toast.error("Please select a user");
+      return;
+    }
 
-    // API call to assign production assistant
-    console.log("Assigning:", {
-      submissionId,
-      userId: selectedUser,
+    const assignmentData = {
+      assigned_to: selectedUser,
       role: selectedRole,
-    });
+    };
 
-    // Reset and close
-    setSelectedUser(null);
-    setSelectedRole("PRODUCTION_ASSISTANT");
-    setSearchQuery("");
-    onClose();
+    if (dueDate) {
+      assignmentData.due_date = dueDate;
+    }
+
+    if (instructions) {
+      assignmentData.instructions = instructions;
+    }
+
+    createMutation.mutate(assignmentData, {
+      onSuccess: () => {
+        setSelectedUser(null);
+        setSelectedRole("PRODUCTION_ASSISTANT");
+        setDueDate("");
+        setInstructions("");
+        setSearchQuery("");
+        onClose();
+      },
+    });
   };
 
   const filteredUsers = users.filter(
@@ -147,17 +168,44 @@ export function AssignProductionAssistantDialog({
               ))
             )}
           </div>
+
+          {/* Due Date */}
+          <div className="space-y-2">
+            <Label htmlFor="due-date">Due Date (optional)</Label>
+            <Input
+              id="due-date"
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+          </div>
+
+          {/* Instructions */}
+          <div className="space-y-2">
+            <Label htmlFor="instructions">Instructions (optional)</Label>
+            <Textarea
+              id="instructions"
+              placeholder="Provide specific instructions for the production assistant..."
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              rows={3}
+            />
+          </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isAssigning}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={createMutation.isPending}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleAssign}
-            disabled={!selectedUser || isAssigning}
+            disabled={!selectedUser || createMutation.isPending}
           >
-            {isAssigning ? (
+            {createMutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Assigning...

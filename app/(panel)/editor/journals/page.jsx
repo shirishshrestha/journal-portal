@@ -97,7 +97,8 @@ export default function JournalsPage() {
             Manage all academic journals and their submission settings.
           </p>
         </div>
-        {journals && journals?.length < 1 && (
+        {/* Hide the button on first load (while data is loading) */}
+        {JournalData && journals && journals.length < 1 ? (
           <Button
             variant="secondary"
             onClick={() => setIsFormOpen(true)}
@@ -106,7 +107,7 @@ export default function JournalsPage() {
             <Plus className="h-4 w-4" />
             Create Journal
           </Button>
-        )}
+        ) : null}
       </div>
 
       {/* Toolbar */}

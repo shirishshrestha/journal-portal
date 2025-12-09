@@ -11,43 +11,112 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   FileText,
   Eye,
   Download,
-  History,
   Upload,
   CheckCircle,
+  Loader2,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import {
-  DocumentUploadModal,
-  DocumentVersionsModal,
-} from "@/features/panel/author";
+  useCopyeditingFiles,
+  useUploadCopyeditingFile,
+  useApproveCopyeditingFile,
+} from "../../hooks";
 
 /**
  * Component to display copyedited files
  * Shows edited manuscript files with tracking and version history
  */
-export function CopyeditedFiles({ submission, submissionId }) {
-  const router = useRouter();
+export function CopyeditedFiles({ submission, submissionId, assignmentId }) {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
-  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
+  const [uploadData, setUploadData] = useState({
+    file_type: "COPYEDITED",
+    description: "",
+    file: null,
+  });
 
-  const handleViewVersions = (docId) => {
-    setSelectedDocumentId(docId);
-    setIsVersionModalOpen(true);
+  // Fetch copyediting files
+  const {
+    data: filesData,
+    isLoading,
+    error,
+  } = useCopyeditingFiles(
+    {
+      submission: submissionId,
+      file_type: "COPYEDITED",
+    },
+    { enabled: !!submissionId }
+  );
+
+  const files = filesData?.results || [];
+
+  // Upload file mutation
+  const uploadMutation = useUploadCopyeditingFile();
+
+  // Approve file mutation
+  const approveMutation = useApproveCopyeditingFile();
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadData((prev) => ({ ...prev, file }));
+    }
   };
 
-  // Filter for copyedited files (REVISED_MANUSCRIPT, FINAL_VERSION types)
-  const copyeditedDocs =
-    submission?.documents?.filter(
-      (doc) =>
-        doc.document_type === "REVISED_MANUSCRIPT" ||
-        doc.document_type === "FINAL_VERSION" ||
-        doc.document_type === "COPYEDITED"
-    ) || [];
+  const handleUpload = () => {
+    if (!uploadData.file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("submission", submissionId);
+    if (assignmentId) {
+      formData.append("assignment", assignmentId);
+    }
+    formData.append("file_type", uploadData.file_type);
+    formData.append("description", uploadData.description);
+    formData.append("file", uploadData.file);
+
+    uploadMutation.mutate(formData, {
+      onSuccess: () => {
+        setIsUploadModalOpen(false);
+        setUploadData({ file_type: "COPYEDITED", description: "", file: null });
+      },
+    });
+  };
+
+  const handleApprove = (fileId) => {
+    approveMutation.mutate(fileId);
+  };
+
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <>
@@ -68,7 +137,18 @@ export function CopyeditedFiles({ submission, submissionId }) {
           </div>
         </CardHeader>
         <CardContent>
-          {copyeditedDocs.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+              <p className="text-sm text-muted-foreground mt-2">
+                Loading files...
+              </p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-8 text-destructive">
+              <p>Error loading copyedited files</p>
+            </div>
+          ) : files.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed rounded-lg">
               <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="font-semibold mb-2">No copyedited files yet</h3>
@@ -82,138 +162,166 @@ export function CopyeditedFiles({ submission, submissionId }) {
             </div>
           ) : (
             <div className="space-y-3">
-              {copyeditedDocs.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3"
-                >
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="relative">
-                      <FileText className="h-8 w-8 text-primary stroke-[1.5] shrink-0" />
-                      <CheckCircle className="h-4 w-4 text-green-600 absolute -bottom-1 -right-1 bg-white rounded-full" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-medium truncate">{doc.title}</p>
-                        {doc.version_number && (
-                          <Badge variant="secondary" className="text-xs">
-                            v{doc.version_number}
-                          </Badge>
+              {files &&
+                files?.results?.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3"
+                  >
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <div className="relative">
+                        <FileText className="h-8 w-8 text-primary stroke-[1.5] shrink-0" />
+                        {file.is_approved && (
+                          <CheckCircle className="h-4 w-4 text-green-600 absolute -bottom-1 -right-1 bg-white rounded-full" />
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-                        <span className="inline-flex items-center">
-                          {doc.document_type_display || doc.document_type}
-                        </span>
-                        <span className="hidden sm:inline">•</span>
-                        <span
-                          className="truncate max-w-[200px]"
-                          title={doc.file_name}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-medium truncate">
+                            {file.original_filename}
+                          </p>
+                          {file.version && (
+                            <Badge variant="secondary" className="text-xs">
+                              v{file.version}
+                            </Badge>
+                          )}
+                          {file.is_approved && (
+                            <Badge variant="success" className="text-xs">
+                              Approved
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                          <span className="inline-flex items-center">
+                            {file.file_type_display || file.file_type}
+                          </span>
+                          {file.file_size && (
+                            <>
+                              <span className="hidden sm:inline">•</span>
+                              <span>
+                                {(file.file_size / 1024 / 1024).toFixed(2)} MB
+                              </span>
+                            </>
+                          )}
+                          {file.created_at && (
+                            <>
+                              <span className="hidden sm:inline">•</span>
+                              <span>
+                                {format(
+                                  new Date(file.created_at),
+                                  "MMM d, yyyy"
+                                )}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        {file.uploaded_by && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Uploaded by: {file.uploaded_by.user?.first_name}{" "}
+                            {file.uploaded_by.user?.last_name}
+                          </p>
+                        )}
+                        {file.description && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {file.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
+                      {!file.is_approved && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleApprove(file.id)}
+                          disabled={approveMutation.isPending}
+                          title="Approve this file"
                         >
-                          {doc.file_name}
-                        </span>
-                        {doc.file_size && (
-                          <>
-                            <span className="hidden sm:inline">•</span>
-                            <span>
-                              {(doc.file_size / 1024 / 1024).toFixed(2)} MB
-                            </span>
-                          </>
-                        )}
-                        {doc.last_modified_at && (
-                          <>
-                            <span className="hidden sm:inline">•</span>
-                            <span title="Last modified">
-                              Modified{" "}
-                              {format(
-                                new Date(doc.last_modified_at),
-                                "MMM d, yyyy HH:mm"
-                              )}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                      {doc.last_edited_by && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Edited by:{" "}
-                          {doc.last_edited_by.name || doc.last_edited_by.email}
-                        </p>
+                          <CheckCircle className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Approve</span>
+                        </Button>
                       )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewVersions(doc.id)}
-                      title="View all versions and changes"
-                    >
-                      <History className="h-4 w-4 sm:mr-2" />
-                      <span className="hidden sm:inline">History</span>
-                    </Button>
-
-                    {doc.file_url && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          router.push(
-                            `/editor/submissions/${submissionId}/documents/${doc.id}`
-                          )
-                        }
-                      >
-                        <Eye className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">View</span>
-                      </Button>
-                    )}
-
-                    {doc.original_file && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => window.open(doc.original_file, "_blank")}
+                        onClick={() =>
+                          handleDownload(file.id, file.original_filename)
+                        }
+                        title="Download file"
                       >
                         <Download className="h-4 w-4 sm:mr-2" />
                         <span className="hidden sm:inline">Download</span>
                       </Button>
-                    )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {copyeditedDocs.length > 0 && (
-            <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-dashed">
-              <h4 className="font-medium text-sm mb-2">Tips:</h4>
-              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                <li>
-                  Use the History button to compare versions and track changes
-                </li>
-                <li>View files in SuperDoc for collaborative editing</li>
-                <li>Download the final version to share with authors</li>
-              </ul>
+                ))}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Upload Modal */}
-      <DocumentUploadModal
-        open={isUploadModalOpen}
-        onOpenChange={setIsUploadModalOpen}
-        submissionId={submissionId}
-      />
-
-      {/* Version History Modal */}
-      {selectedDocumentId && (
-        <DocumentVersionsModal
-          open={isVersionModalOpen}
-          onOpenChange={setIsVersionModalOpen}
-          documentId={selectedDocumentId}
-        />
-      )}
+      {/* Upload Dialog */}
+      <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Upload Copyedited File</DialogTitle>
+            <DialogDescription>
+              Upload a file with copyediting changes applied
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="file">File</Label>
+              <Input
+                id="file"
+                type="file"
+                onChange={handleFileSelect}
+                accept=".pdf,.doc,.docx,.txt"
+              />
+              <p className="text-xs text-muted-foreground">
+                Supported formats: PDF, DOC, DOCX, TXT
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description (optional)</Label>
+              <Textarea
+                id="description"
+                placeholder="Describe the changes made..."
+                value={uploadData.description}
+                onChange={(e) =>
+                  setUploadData({ ...uploadData, description: e.target.value })
+                }
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsUploadModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpload}
+              disabled={!uploadData.file || uploadMutation.isPending}
+            >
+              {uploadMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

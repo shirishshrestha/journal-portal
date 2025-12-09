@@ -68,7 +68,7 @@ export default function ProductionWorkflowPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-6">
+    <div className=" space-y-6">
       {/* Header with breadcrumbs and actions */}
       <div className="flex flex-col gap-4">
         <Button

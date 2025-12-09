@@ -28,6 +28,7 @@ import {
   DecisionBadge,
   decisionTypeConfig,
   ErrorCard,
+  LoadingScreen,
   StatusBadge,
   statusConfig,
   useAssignReviewers,
@@ -134,6 +135,7 @@ export default function EditorSubmissionDetailPage() {
   if (isSubmissionLoading) {
     return (
       <div className=" space-y-6">
+        <LoadingScreen />
         <Skeleton className="h-10 w-48" />
         <Card>
           <CardHeader>
@@ -203,22 +205,26 @@ export default function EditorSubmissionDetailPage() {
           <p className="text-muted-foreground">Review and manage submission</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            onClick={() =>
-              router.push(`/editor/submissions/${submissionId}/copyediting`)
-            }
-          >
-            <FileEdit className="h-4 w-4 mr-2" />
-            Copyediting
-          </Button>
-          <Button
-            onClick={() =>
-              router.push(`/editor/submissions/${submissionId}/production`)
-            }
-          >
-            <Package className="h-4 w-4 mr-2" />
-            Production
-          </Button>
+          {submission?.status === "ACCEPTED" && (
+            <Button
+              onClick={() =>
+                router.push(`/editor/submissions/${submissionId}/copyediting`)
+              }
+            >
+              <FileEdit className="h-4 w-4 mr-2" />
+              Copyediting
+            </Button>
+          )}
+          {submission?.status === "COPYEDITED" && (
+            <Button
+              onClick={() =>
+                router.push(`/editor/submissions/${submissionId}/production`)
+              }
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Production
+            </Button>
+          )}
           {submission?.journal?.ojs_connection_status?.configured && (
             <Button
               variant="secondary"

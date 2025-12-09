@@ -18,108 +18,78 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { AddProductionDiscussionDialog } from "./AddProductionDiscussionDialog";
 import DataTable from "@/features/shared/components/DataTable";
+import { useProductionDiscussions } from "../../hooks";
 
-export function ProductionDiscussions({ submissionId }) {
+export function ProductionDiscussions({ assignmentId }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  // Mock data - replace with actual API call
-  const discussions = [
-    {
-      id: "1",
-      topic: "Galley file format clarification",
-      created_by_name: "Alice Editor",
-      last_reply_at: new Date().toISOString(),
-      reply_count: 3,
-      is_closed: false,
-    },
-    {
-      id: "2",
-      topic: "Layout issues in PDF",
-      created_by_name: "Bob Assistant",
-      last_reply_at: new Date().toISOString(),
-      reply_count: 1,
-      is_closed: true,
-    },
-    {
-      id: "3",
-      topic: "Proofreading checklist",
-      created_by_name: "Carol Proofreader",
-      last_reply_at: null,
-      reply_count: 0,
-      is_closed: false,
-    },
-  ];
-  const isLoading = false;
+  // Fetch discussions from API
+  const {
+    data: discussions = [],
+    isLoading,
+    error,
+  } = useProductionDiscussions(assignmentId);
 
-  const filteredDiscussions = discussions.filter((discussion) =>
-    discussion.topic?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredDiscussions = discussions?.results?.filter((discussion) =>
+    discussion.subject?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const columns = [
     {
-      key: "topic",
+      key: "subject",
       header: "Name",
       cellClassName: "font-medium",
       render: (row) => (
         <div className="flex items-center gap-2">
           <MessageSquare className="h-4 w-4 text-muted-foreground" />
           <span className="truncate max-w-xs">
-            {row.topic || "Untitled Discussion"}
+            {row.subject || "Untitled Discussion"}
           </span>
         </div>
       ),
     },
     {
-      key: "created_by_name",
+      key: "created_by",
       header: "From",
       render: (row) => (
         <span className="text-sm text-muted-foreground">
-          {row.created_by_name || "Unknown"}
+          {row.created_by?.user?.first_name} {row.created_by?.user?.last_name}
         </span>
       ),
     },
     {
-      key: "last_reply_at",
+      key: "updated_at",
       header: "Last Reply",
       render: (row) => (
         <span className="text-sm text-muted-foreground">
-          {row.last_reply_at
-            ? format(new Date(row.last_reply_at), "MMM d, yyyy")
+          {row.updated_at
+            ? format(new Date(row.updated_at), "MMM d, yyyy")
             : "No replies"}
         </span>
       ),
     },
     {
-      key: "reply_count",
+      key: "messages",
       header: "Replies",
       align: "center",
       render: (row) => (
-        <Badge variant="secondary">{row.reply_count || 0}</Badge>
+        <Badge variant="secondary">{row.messages?.length || 0}</Badge>
       ),
     },
     {
-      key: "is_closed",
-      header: "Closed",
+      key: "status",
+      header: "Status",
       align: "center",
-      render: (row) =>
-        row.is_closed ? (
-          <CheckCircle2 className="h-4 w-4 text-green-600 mx-auto" />
-        ) : (
-          <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
-        ),
+      render: (row) => (
+        <Badge variant={row.status === "CLOSED" ? "secondary" : "default"}>
+          {row.status_display || row.status}
+        </Badge>
+      ),
     },
     {
       key: "actions",
@@ -196,7 +166,7 @@ export function ProductionDiscussions({ submissionId }) {
       <AddProductionDiscussionDialog
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
-        submissionId={submissionId}
+        assignmentId={assignmentId}
       />
     </>
   );
