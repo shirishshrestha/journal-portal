@@ -7,17 +7,21 @@ import { Card } from "@/components/ui/card";
 import {
   ErrorCard,
   LoadingScreen,
-  useGetEditorSubmissionById,
   CopyeditingSuperDocEditor,
+  useGetSubmissionById,
   useGetMe,
 } from "@/features";
 
 /**
- * Editor Copyediting File Editor Page
- * Uses CopyeditingSuperDocEditor for editing copyediting files
- * Route: /editor/submissions/[id]/copyediting/edit/[fileId]
+ * Author Copyediting File Editor Page
+ * Uses CopyeditingSuperDocEditor for editing copyedited files
+ * Route: /author/submissions/active/[id]/copyediting/edit/[fileId]
+ *
+ * Permissions:
+ * - Authors can edit copyedited files (with tracked changes)
+ * - Draft files are read-only for authors (handled in CopyeditingDraftFiles component)
  */
-export default function CopyeditingEditPage() {
+export default function AuthorCopyeditingFileEditorPage() {
   const router = useRouter();
   const params = useParams();
   const submissionId = params?.id;
@@ -27,26 +31,33 @@ export default function CopyeditingEditPage() {
 
   const {
     data: submission,
-    isPending: isSubmissionPending,
+    isPending: isSubmissionLoading,
     error: submissionError,
-  } = useGetEditorSubmissionById(submissionId);
+  } = useGetSubmissionById(submissionId);
 
   const handleBack = () => {
-    router.push(`/editor/submissions/${submissionId}/copyediting`);
+    router.push(`/author/submissions/active/${submissionId}/copyediting`);
   };
 
   const handleSaveSuccess = (updatedFile) => {
-    console.log("File saved successfully:", updatedFile);
+    console.log("File saved successfully by author:", updatedFile);
   };
 
+  if (isSubmissionLoading) {
+    return <LoadingScreen />;
+  }
+
   if (submissionError) {
-    return <ErrorCard error={submissionError} />;
+    return (
+      <div className="container mx-auto p-6">
+        <ErrorCard title="Error Loading Submission" />
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      {isSubmissionPending && <LoadingScreen />}
       <div className="flex flex-col gap-4">
         <Button variant="ghost" onClick={handleBack} className="w-fit">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -55,7 +66,7 @@ export default function CopyeditingEditPage() {
 
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Edit Copyediting File
+            Review & Edit Copyedited File
           </h1>
           <p className="text-muted-foreground mt-2">
             {submission?.title || "Loading..."}
@@ -65,6 +76,10 @@ export default function CopyeditingEditPage() {
               Submission ID: {submission.submission_id}
             </p>
           )}
+          <p className="text-sm text-muted-foreground mt-2">
+            You can review tracked changes, accept/reject edits, and make
+            additional changes.
+          </p>
         </div>
       </div>
 
@@ -76,7 +91,7 @@ export default function CopyeditingEditPage() {
             first_name: user?.first_name,
             email: user?.email,
           }}
-          readOnly={false}
+          readOnly={true}
           commentsReadOnly={false}
           onSaveSuccess={handleSaveSuccess}
         />

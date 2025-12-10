@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Download, Upload, Loader2, Edit } from "lucide-react";
+import { FileText, Download, Upload, Loader2, Edit, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import {
@@ -39,6 +39,7 @@ export function CopyeditingDraftFiles({
   assignmentId,
   submission,
   submissionId,
+  readOnly = false,
 }) {
   const router = useRouter();
 
@@ -168,19 +169,36 @@ export function CopyeditingDraftFiles({
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          router.push(
-                            `/editor/submissions/${submissionId}/copyediting/edit/${file.id}`
-                          )
-                        }
-                        title="Edit in SuperDoc"
-                      >
-                        <Edit className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Edit</span>
-                      </Button>
+                      {!readOnly && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            router.push(
+                              `/editor/submissions/${submissionId}/copyediting/edit/${file.id}`
+                            )
+                          }
+                          title="Edit in SuperDoc"
+                        >
+                          <Edit className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Edit</span>
+                        </Button>
+                      )}
+                      {readOnly && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            router.push(
+                              `/author/submissions/active/${submissionId}/copyediting/edit/${file.id}`
+                            )
+                          }
+                          title="View in SuperDoc"
+                        >
+                          <Eye className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">View</span>
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"

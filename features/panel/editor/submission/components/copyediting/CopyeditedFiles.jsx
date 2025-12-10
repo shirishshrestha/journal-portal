@@ -49,7 +49,13 @@ import {
  * Component to display copyedited files
  * Shows edited manuscript files with tracking and version history
  */
-export function CopyeditedFiles({ submission, submissionId, assignmentId }) {
+export function CopyeditedFiles({ 
+  submission, 
+  submissionId, 
+  assignmentId, 
+  isAuthorView = false,
+  readOnly = false 
+}) {
   const router = useRouter();
   const params = useParams();
   const submissionIdFromParams = params?.id;
@@ -236,20 +242,23 @@ export function CopyeditedFiles({ submission, submissionId, assignmentId }) {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          router.push(
-                            `/editor/submissions/${submissionIdFromParams}/copyediting/edit/${file.id}`
-                          )
-                        }
-                        title="Edit in SuperDoc"
-                      >
-                        <Edit className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Edit</span>
-                      </Button>
-                      {!file.is_approved && (
+                      {!readOnly && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const route = isAuthorView
+                              ? `/author/submissions/active/${submissionIdFromParams}/copyediting/edit/${file.id}`
+                              : `/editor/submissions/${submissionIdFromParams}/copyediting/edit/${file.id}`;
+                            router.push(route);
+                          }}
+                          title="Edit in SuperDoc"
+                        >
+                          <Edit className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Edit</span>
+                        </Button>
+                      )}
+                      {!file.is_approved && !isAuthorView && (
                         <Button
                           variant="outline"
                           size="sm"

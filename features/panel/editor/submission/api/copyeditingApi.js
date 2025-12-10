@@ -125,6 +125,36 @@ export const getCopyeditingAssignmentParticipants = async (assignmentId) => {
   return response.data;
 };
 
+/**
+ * Add a participant to a copyediting assignment
+ * @param {string} assignmentId - Assignment ID
+ * @param {Object} data - Participant data
+ * @param {string} data.profile_id - Profile UUID of the user to add
+ * @returns {Promise} API response
+ */
+export const addCopyeditingParticipant = async (assignmentId, data) => {
+  const response = await instance.post(
+    `submissions/copyediting/assignments/${assignmentId}/add_participant/`,
+    data
+  );
+  return response.data;
+};
+
+/**
+ * Remove a participant from a copyediting assignment
+ * @param {string} assignmentId - Assignment ID
+ * @param {Object} data - Participant data
+ * @param {string} data.profile_id - Profile UUID of the user to remove
+ * @returns {Promise} API response
+ */
+export const removeCopyeditingParticipant = async (assignmentId, data) => {
+  const response = await instance.post(
+    `submissions/copyediting/assignments/${assignmentId}/remove_participant/`,
+    data
+  );
+  return response.data;
+};
+
 // ==================== COPYEDITING FILES ====================
 
 /**
@@ -208,6 +238,52 @@ export const approveCopyeditingFile = async (fileId) => {
 export const deleteCopyeditingFile = async (fileId) => {
   const response = await instance.delete(
     `submissions/copyediting/files/${fileId}/`
+  );
+  return response.data;
+};
+
+/**
+ * Load a copyediting file for editing (SuperDoc editor)
+ * @param {string} fileId - File ID
+ * @returns {Promise} API response with file metadata and download URL
+ */
+export const loadCopyeditingFile = async (fileId) => {
+  const response = await instance.get(
+    `submissions/copyediting/files/${fileId}/load/`
+  );
+  return response.data;
+};
+
+/**
+ * Save a copyediting file (manual save - replaces existing file)
+ * @param {string} fileId - File ID
+ * @param {FormData} formData - Form data with file
+ * @returns {Promise} API response
+ */
+export const saveCopyeditingFile = async (fileId, formData) => {
+  const response = await instance.post(
+    `submissions/copyediting/files/${fileId}/save/`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * Download a copyediting file
+ * @param {string} fileId - File ID
+ * @returns {Promise} API response with file blob
+ */
+export const downloadCopyeditingFile = async (fileId) => {
+  const response = await instance.get(
+    `submissions/copyediting/files/${fileId}/download/`,
+    {
+      responseType: "blob",
+    }
   );
   return response.data;
 };

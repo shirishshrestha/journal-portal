@@ -226,6 +226,52 @@ export const deleteProductionFile = async (fileId) => {
   return response.data;
 };
 
+/**
+ * Load a production file for editing (SuperDoc editor)
+ * @param {string} fileId - File ID
+ * @returns {Promise} API response with file metadata and download URL
+ */
+export const loadProductionFile = async (fileId) => {
+  const response = await instance.get(
+    `submissions/production/files/${fileId}/load/`
+  );
+  return response.data;
+};
+
+/**
+ * Save a production file (manual save - replaces existing file)
+ * @param {string} fileId - File ID
+ * @param {FormData} formData - Form data with file
+ * @returns {Promise} API response
+ */
+export const saveProductionFile = async (fileId, formData) => {
+  const response = await instance.post(
+    `submissions/production/files/${fileId}/save/`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * Download a production file
+ * @param {string} fileId - File ID
+ * @returns {Promise} API response with file blob
+ */
+export const downloadProductionFile = async (fileId) => {
+  const response = await instance.get(
+    `submissions/production/files/${fileId}/download/`,
+    {
+      responseType: "blob",
+    }
+  );
+  return response.data;
+};
+
 // ==================== PRODUCTION DISCUSSIONS ====================
 
 /**
