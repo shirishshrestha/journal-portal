@@ -11,7 +11,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileEdit, Calendar, Clock, User, Mail, Award } from "lucide-react";
+import {
+  FileEdit,
+  Calendar,
+  Clock,
+  User,
+  Mail,
+  Award,
+  PauseCircle,
+  CheckCircle,
+  Circle,
+  University,
+} from "lucide-react";
 import { format } from "date-fns";
 
 export function CopyeditingAssignmentCard({ assignment, isPending = false }) {
@@ -144,6 +155,18 @@ export function CopyeditingAssignmentCard({ assignment, isPending = false }) {
 
         {/* Status */}
         <div className="flex items-start gap-2 justify-start">
+          {assignment.status === "IN_PROGRESS" && (
+            <Clock className="h-4 w-4 text-blue-500 mt-0.5" />
+          )}
+          {assignment.status === "PENDING" && (
+            <PauseCircle className="h-4 w-4 text-yellow-500 mt-0.5" />
+          )}
+          {assignment.status === "COMPLETED" && (
+            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+          )}
+          {!["IN_PROGRESS", "PENDING", "COMPLETED"].includes(
+            assignment.status
+          ) && <Circle className="h-4 w-4 text-gray-400 mt-0.5" />}
           <span className="font-medium text-foreground/80 ">Status:</span>
           {renderAssignmentStatusBadge(
             assignment.status,
@@ -154,6 +177,8 @@ export function CopyeditingAssignmentCard({ assignment, isPending = false }) {
         {/* Affiliation */}
         {assignment.copyeditor?.affiliation_name && (
           <div className="flex items-start gap-2">
+            <University className="h-4 w-4 text-muted-foreground mt-0.5" />
+
             <span className="font-medium text-foreground/80 ">
               Affiliation:
             </span>

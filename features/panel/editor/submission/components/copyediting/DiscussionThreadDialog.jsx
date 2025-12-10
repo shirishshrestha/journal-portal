@@ -82,7 +82,7 @@ export function DiscussionThreadDialog({
       },
       {
         onSuccess: () => {
-          form.setValue();
+          form.setValue("message", "");
         },
       }
     );

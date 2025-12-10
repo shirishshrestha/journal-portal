@@ -25,16 +25,20 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCopyeditingAssignmentParticipants } from "../../hooks";
+import { AddParticipantDialog } from "./AddParticipantDialog";
+
 
 /**
  * Component to display and manage copyediting participants
  * Shows assigned copyeditors, authors, and editors
  */
-export function CopyeditingParticipants({ assignmentId }) {
+export function CopyeditingParticipants({ assignmentId, isAuthorView = false }) {
   const queryClient = useQueryClient();
   const [removingUserId, setRemovingUserId] = useState(null);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [userToRemove, setUserToRemove] = useState(null);
+  const [isAddParticipantOpen, setIsAddParticipantOpen] = useState(false);
+  
 
   // Fetch participants from API
   const {
@@ -136,10 +140,24 @@ export function CopyeditingParticipants({ assignmentId }) {
         {/* Participants Section */}
         <Card>
           <CardHeader>
-            <CardTitle>Participants</CardTitle>
-            <CardDescription>
-              All users involved in the copyediting workflow
-            </CardDescription>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle>Participants</CardTitle>
+                <CardDescription>
+                  All users involved in the copyediting workflow
+                </CardDescription>
+              </div>
+              {assignmentId && !isAuthorView && (
+                <Button
+                  size="sm"
+                  onClick={() => setIsAddParticipantOpen(true)}
+                  className="gap-2"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Add Participant
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {isPending ? (
@@ -207,6 +225,15 @@ export function CopyeditingParticipants({ assignmentId }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add Participant Dialog */}
+      {assignmentId && (
+        <AddParticipantDialog
+          isOpen={isAddParticipantOpen}
+          onClose={() => setIsAddParticipantOpen(false)}
+          assignmentId={assignmentId}
+        />
+      )}
     </>
   );
 }
