@@ -45,6 +45,7 @@ import {
   ProductionParticipants,
   ProductionReadyFiles,
   ProductionReadyFilesFromCopyediting,
+  PublicationScheduleDialog,
 } from "@/features/panel/editor/submission/components";
 import {
   useProductionAssignments,
@@ -58,6 +59,7 @@ export default function ProductionWorkflowPage() {
   const router = useRouter();
   const submissionId = params?.id;
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
 
   // Fetch submission details
   const {
@@ -91,7 +93,7 @@ export default function ProductionWorkflowPage() {
   };
 
   const handleScheduleForPublication = () => {
-    router.push(`/editor/submissions/${submissionId}/publication`);
+    setIsScheduleDialogOpen(true);
   };
 
   const getStatusBadge = (status) => {
@@ -438,6 +440,14 @@ export default function ProductionWorkflowPage() {
         isOpen={isAssignDialogOpen}
         onClose={() => setIsAssignDialogOpen(false)}
         submissionId={submissionId}
+      />
+
+      {/* Publication Schedule Dialog */}
+      <PublicationScheduleDialog
+        isOpen={isScheduleDialogOpen}
+        onClose={() => setIsScheduleDialogOpen(false)}
+        submissionId={submissionId}
+        submissionTitle={submission?.title}
       />
     </div>
   );

@@ -8,6 +8,7 @@ import {
   Search,
   CheckCircle2,
   XCircle,
+  RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ import DataTable from "@/features/shared/components/DataTable";
 import {
   useProductionDiscussions,
   useProductionAssignments,
+  useReopenProductionDiscussion,
 } from "../../hooks";
 
 export function ProductionDiscussions({ submissionId }) {
@@ -51,9 +53,16 @@ export function ProductionDiscussions({ submissionId }) {
   const discussions = discussionsData?.results || [];
   const isLoading = assignmentsLoading || discussionsLoading;
 
+  // Reopen discussion mutation
+  const reopenMutation = useReopenProductionDiscussion();
+
   const filteredDiscussions = discussions.filter((discussion) =>
     discussion.subject?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleReopenDiscussion = (discussionId) => {
+    reopenMutation.mutate(discussionId);
+  };
 
   const columns = [
     {
@@ -112,16 +121,32 @@ export function ProductionDiscussions({ submissionId }) {
       header: "Actions",
       align: "right",
       render: (row) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleOpenDiscussion(row.id);
-          }}
-        >
-          View
-        </Button>
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenDiscussion(row.id);
+            }}
+          >
+            View
+          </Button>
+          {row.status === "CLOSED" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleReopenDiscussion(row.id);
+              }}
+              disabled={reopenMutation.isPending}
+            >
+              <RotateCcw className="h-4 w-4 mr-1" />
+              Reopen
+            </Button>
+          )}
+        </div>
       ),
     },
   ];

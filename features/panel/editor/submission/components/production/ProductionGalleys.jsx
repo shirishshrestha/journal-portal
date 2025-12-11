@@ -22,16 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -51,7 +42,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useApproveProductionFile, useUploadProductionFile } from "../../hooks";
+import {
+  useApproveProductionFile,
+  useProductionFiles,
+  useUploadProductionFile,
+  usePublishGalleyFile,
+} from "../../hooks";
+import DataTable from "@/features/shared/components/DataTable";
 
 /**
  * Component to manage production galley files
@@ -78,9 +75,9 @@ export function ProductionGalleys({ submission, submissionId, assignmentId }) {
   });
 
   // Mutations
-  const uploadMutation = useUploadProductionFile(assignmentId);
-  const approveMutation = useApproveProductionFile(assignmentId);
-  const publishMutation = usePublishProductionFile(assignmentId);
+  const uploadMutation = useUploadProductionFile();
+  const approveMutation = useApproveProductionFile();
+  const publishMutation = usePublishGalleyFile();
 
   const resetUploadForm = () => {
     setUploadData({
@@ -158,6 +155,125 @@ export function ProductionGalleys({ submission, submissionId, assignmentId }) {
     }
   };
 
+  // DataTable columns definition
+  const columns = [
+    {
+      key: "galley_format",
+      header: "Format",
+      render: (row) => (
+        <div className="flex items-center gap-2">
+          {getFormatIcon(row.galley_format)}
+          <Badge variant="secondary">
+            {row.galley_format_display || row.galley_format}
+          </Badge>
+        </div>
+      ),
+    },
+    {
+      key: "label",
+      header: "File Name",
+      render: (row) => (
+        <div>
+          <p className="font-medium">{row.label}</p>
+          <p className="text-sm text-muted-foreground">
+            {row.original_filename}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: "version",
+      header: "Version",
+      render: (row) => <span>v{row.version}</span>,
+    },
+    {
+      key: "created_at",
+      header: "Uploaded",
+      render: (row) => (
+        <div className="text-sm">
+          <p>{format(new Date(row.created_at), "MMM d, yyyy")}</p>
+          <p className="text-muted-foreground">
+            {row.uploaded_by?.user?.first_name}{" "}
+            {row.uploaded_by?.user?.last_name}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: "is_published",
+      header: "Status",
+      render: (row) => (
+        <div className="flex flex-col gap-1">
+          {row.is_published ? (
+            <Badge variant="success" className="w-fit">
+              <Globe className="h-3 w-3 mr-1" />
+              Published
+            </Badge>
+          ) : row.is_approved ? (
+            <Badge variant="outline" className="w-fit">
+              <CheckCircle2 className="h-3 w-3 mr-1" />
+              Approved
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="w-fit">
+              Pending Review
+            </Badge>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      render: (row) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => handleView(row.file_url)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => handleDownload(row.file_url, row.original_filename)}
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          {!row.is_approved && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => approveMutation.mutate(row.id)}
+              disabled={approveMutation.isPending}
+            >
+              {approveMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Approve"
+              )}
+            </Button>
+          )}
+          {row.is_approved && !row.is_published && (
+            <Button
+              size="sm"
+              onClick={() => publishMutation.mutate(row.id)}
+              disabled={publishMutation.isPending}
+            >
+              {publishMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Publish"
+              )}
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <>
       <Card>
@@ -192,156 +308,24 @@ export function ProductionGalleys({ submission, submissionId, assignmentId }) {
               />
             </div>
           </div>
-
-          {/* Files Table */}
-          {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : error ? (
-            <div className="text-center py-8 text-destructive">
-              <p>Error loading galley files</p>
-            </div>
-          ) : filteredFiles.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-lg">
-              <File className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No galley files</h3>
-              <p className="text-sm text-muted-foreground max-w-md mb-4">
-                {searchQuery
-                  ? "No files match your search criteria."
-                  : "Upload galley files in different formats (PDF, HTML, XML, EPUB) for publication."}
-              </p>
-              {!searchQuery && assignmentId && (
-                <Button
-                  onClick={() => setIsUploadDialogOpen(true)}
-                  variant="outline"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload First Galley
-                </Button>
-              )}
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Format</TableHead>
-                  <TableHead>File Name</TableHead>
-                  <TableHead>Version</TableHead>
-                  <TableHead>Uploaded</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredFiles.map((file) => (
-                  <TableRow key={file.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getFormatIcon(file.galley_format)}
-                        <Badge variant="secondary">
-                          {file.galley_format_display || file.galley_format}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{file.label}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {file.original_filename}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>v{file.version}</TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <p>
-                          {format(new Date(file.created_at), "MMM d, yyyy")}
-                        </p>
-                        <p className="text-muted-foreground">
-                          {file.uploaded_by?.user?.first_name}{" "}
-                          {file.uploaded_by?.user?.last_name}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        {file.is_published ? (
-                          <Badge variant="success" className="w-fit">
-                            <Globe className="h-3 w-3 mr-1" />
-                            Published
-                          </Badge>
-                        ) : file.is_approved ? (
-                          <Badge variant="outline" className="w-fit">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Approved
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="w-fit">
-                            Pending Review
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleView(file.file_url)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() =>
-                            handleDownload(
-                              file.file_url,
-                              file.original_filename
-                            )
-                          }
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        {!file.is_approved && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => approveMutation.mutate(file.id)}
-                            disabled={approveMutation.isPending}
-                          >
-                            {approveMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              "Approve"
-                            )}
-                          </Button>
-                        )}
-                        {file.is_approved && !file.is_published && (
-                          <Button
-                            size="sm"
-                            onClick={() => publishMutation.mutate(file.id)}
-                            disabled={publishMutation.isPending}
-                          >
-                            {publishMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              "Publish"
-                            )}
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
         </CardContent>
       </Card>
+
+      {/* DataTable for Galley Files */}
+      <DataTable
+        data={filteredFiles || []}
+        columns={columns}
+        emptyMessage={
+          searchQuery
+            ? "No files match your search criteria."
+            : "Upload galley files in different formats (PDF, HTML, XML, EPUB) for publication."
+        }
+        error={error}
+        errorMessage="Error loading galley files"
+        isPending={isLoading}
+        hoverable={true}
+        tableClassName="bg-card border"
+      />
 
       {/* Upload Dialog */}
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
