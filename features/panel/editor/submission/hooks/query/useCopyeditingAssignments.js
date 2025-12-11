@@ -10,10 +10,10 @@ import {
 /**
  * Hook to fetch copyediting assignments list
  */
-export function useCopyeditingAssignments(params = {}, options = {}) {
+export function useCopyeditingAssignments(options = {}) {
   return useQuery({
-    queryKey: ["copyediting-assignments", params],
-    queryFn: () => listCopyeditingAssignments(params),
+    queryKey: ["copyediting-assignments"],
+    queryFn: () => listCopyeditingAssignments(),
     ...options,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

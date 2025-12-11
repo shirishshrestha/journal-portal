@@ -5,6 +5,8 @@ import {
   updateProductionAssignment,
   startProductionAssignment,
   completeProductionAssignment,
+  addProductionParticipant,
+  removeProductionParticipant,
 } from "../../api";
 
 /**
@@ -115,6 +117,70 @@ export function useCompleteProductionAssignment() {
         error?.response?.data?.detail ||
         error?.message ||
         "Failed to complete assignment";
+      toast.error(message);
+    },
+  });
+}
+
+/**
+ * Hook to add a participant to a production assignment
+ */
+export function useAddProductionParticipant() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ assignmentId, profile_id }) =>
+      addProductionParticipant(assignmentId, { profile_id }),
+    onSuccess: (data, variables) => {
+      toast.success("Participant added successfully");
+      queryClient.invalidateQueries({
+        queryKey: [
+          "production-assignment-participants",
+          variables.assignmentId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["production-assignment", variables.assignmentId],
+      });
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.error ||
+        error?.response?.data?.detail ||
+        error?.message ||
+        "Failed to add participant";
+      toast.error(message);
+    },
+  });
+}
+
+/**
+ * Hook to remove a participant from a production assignment
+ */
+export function useRemoveProductionParticipant() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ assignmentId, profile_id }) =>
+      removeProductionParticipant(assignmentId, { profile_id }),
+    onSuccess: (data, variables) => {
+      toast.success("Participant removed successfully");
+      queryClient.invalidateQueries({
+        queryKey: [
+          "production-assignment-participants",
+          variables.assignmentId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["production-assignment", variables.assignmentId],
+      });
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.error ||
+        error?.response?.data?.detail ||
+        error?.message ||
+        "Failed to remove participant";
       toast.error(message);
     },
   });

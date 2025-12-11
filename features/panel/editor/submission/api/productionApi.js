@@ -125,6 +125,36 @@ export const getProductionAssignmentParticipants = async (assignmentId) => {
   return response.data;
 };
 
+/**
+ * Add a participant to a production assignment
+ * @param {string} assignmentId - Assignment ID
+ * @param {Object} data - Participant data
+ * @param {string} data.profile_id - Profile UUID of the user to add
+ * @returns {Promise} API response
+ */
+export const addProductionParticipant = async (assignmentId, data) => {
+  const response = await instance.post(
+    `submissions/production/assignments/${assignmentId}/add_participant/`,
+    data
+  );
+  return response.data;
+};
+
+/**
+ * Remove a participant from a production assignment
+ * @param {string} assignmentId - Assignment ID
+ * @param {Object} data - Participant data
+ * @param {string} data.profile_id - Profile UUID of the user to remove
+ * @returns {Promise} API response
+ */
+export const removeProductionParticipant = async (assignmentId, data) => {
+  const response = await instance.post(
+    `submissions/production/assignments/${assignmentId}/remove_participant/`,
+    data
+  );
+  return response.data;
+};
+
 // ==================== PRODUCTION FILES (GALLEYS) ====================
 
 /**

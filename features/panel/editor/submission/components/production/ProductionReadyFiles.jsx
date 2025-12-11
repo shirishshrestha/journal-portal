@@ -38,32 +38,46 @@ import {
   useApproveProductionFile,
   useProductionFiles,
   useUploadProductionFile,
+  useProductionAssignments,
 } from "../../hooks";
 
-export function ProductionReadyFiles({ assignmentId }) {
+export function ProductionReadyFiles({ submissionId }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [uploadData, setUploadData] = useState({
     file_type: "GALLEY",
+    galley_format: "PDF",
+    label: "",
     description: "",
     file: null,
   });
 
+  // Get the production assignment for this submission
+  const { data: assignmentsData, isLoading: assignmentsLoading } =
+    useProductionAssignments({ submission: submissionId });
+
+  const assignment = assignmentsData?.results?.[0];
+  const assignmentId = assignment?.id;
+
   // Fetch files from API
   const {
-    data: files = [],
-    isLoading,
+    data: filesData,
+    isLoading: filesLoading,
     error,
-  } = useProductionFiles(assignmentId, {
-    file_type: "GALLEY",
-  });
+  } = useProductionFiles(
+    { submission: submissionId },
+    { enabled: !!submissionId }
+  );
 
   // Mutations
-  const uploadMutation = useUploadProductionFile(assignmentId);
-  const approveMutation = useApproveProductionFile(assignmentId);
+  const uploadMutation = useUploadProductionFile();
+  const approveMutation = useApproveProductionFile();
 
-  const filteredFiles = files?.results?.filter((file) =>
-    file.file_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const files = filesData?.results || [];
+  const isLoading = assignmentsLoading || filesLoading;
+
+  const filteredFiles = files.filter((file) =>
+    file.original_filename?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDownload = (fileUrl, fileName) => {
@@ -92,9 +106,24 @@ export function ProductionReadyFiles({ assignmentId }) {
       return;
     }
 
+    if (!uploadData.label) {
+      toast.error("Please enter a label for the galley");
+      return;
+    }
+
+    if (!assignmentId) {
+      toast.error("No production assignment found");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", uploadData.file);
     formData.append("file_type", uploadData.file_type);
+    formData.append("galley_format", uploadData.galley_format);
+    formData.append("label", uploadData.label);
+    formData.append("assignment", assignmentId);
+    formData.append("submission", submissionId);
+
     if (uploadData.description) {
       formData.append("description", uploadData.description);
     }
@@ -102,7 +131,13 @@ export function ProductionReadyFiles({ assignmentId }) {
     uploadMutation.mutate(formData, {
       onSuccess: () => {
         setIsUploadDialogOpen(false);
-        setUploadData({ file_type: "GALLEY", description: "", file: null });
+        setUploadData({
+          file_type: "GALLEY",
+          galley_format: "PDF",
+          label: "",
+          description: "",
+          file: null,
+        });
       },
     });
   };
@@ -183,45 +218,53 @@ export function ProductionReadyFiles({ assignmentId }) {
                         <div className="flex items-center gap-2">
                           <File className="h-4 w-4 text-muted-foreground" />
                           <span className="truncate max-w-xs">
-                            {file.file_name || "Untitled"}
+                            {file.original_filename || file.label || "Untitled"}
                           </span>
-                          {file.file_type && (
+                          {file.galley_format && (
                             <Badge variant="secondary" className="text-xs">
-                              {file.file_type}
+                              {file.galley_format}
                             </Badge>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
-                          {file.uploaded_by_name || "Unknown"}
+                          {file.uploaded_by?.user?.first_name}{" "}
+                          {file.uploaded_by?.user?.last_name || "Unknown"}
                         </span>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
-                          {file.uploaded_at
-                            ? format(new Date(file.uploaded_at), "MMM d, yyyy")
+                          {file.created_at
+                            ? format(new Date(file.created_at), "MMM d, yyyy")
                             : "N/A"}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleView(file.file_url)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              handleDownload(file.file_url, file.file_name)
-                            }
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
+                          {file.file_url && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleView(file.file_url)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleDownload(
+                                    file.file_url,
+                                    file.original_filename
+                                  )
+                                }
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -237,9 +280,9 @@ export function ProductionReadyFiles({ assignmentId }) {
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Upload Production File</DialogTitle>
+            <DialogTitle>Upload Production File (Galley)</DialogTitle>
             <DialogDescription>
-              Upload galley files ready for production
+              Upload galley files ready for publication
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -249,11 +292,46 @@ export function ProductionReadyFiles({ assignmentId }) {
                 id="file"
                 type="file"
                 onChange={handleFileSelect}
-                accept=".pdf,.doc,.docx,.txt"
+                accept=".pdf,.html,.xml,.epub,.mobi"
               />
               <p className="text-xs text-muted-foreground">
-                Supported formats: PDF, DOC, DOCX, TXT
+                Supported formats: PDF, HTML, XML, EPUB, MOBI
               </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="label">Label *</Label>
+              <Input
+                id="label"
+                placeholder="e.g., PDF, Full Text HTML"
+                value={uploadData.label}
+                onChange={(e) =>
+                  setUploadData({ ...uploadData, label: e.target.value })
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Display label for this galley file
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="galley-format">Galley Format</Label>
+              <select
+                id="galley-format"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={uploadData.galley_format}
+                onChange={(e) =>
+                  setUploadData({
+                    ...uploadData,
+                    galley_format: e.target.value,
+                  })
+                }
+              >
+                <option value="PDF">PDF</option>
+                <option value="HTML">HTML</option>
+                <option value="XML">XML</option>
+                <option value="EPUB">EPUB</option>
+                <option value="MOBI">MOBI</option>
+                <option value="OTHER">Other</option>
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description (optional)</Label>
@@ -277,7 +355,11 @@ export function ProductionReadyFiles({ assignmentId }) {
             </Button>
             <Button
               onClick={handleUpload}
-              disabled={!uploadData.file || uploadMutation.isPending}
+              disabled={
+                !uploadData.file ||
+                !uploadData.label ||
+                uploadMutation.isPending
+              }
             >
               {uploadMutation.isPending ? (
                 <>

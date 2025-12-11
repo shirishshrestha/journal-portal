@@ -1,4 +1,5 @@
 export { ProductionReadyFiles } from "./ProductionReadyFiles";
+export { ProductionReadyFilesFromCopyediting } from "./ProductionReadyFilesFromCopyediting";
 export { ProductionGalleys } from "./ProductionGalleys";
 export { ProductionDiscussions } from "./ProductionDiscussions";
 export { ProductionParticipants } from "./ProductionParticipants";

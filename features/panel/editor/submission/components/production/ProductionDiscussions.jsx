@@ -22,20 +22,36 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { AddProductionDiscussionDialog } from "./AddProductionDiscussionDialog";
 import DataTable from "@/features/shared/components/DataTable";
-import { useProductionDiscussions } from "../../hooks";
+import {
+  useProductionDiscussions,
+  useProductionAssignments,
+} from "../../hooks";
 
-export function ProductionDiscussions({ assignmentId }) {
+export function ProductionDiscussions({ submissionId }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
+  // Get the production assignment for this submission
+  const { data: assignmentsData, isLoading: assignmentsLoading } =
+    useProductionAssignments({ submission: submissionId });
+
+  const assignment = assignmentsData?.results?.[0];
+  const assignmentId = assignment?.id;
+
   // Fetch discussions from API
   const {
-    data: discussions = [],
-    isLoading,
+    data: discussionsData,
+    isLoading: discussionsLoading,
     error,
-  } = useProductionDiscussions(assignmentId);
+  } = useProductionDiscussions(
+    { submission: submissionId },
+    { enabled: !!submissionId }
+  );
 
-  const filteredDiscussions = discussions?.results?.filter((discussion) =>
+  const discussions = discussionsData?.results || [];
+  const isLoading = assignmentsLoading || discussionsLoading;
+
+  const filteredDiscussions = discussions.filter((discussion) =>
     discussion.subject?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -167,6 +183,7 @@ export function ProductionDiscussions({ assignmentId }) {
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
         assignmentId={assignmentId}
+        submissionId={submissionId}
       />
     </>
   );
