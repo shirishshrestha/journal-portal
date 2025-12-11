@@ -10,3 +10,4 @@ export { DiscussionThreadDialog } from "./DiscussionThreadDialog";
 export { CreateCopyeditingDialog } from "./CreateCopyeditingDialog";
 export { AuthorConfirmCopyeditedFiles } from "./AuthorConfirmCopyeditedFiles";
 export { EditorCompleteCopyediting } from "./EditorCompleteCopyediting";
+export { CopyeditingAssignmentCard } from "./CopyeditingAssignmentCard";

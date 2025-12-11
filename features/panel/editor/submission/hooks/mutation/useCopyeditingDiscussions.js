@@ -127,7 +127,6 @@ export function useReopenCopyeditingDiscussion() {
   return useMutation({
     mutationFn: (discussionId) => reopenCopyeditingDiscussion(discussionId),
     onSuccess: (data) => {
-      toast.success("Discussion reopened");
       queryClient.invalidateQueries({
         queryKey: ["copyediting-discussions"],
       });

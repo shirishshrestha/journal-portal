@@ -17,16 +17,15 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
   const router = useRouter();
 
   // Fetch files for this assignment
-  const { data: filesData, isLoading } = useCopyeditingFiles(assignmentId);
-
-  // Filter for FINAL status files only
-  const finalFiles =
-    filesData?.results?.filter((file) => file.file_type === "FINAL") || [];
+  const { data: finalFiles, isLoading } = useCopyeditingFiles({
+    assignmentId,
+    file_type: "AUTHOR_FINAL",
+  });
 
   const handleViewFile = (fileId) => {
     // Navigate to read-only SuperDoc editor
     router.push(
-      `/author/submissions/${submissionId}/copyediting/${assignmentId}/editor/${fileId}?readOnly=true`
+      `/author/submissions/active/${submissionId}/copyediting/edit/${fileId}?readOnly=true`
     );
   };
 
@@ -92,21 +91,24 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
         <CardContent>
           <div className="space-y-4">
             {finalFiles.map((file) => (
-              <Card key={file.id} className="border-green-200 bg-green-50/50">
-                <CardContent className="pt-6">
+              <Card
+                key={file.id}
+                className="border rounded-lg hover:bg-muted/50 transition-colors"
+              >
+                <CardContent className="">
                   <div className="flex items-start justify-between gap-4">
                     {/* File info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <FileText className="h-5 w-5 text-green-600 shrink-0" />
-                        <h4 className="font-medium text-green-900 truncate">
+                        <FileText className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
+                        <h4 className="font-medium text-green-900 dark:text-green-100 truncate">
                           {file.label || "Untitled File"}
                         </h4>
                         <Badge
                           variant="outline"
-                          className="shrink-0 bg-green-100 text-green-800 border-green-200"
+                          className="shrink-0 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700"
                         >
-                          FINAL
+                          AUTHOR FINAL
                         </Badge>
                       </div>
 
@@ -143,11 +145,11 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
 
                       {/* Completion notes */}
                       {file.completion_notes && (
-                        <div className="mt-3 p-3 bg-green-100/50 rounded-md border border-green-200">
-                          <p className="text-sm font-medium text-green-900 mb-1">
+                        <div className="mt-3 p-3 bg-green-100/50 dark:bg-green-900/40 rounded-md border border-green-200 dark:border-green-700">
+                          <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">
                             Completion Notes:
                           </p>
-                          <p className="text-sm text-green-800">
+                          <p className="text-sm text-green-800 dark:text-green-300">
                             {file.completion_notes}
                           </p>
                         </div>
@@ -160,7 +162,7 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
                         size="sm"
                         variant="outline"
                         onClick={() => handleViewFile(file.id)}
-                        className="border-green-600 text-green-600 hover:bg-green-50"
+                        className="border-green-600 dark:border-green-700 text-green-600 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900"
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         View
@@ -170,7 +172,7 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
                         variant="outline"
                         onClick={() => handleDownloadFile(file)}
                         disabled={!file.file}
-                        className="border-green-600 text-green-600 hover:bg-green-50"
+                        className="border-green-600 dark:border-green-700 text-green-600 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900"
                       >
                         <Download className="h-4 w-4 mr-2" />
                         Download
@@ -183,14 +185,14 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
           </div>
 
           {/* Summary */}
-          <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="mt-6 p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-700">
             <div className="flex items-start gap-3">
-              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
+              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
               <div>
-                <p className="font-medium text-green-900">
+                <p className="font-medium text-green-900 dark:text-green-100">
                   Copyediting Complete
                 </p>
-                <p className="text-sm text-green-800 mt-1">
+                <p className="text-sm text-green-800 dark:text-green-300 mt-1">
                   All files have completed the copyediting process and are ready
                   for the next stage of production.
                 </p>

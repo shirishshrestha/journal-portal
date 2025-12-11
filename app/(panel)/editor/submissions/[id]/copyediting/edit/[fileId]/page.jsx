@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,10 +22,15 @@ import { toast } from "sonner";
 export default function CopyeditingEditPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+
   const submissionId = params?.id;
   const fileId = params?.fileId;
 
   const { data: user, isPending: isUserPending } = useGetMe();
+
+  // Get readOnly from URL query parameter (defaults to true for safety)
+  const isReadOnly = searchParams?.get("readOnly") !== "false";
 
   // Editor uses approve endpoint
   const approveMutation = useApproveCopyeditingFile();
@@ -38,7 +43,6 @@ export default function CopyeditingEditPage() {
     return new Promise((resolve, reject) => {
       approveMutation.mutate(fileId, {
         onSuccess: () => {
-          toast.success("Copyediting file approved");
           resolve();
         },
         onError: (error) => {
@@ -79,7 +83,7 @@ export default function CopyeditingEditPage() {
               first_name: user?.first_name,
               email: user?.email,
             }}
-            readOnly={false}
+            readOnly={isReadOnly}
             commentsReadOnly={false}
             className="border rounded-lg"
             goBack={`/editor/submissions/${submissionId}/copyediting`}

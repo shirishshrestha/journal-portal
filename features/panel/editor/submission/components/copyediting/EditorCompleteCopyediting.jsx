@@ -33,6 +33,7 @@ import {
   useCopyeditingFiles,
   useCompleteCopyeditingAssignment,
 } from "../../hooks";
+import { useRouter } from "next/navigation";
 
 /**
  * EditorCompleteCopyediting Component
@@ -40,9 +41,10 @@ import {
  * Allows editors to complete copyediting assignment after authors confirm files.
  * Shows file status breakdown and validates all files are confirmed before completion.
  */
-export function EditorCompleteCopyediting({ assignmentId }) {
+export function EditorCompleteCopyediting({ assignmentId, submissionId }) {
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
   const [completionNotes, setCompletionNotes] = useState("");
+  const router = useRouter();
 
   // Fetch all copyediting files to check status
   const {
@@ -176,15 +178,12 @@ export function EditorCompleteCopyediting({ assignmentId }) {
                 </div>
                 <Badge variant="secondary">{filesByStatus.draft.length}</Badge>
               </div>
-
-              {/* Copyedited Files (Awaiting Author) */}
+              {/* ...other status blocks unchanged... */}
               <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-2">
-                  <FileX className="h-5 w-5 text-orange-500" />
-                  <span className="text-sm font-medium">
-                    Awaiting Author Confirmation
-                  </span>
-                </div>
+                <FileX className="h-5 w-5 text-orange-500" />
+                <span className="text-sm font-medium">
+                  Awaiting Author Confirmation
+                </span>
                 <Badge
                   variant={
                     filesByStatus.copyedited.length > 0
@@ -195,13 +194,9 @@ export function EditorCompleteCopyediting({ assignmentId }) {
                   {filesByStatus.copyedited.length}
                 </Badge>
               </div>
-
-              {/* Author Confirmed Files */}
               <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  <span className="text-sm font-medium">Author Confirmed</span>
-                </div>
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <span className="text-sm font-medium">Author Confirmed</span>
                 <Badge
                   variant={
                     filesByStatus.authorFinal.length > 0
@@ -212,18 +207,92 @@ export function EditorCompleteCopyediting({ assignmentId }) {
                   {filesByStatus.authorFinal.length}
                 </Badge>
               </div>
-
-              {/* Final Files */}
               <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-blue-600" />
-                  <span className="text-sm font-medium">
-                    Final (Production)
-                  </span>
-                </div>
+                <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                <span className="text-sm font-medium">Final (Production)</span>
                 <Badge variant="secondary">{filesByStatus.final.length}</Badge>
               </div>
             </div>
+          </div>
+
+          {/* List of Files UI */}
+          <div className="space-y-3 mt-6">
+            <h3 className="font-semibold text-sm">Files</h3>
+            {filesData && filesData.length > 0 ? (
+              filesData.map((file) => (
+                <div
+                  key={file.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3"
+                >
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <FileCheck className="h-8 w-8 text-primary stroke-[1.5] shrink-0 mt-1" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium truncate">
+                          {file.original_filename}
+                        </p>
+                        {file.version && (
+                          <Badge variant="secondary" className="text-xs">
+                            v{file.version}
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs">
+                          {file.file_type_display || file.file_type}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mt-1">
+                        {file.file_size && (
+                          <>
+                            <span className="hidden sm:inline">•</span>
+                            <span>
+                              {(file.file_size / 1024 / 1024).toFixed(2)} MB
+                            </span>
+                          </>
+                        )}
+                        {file.created_at && (
+                          <>
+                            <span className="hidden sm:inline">•</span>
+                            <span>
+                              {new Date(file.created_at).toLocaleDateString()}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      {file.uploaded_by && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Uploaded by: {file.uploaded_by.user?.first_name}{" "}
+                          {file.uploaded_by.user?.last_name}
+                        </p>
+                      )}
+                      {file.description && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {file.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        // Navigate to SuperDoc editor page in read-only mode
+                        router.push(
+                          `/editor/submissions/${submissionId}/copyediting/edit/${file.id}?readOnly=true`
+                        );
+                      }}
+                      title="View in SuperDoc (Read-Only)"
+                    >
+                      <span className="hidden sm:inline">View</span>
+                    </Button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No files found.</p>
+              </div>
+            )}
           </div>
 
           {/* Completion Requirements */}

@@ -130,8 +130,17 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-karla!;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    @apply font-jost;
   }
 }
 
@@ -195,6 +204,7 @@ svg#freepik_stories-oops-404-error-with-a-broken-robot.animated
   animation: 1s 1 forwards cubic-bezier(0.36, -0.01, 0.5, 1.38) slideUp;
   animation-delay: 0s;
 }
+
 @keyframes slideRight {
   0% {
     opacity: 0;

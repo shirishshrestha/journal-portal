@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   Card,
@@ -11,26 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-
-import {
-  FileText,
-  Download,
-  Upload,
-  CheckCircle,
-  Loader2,
-  Edit,
-} from "lucide-react";
+import { FileText, Download, CheckCircle, Loader2, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { useApproveCopyeditingFile, useCopyEditedFiles } from "../../hooks";
 
@@ -192,7 +172,7 @@ export function CopyeditedFiles({
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
-                      {!readOnly && (
+                      {!readOnly && file.file_type !== "COPYEDITED" && (
                         <Button
                           variant="ghost"
                           size="sm"

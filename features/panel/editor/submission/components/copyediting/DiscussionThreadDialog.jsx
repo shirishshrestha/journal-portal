@@ -36,6 +36,7 @@ import {
   useReopenCopyeditingDiscussion,
   useCopyeditingDiscussion,
 } from "../../hooks";
+import { useCurrentRole } from "@/features/shared";
 
 // Reply validation schema
 const replySchema = z.object({
@@ -52,10 +53,13 @@ export function DiscussionThreadDialog({
   assignmentId,
 }) {
   // Fetch discussion with messages
-  const { data: discussionData, isLoading } = useCopyeditingDiscussion(
+  const { data: discussionData, isPending } = useCopyeditingDiscussion(
     discussion?.id,
     { enabled: isOpen && !!discussion?.id }
   );
+
+  const { currentRole } = useCurrentRole();
+  console.log(currentRole);
 
   // Mutations
   const addMessageMutation = useAddCopyeditingMessage(discussion?.id);
@@ -106,15 +110,18 @@ export function DiscussionThreadDialog({
       onSuccess: () => {
         // Keep dialog open to continue discussion
         toast.success("Discussion reopened successfully");
+        onClose();
       },
     });
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      OPEN: "bg-blue-100 text-blue-800 border-blue-200",
-      RESOLVED: "bg-green-100 text-green-800 border-green-200",
-      CLOSED: "bg-gray-100 text-gray-800 border-gray-200",
+      OPEN: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700",
+      RESOLVED:
+        "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900 dark:text-emerald-200 dark:border-emerald-700",
+      CLOSED:
+        "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-200 dark:border-zinc-700",
     };
     return colors[status] || colors.OPEN;
   };
@@ -135,7 +142,7 @@ export function DiscussionThreadDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+      <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -164,7 +171,7 @@ export function DiscussionThreadDialog({
         {/* Thread Messages */}
         <ScrollArea className="flex-1 max-h-[400px] pr-4">
           <div className="space-y-4">
-            {isLoading ? (
+            {isPending ? (
               <div className="text-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
               </div>
@@ -238,7 +245,7 @@ export function DiscussionThreadDialog({
 
               <DialogFooter className="flex items-center justify-between gap-2">
                 <div className="flex-1">
-                  {discussion.status === "OPEN" && (
+                  {discussion.status === "OPEN" && currentRole === "EDITOR" && (
                     <Button
                       type="button"
                       variant="outline"
@@ -254,24 +261,6 @@ export function DiscussionThreadDialog({
                         <CheckCircle className="h-4 w-4 mr-2" />
                       )}
                       Mark as Resolved
-                    </Button>
-                  )}
-                  {discussion.status === "RESOLVED" && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleReopen}
-                      disabled={
-                        reopenMutation.isPending || addMessageMutation.isPending
-                      }
-                      size="sm"
-                    >
-                      {reopenMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <CheckCircle className="h-4 w-4 mr-2\" />
-                      )}
-                      Reopen Discussion
                     </Button>
                   )}
                 </div>
@@ -299,10 +288,29 @@ export function DiscussionThreadDialog({
         )}
 
         {discussion.status !== "OPEN" && (
-          <DialogFooter>
-            <p className="text-sm text-muted-foreground">
+          <DialogFooter className="items-center gap-4 ">
+            <p className="text-sm text-muted-foreground mb-0">
               This discussion has been {discussion.status.toLowerCase()}.
             </p>
+            {discussion.status === "CLOSED" && currentRole === "EDITOR" && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleReopen}
+                disabled={
+                  reopenMutation.isPending || addMessageMutation.isPending
+                }
+                size="sm"
+              >
+                {reopenMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 mr-2\" />
+                )}
+                Reopen Discussion
+              </Button>
+            )}
+
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>
