@@ -59,7 +59,6 @@ export default function AuthorCopyeditingFileEditorPage() {
         { fileId, data: {} },
         {
           onSuccess: () => {
-            toast.success("File confirmed as final");
             resolve();
           },
           onError: (error) => {

@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   HelpCircle,
-  UserPlus,
   MessageSquare,
   FileText,
   Play,
@@ -30,20 +29,20 @@ import {
   useGetEditorSubmissionById,
   useStartCopyeditingAssignment,
 } from "@/features";
-import { CopyeditingDraftFiles } from "@/features/panel/editor/submission/components/copyediting/CopyeditingDraftFiles";
-import { CopyeditedFiles } from "@/features/panel/editor/submission/components/copyediting/CopyeditedFiles";
-import { AssignCopyeditorDialog } from "@/features/panel/editor/submission/components/copyediting/AssignCopyeditorDialog";
-import { CopyeditingParticipants } from "@/features/panel/editor/submission/components/copyediting/CopyeditingParticipants";
-import { CopyeditingDiscussions } from "@/features/panel/editor/submission/components";
-import { CopyeditingAssignmentCard } from "@/features/panel/editor/submission/components/copyediting/CopyeditingAssignmentCard";
-import { EditorCompleteCopyediting } from "@/features/panel/editor/submission/components/copyediting/EditorCompleteCopyediting";
+import {
+  CopyeditedFiles,
+  CopyeditingAssignmentCard,
+  CopyeditingDiscussions,
+  CopyeditingDraftFiles,
+  CopyeditingParticipants,
+  EditorCompleteCopyediting,
+} from "@/features/panel/editor/submission/components";
 import { Card } from "@/components/ui/card";
 
 export default function CopyeditingWorkflowPage() {
   const params = useParams();
   const router = useRouter();
   const submissionId = params?.id;
-  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
 
   // Fetch submission details
   const {

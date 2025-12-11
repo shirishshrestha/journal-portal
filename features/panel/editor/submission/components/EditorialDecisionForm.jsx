@@ -153,7 +153,13 @@ export function EditorialDecisionForm({
       )}
 
       {/* Decision Form */}
-      {submission?.status !== "ACCEPTED" && (
+      {![
+        "ACCEPTED",
+        "COPYEDITING",
+        "PRODUCTION",
+        "PUBLISHED",
+        "REVISED",
+      ].includes(submission?.status) && (
         <Card>
           <CardHeader>
             <CardTitle>Make Editorial Decision</CardTitle>

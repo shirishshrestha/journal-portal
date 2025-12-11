@@ -79,9 +79,6 @@ export function useApproveCopyeditingFile() {
       queryClient.invalidateQueries({
         queryKey: ["copyediting-files"],
       });
-      queryClient.invalidateQueries({
-        queryKey: ["copyediting-file"],
-      });
     },
     onError: (error) => {
       const message =
@@ -131,10 +128,10 @@ export function useConfirmFileFinal() {
     onSuccess: (data) => {
       toast.success("File confirmed as final successfully");
       queryClient.invalidateQueries({
-        queryKey: ["copyediting-files"],
+        queryKey: ["copyediting-files", data.file.id],
       });
       queryClient.invalidateQueries({
-        queryKey: ["copyediting-file", data.file?.id],
+        queryKey: ["copyediting-assignments"],
       });
     },
     onError: (error) => {

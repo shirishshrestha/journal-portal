@@ -39,9 +39,11 @@ export function CopyeditingDiscussions({ assignmentId }) {
 
   const getStatusColor = (status) => {
     const colors = {
-      OPEN: "bg-blue-100 text-blue-800 border-blue-200",
-      RESOLVED: "bg-green-100 text-green-800 border-green-200",
-      CLOSED: "bg-gray-100 text-gray-800 border-gray-200",
+      OPEN: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700",
+      RESOLVED:
+        "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900 dark:text-emerald-200 dark:border-emerald-700",
+      CLOSED:
+        "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-200 dark:border-zinc-700",
     };
     return colors[status] || colors.OPEN;
   };

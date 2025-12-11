@@ -54,10 +54,10 @@ export function AuthorConfirmCopyeditedFiles({ submissionId, assignmentId }) {
   const { data: confirmedFilesData, isPending: isConfirmedLoading } =
     useCopyeditingFiles(
       {
-        submission: submissionId,
+        submission: assignmentId,
         file_type: "AUTHOR_FINAL",
       },
-      { enabled: !!submissionId }
+      { enabled: !!assignmentId }
     );
 
   const files = filesData?.results || [];
@@ -297,18 +297,6 @@ export function AuthorConfirmCopyeditedFiles({ submissionId, assignmentId }) {
               You are about to confirm this file as final. Please review it
               carefully before confirming.
             </p>
-            <div className="space-y-2 text-left">
-              <label className="text-sm font-medium">
-                Confirmation Notes (Optional)
-              </label>
-              <Textarea
-                placeholder="Add any notes or feedback about your review..."
-                value={confirmationNotes}
-                onChange={(e) => setConfirmationNotes(e.target.value)}
-                rows={3}
-                disabled={confirmMutation.isPending}
-              />
-            </div>
           </>
         }
         confirmText="Confirm Final"
