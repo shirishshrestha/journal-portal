@@ -30,7 +30,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -162,6 +161,64 @@ export function ProductionParticipants({ submissionId }) {
     );
   }
 
+  // DataTable columns definition
+  const columns = [
+    {
+      key: "name",
+      header: "Name",
+      render: (row) => (
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-muted-foreground" />
+          <span>
+            {row.user?.first_name} {row.user?.last_name}
+          </span>
+        </div>
+      ),
+      cellClassName: "font-medium",
+    },
+    {
+      key: "email",
+      header: "Email",
+      render: (row) => (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Mail className="h-4 w-4" />
+          <span>{row.user?.email || "N/A"}</span>
+        </div>
+      ),
+    },
+    {
+      key: "role",
+      header: "Role",
+      render: (row) => (
+        <Badge variant="outline" className={getRoleBadgeColor(row.role)}>
+          {getRoleDisplay(row.role)}
+        </Badge>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      render: (row) =>
+        canRemove(row) ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleRemoveParticipant(row)}
+            disabled={removeMutation.isPending}
+          >
+            {removeMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4 text-destructive" />
+            )}
+          </Button>
+        ) : (
+          <span className="text-xs text-muted-foreground">Core role</span>
+        ),
+    },
+  ];
+
   return (
     <>
       <Card>
@@ -185,103 +242,19 @@ export function ProductionParticipants({ submissionId }) {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : participants.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Users className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
-                No participants assigned
-              </h3>
-              <p className="text-sm text-muted-foreground max-w-md">
-                Assign additional participants to help with production workflow.
-              </p>
-              <Button className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add First Participant
-              </Button>
-            </div>
-          ) : (
-            <div className="border rounded-lg">
-              <DataTable
-                data={participants}
-                columns={[
-                  {
-                    key: "name",
-                    header: "Name",
-                    render: (row) => (
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-muted-foreground" />
-                        <span>
-                          {row.user?.first_name} {row.user?.last_name}
-                        </span>
-                      </div>
-                    ),
-                    cellClassName: "font-medium",
-                  },
-                  {
-                    key: "email",
-                    header: "Email",
-                    render: (row) => (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Mail className="h-4 w-4" />
-                        <span>{row.user?.email || "N/A"}</span>
-                      </div>
-                    ),
-                  },
-                  {
-                    key: "role",
-                    header: "Role",
-                    render: (row) => (
-                      <Badge
-                        variant="outline"
-                        className={getRoleBadgeColor(row.role)}
-                      >
-                        {getRoleDisplay(row.role)}
-                      </Badge>
-                    ),
-                  },
-                  {
-                    key: "actions",
-                    header: "Actions",
-                    align: "right",
-                    render: (row) =>
-                      canRemove(row) ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveParticipant(row)}
-                          disabled={removeMutation.isPending}
-                        >
-                          {removeMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          )}
-                        </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">
-                          Core role
-                        </span>
-                      ),
-                  },
-                ]}
-                emptyMessage="No participants assigned"
-                isPending={isLoading}
-                error={error}
-                errorMessage="Error loading participants"
-                hoverable={true}
-                tableClassName="bg-card border"
-              />
-            </div>
-          )}
-        </CardContent>
       </Card>
+
+      {/* DataTable for Participants */}
+      <DataTable
+        data={participants}
+        columns={columns}
+        emptyMessage="Assign additional participants to help with production workflow."
+        isPending={isLoading}
+        error={error}
+        errorMessage="Error loading participants"
+        hoverable={true}
+        tableClassName="bg-card border"
+      />
 
       {/* Add Participant Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

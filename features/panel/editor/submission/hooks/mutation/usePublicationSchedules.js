@@ -8,6 +8,37 @@ import {
 } from "../../api";
 
 /**
+ * Hook to create/schedule a publication
+ * Alias for useSchedulePublication for consistency with naming conventions
+ */
+export function useCreatePublicationSchedule() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data) => schedulePublication(data),
+    onSuccess: (data) => {
+      toast.success("Publication scheduled successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["publication-schedules"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["publication-schedules", data.submission],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["editor-submission", data.submission],
+      });
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.detail ||
+        error?.message ||
+        "Failed to schedule publication";
+      toast.error(message);
+    },
+  });
+}
+
+/**
  * Hook to schedule a publication
  */
 export function useSchedulePublication() {
