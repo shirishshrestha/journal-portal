@@ -31,6 +31,7 @@ export function useCreatePublicationSchedule() {
     onError: (error) => {
       const message =
         error?.response?.data?.detail ||
+        error?.response?.data?.submission ||
         error?.message ||
         "Failed to schedule publication";
       toast.error(message);

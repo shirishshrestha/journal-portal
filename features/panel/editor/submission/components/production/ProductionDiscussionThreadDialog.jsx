@@ -83,6 +83,7 @@ export function ProductionDiscussionThreadDialog({
       {
         discussionId: discussion?.id,
         data: {
+          discussion: discussion?.id,
           message: data.message,
         },
       },
