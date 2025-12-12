@@ -20,10 +20,10 @@ export function useCreateProductionDiscussion() {
     onSuccess: (data) => {
       toast.success("Discussion created successfully");
       queryClient.invalidateQueries({
-        queryKey: ["production-discussions"],
+        queryKey: ["production-assignment-discussions"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["production-discussions", data.submission],
+        queryKey: ["production-assignment-discussions", data.assignment],
       });
     },
     onError: (error) => {
@@ -48,7 +48,7 @@ export function useUpdateProductionDiscussion() {
     onSuccess: (data) => {
       toast.success("Discussion updated successfully");
       queryClient.invalidateQueries({
-        queryKey: ["production-discussions"],
+        queryKey: ["production-assignment-discussions"],
       });
       queryClient.invalidateQueries({
         queryKey: ["production-discussion", data.id],
@@ -76,7 +76,7 @@ export function useAddProductionMessage() {
     onSuccess: (data, variables) => {
       toast.success("Message added successfully");
       queryClient.invalidateQueries({
-        queryKey: ["production-discussions"],
+        queryKey: ["production-assignment-discussions"],
       });
       queryClient.invalidateQueries({
         queryKey: ["production-discussion", variables.discussionId],
@@ -103,7 +103,7 @@ export function useCloseProductionDiscussion() {
     onSuccess: (data) => {
       toast.success("Discussion closed");
       queryClient.invalidateQueries({
-        queryKey: ["production-discussions"],
+        queryKey: ["production-assignment-discussions"],
       });
       queryClient.invalidateQueries({
         queryKey: ["production-discussion", data.id],
@@ -130,7 +130,7 @@ export function useReopenProductionDiscussion() {
     onSuccess: (data) => {
       toast.success("Discussion reopened");
       queryClient.invalidateQueries({
-        queryKey: ["production-discussions"],
+        queryKey: ["production-assignment-discussions"],
       });
       queryClient.invalidateQueries({
         queryKey: ["production-discussion", data.id],
@@ -157,7 +157,7 @@ export function useDeleteProductionDiscussion() {
     onSuccess: () => {
       toast.success("Discussion deleted successfully");
       queryClient.invalidateQueries({
-        queryKey: ["production-discussions"],
+        queryKey: ["production-assignment-discussions"],
       });
     },
     onError: (error) => {

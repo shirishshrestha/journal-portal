@@ -1,17 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import { format } from "date-fns";
-import {
-  MessageSquare,
-  Plus,
-  Search,
-  CheckCircle2,
-  XCircle,
-  RotateCcw,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -19,19 +8,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { MessageSquare, Plus, Reply, User, Loader2 } from "lucide-react";
+import { format } from "date-fns";
 import { AddProductionDiscussionDialog } from "./AddProductionDiscussionDialog";
-import DataTable from "@/features/shared/components/DataTable";
+import { ProductionDiscussionThreadDialog } from "./ProductionDiscussionThreadDialog";
 import {
-  useProductionDiscussions,
   useProductionAssignments,
-  useReopenProductionDiscussion,
+  useProductionAssignmentDiscussions,
 } from "../../hooks";
 
+/**
+ * Component to display and manage production discussions
+ * Shows discussion threads between production assistants, editors, and authors
+ */
 export function ProductionDiscussions({ submissionId }) {
-  const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [selectedDiscussion, setSelectedDiscussion] = useState(null);
+  const [isThreadDialogOpen, setIsThreadDialogOpen] = useState(false);
 
   // Get the production assignment for this submission
   const { data: assignmentsData, isLoading: assignmentsLoading } =
@@ -42,118 +37,29 @@ export function ProductionDiscussions({ submissionId }) {
 
   // Fetch discussions from API
   const {
-    data: discussionsData,
-    isLoading: discussionsLoading,
+    data: discussions = [],
+    isPending: discussionsLoading,
     error,
-  } = useProductionDiscussions(
-    { submission: submissionId },
-    { enabled: !!submissionId }
-  );
+  } = useProductionAssignmentDiscussions(assignmentId, {
+    enabled: !!assignmentId,
+  });
 
-  const discussions = discussionsData?.results || [];
   const isLoading = assignmentsLoading || discussionsLoading;
 
-  // Reopen discussion mutation
-  const reopenMutation = useReopenProductionDiscussion();
-
-  const filteredDiscussions = discussions.filter((discussion) =>
-    discussion.subject?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleReopenDiscussion = (discussionId) => {
-    reopenMutation.mutate(discussionId);
+  const handleViewThread = (discussion) => {
+    setSelectedDiscussion(discussion);
+    setIsThreadDialogOpen(true);
   };
 
-  const columns = [
-    {
-      key: "subject",
-      header: "Name",
-      cellClassName: "font-medium",
-      render: (row) => (
-        <div className="flex items-center gap-2">
-          <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          <span className="truncate max-w-xs">
-            {row.subject || "Untitled Discussion"}
-          </span>
-        </div>
-      ),
-    },
-    {
-      key: "created_by",
-      header: "From",
-      render: (row) => (
-        <span className="text-sm text-muted-foreground">
-          {row.created_by?.user?.first_name} {row.created_by?.user?.last_name}
-        </span>
-      ),
-    },
-    {
-      key: "updated_at",
-      header: "Last Reply",
-      render: (row) => (
-        <span className="text-sm text-muted-foreground">
-          {row.updated_at
-            ? format(new Date(row.updated_at), "MMM d, yyyy")
-            : "No replies"}
-        </span>
-      ),
-    },
-    {
-      key: "messages",
-      header: "Replies",
-      align: "center",
-      render: (row) => (
-        <Badge variant="secondary">{row.messages?.length || 0}</Badge>
-      ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      align: "center",
-      render: (row) => (
-        <Badge variant={row.status === "CLOSED" ? "secondary" : "default"}>
-          {row.status_display || row.status}
-        </Badge>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      align: "right",
-      render: (row) => (
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleOpenDiscussion(row.id);
-            }}
-          >
-            View
-          </Button>
-          {row.status === "CLOSED" && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleReopenDiscussion(row.id);
-              }}
-              disabled={reopenMutation.isPending}
-            >
-              <RotateCcw className="h-4 w-4 mr-1" />
-              Reopen
-            </Button>
-          )}
-        </div>
-      ),
-    },
-  ];
-
-  const handleOpenDiscussion = (discussionId) => {
-    // Navigate to discussion detail or open modal
-    console.log("Open discussion:", discussionId);
+  const getStatusColor = (status) => {
+    const colors = {
+      OPEN: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700",
+      RESOLVED:
+        "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900 dark:text-emerald-200 dark:border-emerald-700",
+      CLOSED:
+        "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-200 dark:border-zinc-700",
+    };
+    return colors[status] || colors.OPEN;
   };
 
   return (
@@ -163,53 +69,159 @@ export function ProductionDiscussions({ submissionId }) {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Production Discussions</CardTitle>
-              <CardDescription className="mt-1">
-                Communicate with production assistants about the manuscript
+              <CardDescription>
+                Communication threads between production assistants, editors,
+                and authors
               </CardDescription>
             </div>
             <Button
-              variant="default"
-              size="sm"
               onClick={() => setIsAddDialogOpen(true)}
+              disabled={!assignmentId}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Discussion
+              Start Discussion
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Search Bar */}
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search discussions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
+        <CardContent>
+          {isLoading ? (
+            <div className="text-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+              <p className="text-sm text-muted-foreground mt-2">
+                Loading discussions...
+              </p>
             </div>
-          </div>
-          <DataTable
-            data={filteredDiscussions}
-            columns={columns}
-            emptyMessage={
-              searchQuery
-                ? "No discussions match your search criteria."
-                : "No discussions yet. Start a discussion to communicate with production assistants about this manuscript."
-            }
-            isPending={isLoading}
-            hoverable={true}
-            tableClassName="bg-card border flex justify-center"
-          />
+          ) : error ? (
+            <div className="text-center py-8 text-destructive">
+              <p>Error loading discussions</p>
+            </div>
+          ) : !assignmentId ? (
+            <div className="text-center py-12 border-2 border-dashed rounded-lg">
+              <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="font-semibold mb-2">No Production Assignment</h3>
+              <p className="text-sm text-muted-foreground">
+                Assign a production assistant to enable discussions
+              </p>
+            </div>
+          ) : discussions?.length === 0 ? (
+            <div className="text-center py-12 border-2 border-dashed rounded-lg">
+              <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="font-semibold mb-2">No discussions yet</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Start a discussion to communicate with the production team
+              </p>
+              <Button
+                onClick={() => setIsAddDialogOpen(true)}
+                variant="outline"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Start First Discussion
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {discussions?.map((discussion) => (
+                <div
+                  key={discussion.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3 cursor-pointer"
+                  onClick={() => handleViewThread(discussion)}
+                >
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <MessageSquare className="h-5 w-5 text-primary shrink-0 mt-1" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2 mb-1">
+                        <p className="font-medium flex-1">
+                          {discussion.subject || "Untitled Discussion"}
+                        </p>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs shrink-0 ${getStatusColor(
+                            discussion.status || "OPEN"
+                          )}`}
+                        >
+                          {discussion.status_display ||
+                            discussion.status ||
+                            "OPEN"}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          From: {discussion.started_by?.user?.first_name}{" "}
+                          {discussion.started_by?.user?.last_name}
+                        </span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="flex items-center gap-1">
+                          <Reply className="h-3 w-3" />
+                          {discussion.message_count || 0}{" "}
+                          {(discussion.message_count || 0) === 1
+                            ? "reply"
+                            : "replies"}
+                        </span>
+                        {discussion.updated_at && (
+                          <>
+                            <span className="hidden sm:inline">•</span>
+                            <span>
+                              Last reply:{" "}
+                              {format(
+                                new Date(discussion.updated_at),
+                                "MMM d, yyyy"
+                              )}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {discussions?.length > 0 && (
+            <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-dashed">
+              <h4 className="font-medium text-sm mb-2">Discussion Tips:</h4>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>
+                  Click on any discussion to view the full thread and reply
+                </li>
+                <li>
+                  Use discussions to clarify galley formats and publication
+                  details
+                </li>
+                <li>
+                  Mark discussions as resolved once the issue is addressed
+                </li>
+                <li>
+                  Tag specific participants to notify them about important
+                  messages
+                </li>
+              </ul>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Add Discussion Dialog */}
       <AddProductionDiscussionDialog
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
         assignmentId={assignmentId}
         submissionId={submissionId}
       />
+
+      {/* Discussion Thread Dialog */}
+      {selectedDiscussion && (
+        <ProductionDiscussionThreadDialog
+          isOpen={isThreadDialogOpen}
+          onClose={() => {
+            setIsThreadDialogOpen(false);
+            setSelectedDiscussion(null);
+          }}
+          discussion={selectedDiscussion}
+          assignmentId={assignmentId}
+        />
+      )}
     </>
   );
 }

@@ -1,18 +1,5 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  Users,
-  UserPlus,
-  Mail,
-  Shield,
-  Trash2,
-  Loader2,
-  Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -20,16 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import DataTable from "@/features/shared/components/DataTable";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, Mail, Trash2, UserPlus, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,19 +23,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
 import {
   useProductionAssignmentParticipants,
-  useAddProductionParticipant,
-  useRemoveProductionParticipant,
   useProductionAssignments,
+  useRemoveProductionParticipant,
 } from "../../hooks";
+import { AddProductionParticipantDialog } from "./AddProductionParticipantDialog";
 
-export function ProductionParticipants({ submissionId }) {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [participantToRemove, setParticipantToRemove] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProfileId, setSelectedProfileId] = useState("");
+const EmptyState = ({ icon: Icon, title, description }) => (
+  <div className="text-center py-8 border-2 border-dashed rounded-lg">
+    <Icon className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+    <h4 className="font-medium mb-1">{title}</h4>
+    <p className="text-sm text-muted-foreground">{description}</p>
+  </div>
+);
+
+/**
+ * Component to display and manage production participants
+ * Shows assigned production assistants, authors, and editors
+ */
+export function ProductionParticipants({ submissionId, isAuthorView = false }) {
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [userToRemove, setUserToRemove] = useState(null);
+  const [isAddParticipantOpen, setIsAddParticipantOpen] = useState(false);
 
   // Get the production assignment for this submission
   const { data: assignmentsData, isLoading: assignmentsLoading } =
@@ -64,277 +57,191 @@ export function ProductionParticipants({ submissionId }) {
   // Fetch participants from API
   const {
     data: participants = [],
-    isLoading: participantsLoading,
+    isPending,
     error,
   } = useProductionAssignmentParticipants(assignmentId, {
     enabled: !!assignmentId,
   });
 
   // Mutations
-  const addMutation = useAddProductionParticipant();
   const removeMutation = useRemoveProductionParticipant();
 
-  const isLoading = assignmentsLoading || participantsLoading;
-
-  const handleAddParticipant = () => {
-    if (!selectedProfileId) {
-      toast.error("Please select a user");
-      return;
-    }
-
-    addMutation.mutate(
-      { assignmentId, profile_id: selectedProfileId },
-      {
-        onSuccess: () => {
-          setIsAddDialogOpen(false);
-          setSelectedProfileId("");
-          setSearchQuery("");
-        },
-      }
-    );
+  const handleRemoveClick = (user) => {
+    setUserToRemove(user);
+    setIsRemoveDialogOpen(true);
   };
 
-  const handleRemoveParticipant = (participant) => {
-    setParticipantToRemove(participant);
-  };
-
-  const confirmRemoveParticipant = () => {
-    if (!participantToRemove) return;
+  const handleRemove = async () => {
+    if (!userToRemove) return;
 
     removeMutation.mutate(
-      { assignmentId, profile_id: participantToRemove.id },
+      { assignmentId, profile_id: userToRemove.id },
       {
         onSuccess: () => {
-          setParticipantToRemove(null);
+          setIsRemoveDialogOpen(false);
+          setUserToRemove(null);
         },
       }
     );
   };
 
-  const getRoleBadgeColor = (role) => {
-    const colors = {
-      production_assistant:
-        "bg-purple-100 dark:bg-purple-600 text-purple-800 dark:text-primary-foreground border-purple-200 dark:border-purple-700",
-      assigned_by:
-        "bg-blue-100 dark:bg-blue-600 text-blue-700 dark:text-primary-foreground border-blue-200 dark:border-blue-700",
-      author:
-        "bg-green-100 dark:bg-green-600 text-green-700 dark:text-primary-foreground border-green-200 dark:border-green-700",
-      participant:
-        "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-primary-foreground border-gray-200 dark:border-gray-700",
-    };
+  const ParticipantCard = ({ user, canRemove = false }) => {
+    const initials =
+      (user.user?.first_name?.[0] || "") + (user.user?.last_name?.[0] || "") ||
+      user.user_name?.[0] ||
+      "?";
+
     return (
-      colors[role] ||
-      "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-primary-foreground border-gray-200 dark:border-gray-700"
+      <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage src={user.avatar} alt={user.user_name} />
+            <AvatarFallback>{initials.toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="font-medium">
+                {user.user?.first_name} {user.user?.last_name || user.user_name}
+              </p>
+              {user.role && (
+                <Badge variant="secondary" className="text-xs">
+                  {user.role_display || user.role.replace("_", " ")}
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Mail className="h-3 w-3" />
+              {user.user?.email || user.user_email || "N/A"}
+            </div>
+            {user.assigned_at && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Assigned: {new Date(user.assigned_at).toLocaleDateString()}
+              </p>
+            )}
+          </div>
+        </div>
+        {canRemove && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleRemoveClick(user)}
+            disabled={removeMutation.isPending}
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        )}
+      </div>
     );
   };
 
-  const getRoleDisplay = (role) => {
-    const displays = {
-      production_assistant: "Production Assistant",
-      assigned_by: "Editor (Assigned By)",
-      author: "Author",
-      participant: "Participant",
-    };
-    return displays[role] || role;
-  };
-
-  const canRemove = (participant) => {
+  const canRemoveParticipant = (participant) => {
     // Can only remove participants, not core roles
     return participant.role === "participant";
   };
 
-  if (!assignmentId && !assignmentsLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Production Participants</CardTitle>
-          <CardDescription>
-            No production assignment found for this submission
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Please create a production assignment first.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // DataTable columns definition
-  const columns = [
-    {
-      key: "name",
-      header: "Name",
-      render: (row) => (
-        <div className="flex items-center gap-2">
-          <Shield className="h-4 w-4 text-muted-foreground" />
-          <span>
-            {row.user?.first_name} {row.user?.last_name}
-          </span>
-        </div>
-      ),
-      cellClassName: "font-medium",
-    },
-    {
-      key: "email",
-      header: "Email",
-      render: (row) => (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Mail className="h-4 w-4" />
-          <span>{row.user?.email || "N/A"}</span>
-        </div>
-      ),
-    },
-    {
-      key: "role",
-      header: "Role",
-      render: (row) => (
-        <Badge variant="outline" className={getRoleBadgeColor(row.role)}>
-          {getRoleDisplay(row.role)}
-        </Badge>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      align: "right",
-      render: (row) =>
-        canRemove(row) ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleRemoveParticipant(row)}
-            disabled={removeMutation.isPending}
-          >
-            {removeMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Trash2 className="h-4 w-4 text-destructive" />
-            )}
-          </Button>
-        ) : (
-          <span className="text-xs text-muted-foreground">Core role</span>
-        ),
-    },
-  ];
-
   return (
     <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Production Participants</CardTitle>
-              <CardDescription className="mt-1">
-                Production assistants and additional collaborators assigned to
-                this submission
-              </CardDescription>
-            </div>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => setIsAddDialogOpen(true)}
-              disabled={!assignmentId}
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              Add Participant
-            </Button>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* DataTable for Participants */}
-      <DataTable
-        data={participants}
-        columns={columns}
-        emptyMessage="Assign additional participants to help with production workflow."
-        isPending={isLoading}
-        error={error}
-        errorMessage="Error loading participants"
-        hoverable={true}
-        tableClassName="bg-card border"
-      />
-
-      {/* Add Participant Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Participant</DialogTitle>
-            <DialogDescription>
-              Add an additional participant to the production workflow.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="profile-id">Profile ID</Label>
-              <Input
-                id="profile-id"
-                placeholder="Enter profile UUID"
-                value={selectedProfileId}
-                onChange={(e) => setSelectedProfileId(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter the UUID of the user profile to add as a participant
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsAddDialogOpen(false)}
-              disabled={addMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleAddParticipant}
-              disabled={addMutation.isPending || !selectedProfileId}
-            >
-              {addMutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      <div className="space-y-6">
+        {/* Participants Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle>Participants</CardTitle>
+                <CardDescription>
+                  All users involved in the production workflow
+                </CardDescription>
+              </div>
+              {assignmentId && !isAuthorView && (
+                <Button
+                  size="sm"
+                  onClick={() => setIsAddParticipantOpen(true)}
+                  className="gap-2"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Add Participant
+                </Button>
               )}
-              Add Participant
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isPending || assignmentsLoading ? (
+              <div className="text-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                <p className="text-sm text-muted-foreground mt-2">
+                  Loading participants...
+                </p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-destructive">
+                <p>Error loading participants</p>
+              </div>
+            ) : !assignmentId ? (
+              <EmptyState
+                icon={UserPlus}
+                title="No Production Assignment"
+                description="Assign a production assistant to enable participant management"
+              />
+            ) : participants.length === 0 ? (
+              <EmptyState
+                icon={UserPlus}
+                title="No participants assigned"
+                description="Participants will appear here once assigned to the production workflow"
+              />
+            ) : (
+              <div className="space-y-3">
+                {participants?.map((participant, index) => (
+                  <ParticipantCard
+                    key={`${participant.id}-${index}`}
+                    user={participant}
+                    canRemove={
+                      canRemoveParticipant(participant) && !isAuthorView
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Remove Participant Confirmation */}
+      {/* Remove Confirmation Dialog */}
       <AlertDialog
-        open={!!participantToRemove}
-        onOpenChange={() => setParticipantToRemove(null)}
+        open={isRemoveDialogOpen}
+        onOpenChange={setIsRemoveDialogOpen}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Participant</AlertDialogTitle>
+            <AlertDialogTitle>Remove Participant?</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to remove{" "}
               <strong>
-                {participantToRemove?.user?.first_name}{" "}
-                {participantToRemove?.user?.last_name}
+                {userToRemove?.user?.first_name} {userToRemove?.user?.last_name}
               </strong>{" "}
-              from the production workflow? They will no longer have access to
+              from this production workflow? They will lose access to the
               production files and discussions.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={removeMutation.isPending}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={confirmRemoveParticipant}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={removeMutation.isPending}
+              onClick={handleRemove}
+              className="bg-destructive hover:bg-destructive/90"
             >
-              {removeMutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
               Remove
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add Participant Dialog */}
+      {assignmentId && (
+        <AddProductionParticipantDialog
+          isOpen={isAddParticipantOpen}
+          onClose={() => setIsAddParticipantOpen(false)}
+          assignmentId={assignmentId}
+        />
+      )}
     </>
   );
 }

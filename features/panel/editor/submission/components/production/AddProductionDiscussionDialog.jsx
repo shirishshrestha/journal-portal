@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,48 +21,34 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/features/shared/components/RichTextEditor";
 import { stripHtmlTags } from "@/features/shared/utils";
 import { useCreateProductionDiscussion } from "../../hooks";
+import { addProductionMessage } from "../../api";
 
 // Form validation schema
 const productionDiscussionSchema = z.object({
-  participants: z.array(z.string()).min(1, "At least one participant required"),
   subject: z.string().min(3, "Subject must be at least 3 characters"),
   message: z.string().min(10, "Message must be at least 10 characters"),
-  attachedFiles: z.array(z.any()).optional(),
 });
 
 export function AddProductionDiscussionDialog({
   isOpen,
   onClose,
   assignmentId,
+  submissionId,
 }) {
-  const queryClient = useQueryClient();
-  const createMutation = useCreateProductionDiscussion(assignmentId);
+  const createMutation = useCreateProductionDiscussion();
 
   const form = useForm({
     resolver: zodResolver(productionDiscussionSchema),
     defaultValues: {
-      participants: [],
       subject: "",
       message: "",
-      attachedFiles: [],
     },
   });
-
-  // TODO: Fetch available participants from API
-  const availableParticipants = [];
 
   const onSubmit = async (data) => {
     const plainText = stripHtmlTags(data.message);
@@ -72,16 +57,34 @@ export function AddProductionDiscussionDialog({
       return;
     }
 
+    if (!assignmentId || !submissionId) {
+      toast.error("Assignment ID and Submission ID are required");
+      return;
+    }
+
+    // First create the discussion, then add the initial message
     createMutation.mutate(
       {
+        assignment: assignmentId,
+        submission: submissionId,
         subject: data.subject,
-        topic: "GENERAL",
-        initial_message: data.message,
       },
       {
-        onSuccess: () => {
-          form.reset();
-          onClose();
+        onSuccess: async (discussionData) => {
+          // Now add the initial message
+          try {
+            await addProductionMessage(discussionData.id, {
+              discussion: discussionData.id,
+              message: data.message,
+            });
+            form.reset();
+            onClose();
+            toast.success("Discussion started successfully");
+          } catch (error) {
+            toast.error("Discussion created but failed to add message");
+            form.reset();
+            onClose();
+          }
         },
       }
     );
@@ -104,48 +107,6 @@ export function AddProductionDiscussionDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Participants */}
-            <FormField
-              control={form.control}
-              name="participants"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Participants</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={(value) => {
-                        let current = Array.isArray(field.value)
-                          ? field.value
-                          : [];
-                        if (!current.includes(value)) {
-                          field.onChange([...current, value]);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Add participants..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableParticipants.map((participant) => (
-                          <SelectItem
-                            key={participant.value}
-                            value={participant.value}
-                          >
-                            {participant.label}
-                          </SelectItem>
-                        ))}
-                        {availableParticipants.length === 0 && (
-                          <div className="px-2 py-6 text-center text-sm text-muted-foreground">
-                            No participants available
-                          </div>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             {/* Subject */}
             <FormField
               control={form.control}
@@ -175,26 +136,6 @@ export function AddProductionDiscussionDialog({
                       initialValue={field.value || ""}
                       onChange={field.onChange}
                       placeholder="Type your message here..."
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Attached Files */}
-            <FormField
-              control={form.control}
-              name="attachedFiles"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Attached Files</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      multiple
-                      onChange={(e) => {
-                        field.onChange(Array.from(e.target.files));
-                      }}
                     />
                   </FormControl>
                   <FormMessage />

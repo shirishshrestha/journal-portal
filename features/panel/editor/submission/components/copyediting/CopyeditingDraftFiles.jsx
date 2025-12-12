@@ -159,7 +159,7 @@ export function CopyeditingDraftFiles({
                           size="sm"
                           onClick={() =>
                             router.push(
-                              `/editor/submissions/${submissionId}/copyediting/edit/${file.id}`
+                              `/editor/submissions/${submissionId}/copyediting/edit/${file.id}/readOnly=true`
                             )
                           }
                           title="Edit in SuperDoc"
