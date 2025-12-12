@@ -74,16 +74,8 @@ export function PublicationScheduleDialog({
 
     createMutation.mutate(data, {
       onSuccess: () => {
-        toast.success("Publication scheduled successfully");
         onClose();
         resetForm();
-      },
-      onError: (error) => {
-        const message =
-          error?.response?.data?.detail ||
-          error?.message ||
-          "Failed to schedule publication";
-        toast.error(message);
       },
     });
   };
