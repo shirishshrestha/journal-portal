@@ -106,6 +106,7 @@ export function EditorCompleteCopyediting({ assignmentId, submissionId }) {
       },
       {
         onSuccess: () => {
+          router.push(`/editor/submissions/${submissionId}`);
           setIsCompleteDialogOpen(false);
           setCompletionNotes("");
         },

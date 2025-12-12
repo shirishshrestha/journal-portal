@@ -131,6 +131,9 @@ export function useConfirmFileFinal() {
         queryKey: ["copyediting-files", data.file.id],
       });
       queryClient.invalidateQueries({
+        queryKey: ["copyedited-files"],
+      });
+      queryClient.invalidateQueries({
         queryKey: ["copyediting-assignments"],
       });
     },

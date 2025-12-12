@@ -108,7 +108,6 @@ export function CreateCopyeditingDialog({
 
     createMutation.mutate(payload, {
       onSuccess: (assignmentData) => {
-        toast.success("Copyediting assignment created successfully");
         form.reset();
         onClose();
 

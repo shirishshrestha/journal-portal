@@ -46,6 +46,7 @@ import {
   ProductionReadyFiles,
   ProductionReadyFilesFromCopyediting,
   PublicationScheduleDialog,
+  ProductionInfoCard,
 } from "@/features/panel/editor/submission/components";
 import {
   useProductionAssignments,
@@ -287,102 +288,13 @@ export default function ProductionWorkflowPage() {
 
       {/* Production Assignment Status Card */}
       {assignment ? (
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle>Production Assignment</CardTitle>
-                <CardDescription className="mt-1">
-                  Current production status and details
-                </CardDescription>
-              </div>
-              {getStatusBadge(assignment.status)}
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Production Assistant
-                </p>
-                <p className="text-sm font-semibold mt-1">
-                  {assignment.production_assistant?.user?.first_name}{" "}
-                  {assignment.production_assistant?.user?.last_name}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Assigned By
-                </p>
-                <p className="text-sm font-semibold mt-1">
-                  {assignment.assigned_by?.user?.first_name}{" "}
-                  {assignment.assigned_by?.user?.last_name}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Due Date
-                </p>
-                <p className="text-sm font-semibold mt-1">
-                  {assignment.due_date
-                    ? format(new Date(assignment.due_date), "MMM dd, yyyy")
-                    : "Not set"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Assigned On
-                </p>
-                <p className="text-sm font-semibold mt-1">
-                  {format(new Date(assignment.assigned_at), "MMM dd, yyyy")}
-                </p>
-              </div>
-            </div>
-
-            {assignment.instructions && (
-              <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Instructions
-                </p>
-                <p className="text-sm bg-muted p-3 rounded-md">
-                  {assignment.instructions}
-                </p>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 pt-2">
-              {assignment.status === "PENDING" && (
-                <Button
-                  onClick={handleStartProduction}
-                  disabled={startMutation.isPending}
-                  size="sm"
-                >
-                  <PlayCircle className="h-4 w-4 mr-2" />
-                  Start Production
-                </Button>
-              )}
-              {assignment.status === "IN_PROGRESS" && (
-                <Button
-                  onClick={handleCompleteProduction}
-                  disabled={completeMutation.isPending}
-                  size="sm"
-                >
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Complete Production
-                </Button>
-              )}
-              {assignment.status === "COMPLETED" && (
-                <Alert>
-                  <CheckCircle2 className="h-4 w-4" />
-                  <AlertTitle>Production Completed</AlertTitle>
-                  <AlertDescription>
-                    This submission is ready for publication scheduling.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <ProductionInfoCard
+          assignment={assignment}
+          onStartProduction={handleStartProduction}
+          onCompleteProduction={handleCompleteProduction}
+          isStarting={startMutation.isPending}
+          isCompleting={completeMutation.isPending}
+        />
       ) : (
         <Alert>
           <AlertCircle className="h-4 w-4" />

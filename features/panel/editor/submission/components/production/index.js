@@ -6,4 +6,7 @@ export { ProductionParticipants } from "./ProductionParticipants";
 export { PublicationSchedule } from "./PublicationSchedule";
 export { AssignProductionAssistantDialog } from "./AssignProductionAssistantDialog";
 export { AddProductionDiscussionDialog } from "./AddProductionDiscussionDialog";
+export { AddProductionParticipantDialog } from "./AddProductionParticipantDialog";
+export { ProductionDiscussionThreadDialog } from "./ProductionDiscussionThreadDialog";
 export { PublicationScheduleDialog } from "./PublicationScheduleDialog";
+export { ProductionInfoCard } from "./ProductionInfoCard";
