@@ -54,6 +54,8 @@ export default function JournalSubmissionsPage() {
     error: journalError,
   } = useGetJournalById(journalId);
 
+  console.log(journalError);
+
   const handlePageChange = (page) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
@@ -156,7 +158,11 @@ export default function JournalSubmissionsPage() {
     return (
       <ErrorCard
         title="Failed to load journal submissions"
-        description={journalError}
+        description={
+          journalError?.response?.data?.detail ||
+          journalError?.message ||
+          "Failed to load journal submissions"
+        }
         onBack={() => router.push("/editor/journals")}
       />
     );
