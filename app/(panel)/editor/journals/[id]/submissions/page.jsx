@@ -133,6 +133,8 @@ export default function JournalSubmissionsPage() {
     }
   }, [isWaitingForStart, progressData.status, toggleSyncDialog]);
 
+  console.log(isPolling);
+
   const columns = [
     {
       key: "submission_number",
@@ -304,8 +306,17 @@ export default function JournalSubmissionsPage() {
             </>
           ) : (
             <Button onClick={handleViewProgress} variant="secondary" size="sm">
-              <Eye className="h-4 w-4 mr-2" />
-              View Import Status
+              {isPolling === false ? (
+                <>
+                  <Eye className="h-4 w-4 mr-2" />
+                  <p>View Import Status</p>
+                </>
+              ) : (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <p> Importing...</p>
+                </>
+              )}
             </Button>
           )}
         </>
