@@ -171,7 +171,7 @@ export default function ProductionWorkflowPage() {
       <div className="flex flex-col gap-4">
         {assignmentsData &&
           userEmail ===
-            assignmentsData?.results[0].production_assistant.user_email && (
+            assignmentsData?.results[0]?.production_assistant?.user_email && (
             <Button
               variant="ghost"
               onClick={() => router.push(`/editor/submissions/${submissionId}`)}

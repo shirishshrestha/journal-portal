@@ -1,9 +1,10 @@
 "use client";
 
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, CheckCircle, Calendar } from "lucide-react";
-import { DataTable } from "@/features/shared";
+import { DataTable, ConfirmationPopup, useToggle } from "@/features/shared";
 import { formatDistanceToNow } from "date-fns";
 import EllipsisTooltip from "@/components/ui/EllipsisTooltip";
 
@@ -19,6 +20,8 @@ export default function InactiveJournalsTable({
   isPending = false,
   error = null,
 }) {
+  const [isActivateOpen, toggleActivate] = useToggle(false);
+  const [selectedJournal, setSelectedJournal] = useState(null);
   const columns = [
     {
       key: "title",
@@ -92,7 +95,10 @@ export default function InactiveJournalsTable({
           <Button
             variant="default"
             size="sm"
-            onClick={() => onActivate(row)}
+            onClick={() => {
+              setSelectedJournal(row);
+              toggleActivate();
+            }}
             className="h-8 gap-1"
           >
             <CheckCircle className="h-4 w-4" />
@@ -104,13 +110,34 @@ export default function InactiveJournalsTable({
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={journals}
-      isPending={isPending}
-      error={error}
-      emptyMessage="No inactive journals found"
-      tableClassName="bg-card border flex justify-center"
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={journals}
+        isPending={isPending}
+        error={error}
+        emptyMessage="No inactive journals found"
+        tableClassName="bg-card border flex justify-center"
+      />
+
+      <ConfirmationPopup
+        open={isActivateOpen}
+        onOpenChange={toggleActivate}
+        title="Activate Journal"
+        description={
+          selectedJournal
+            ? `Are you sure you want to activate "${selectedJournal.title}"?`
+            : "Are you sure you want to activate this journal?"
+        }
+        confirmText="Activate"
+        cancelText="Cancel"
+        variant="primary"
+        onConfirm={() => {
+          if (selectedJournal) onActivate(selectedJournal);
+          toggleActivate();
+          setSelectedJournal(null);
+        }}
+      />
+    </>
   );
 }

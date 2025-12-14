@@ -6,13 +6,22 @@ import {
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, FileText, Upload, Database } from "lucide-react";
+import {
+  Loader2,
+  FileText,
+  Upload,
+  Database,
+  AlertCircle,
+  XCircle,
+} from "lucide-react";
 
 export function OJSSyncingDialog({
   open,
   onOpenChange,
   progress,
   progressData,
+  error,
+  stoppedByError,
 }) {
   const steps = [
     { icon: Upload, label: "Connecting to OJS", threshold: 0 },
@@ -48,152 +57,196 @@ export function OJSSyncingDialog({
       <AlertDialogContent className="pointer-events-none select-none max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-center text-xl">
-            Importing Submissions from OJS
+            {stoppedByError
+              ? "Import Failed"
+              : "Importing Submissions from OJS"}
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-6 items-center text-center pt-6">
-            {/* Animated spinner with pulse effect */}
-            <div className="flex items-center justify-center">
-              <div className="relative">
-                <Loader2 className="h-12 w-12 animate-spin text-blue-600 dark:text-blue-400" />
-                <div className="absolute inset-0 h-12 w-12 animate-ping rounded-full bg-blue-400 dark:bg-blue-500 opacity-20" />
-              </div>
-            </div>
-
-            {/* Progress bar */}
-            <div className="space-y-2">
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div
-                  className="h-full bg-secondary transition-all duration-300 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {progress.toFixed(1)}% Complete
-              </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
-                {displayStage}
-              </p>
-            </div>
-
-            {/* Progress counts from backend */}
-            {progressData &&
-              (progressData.imported > 0 ||
-                progressData.updated > 0 ||
-                progressData.skipped > 0 ||
-                progressData.total > 0) && (
-                <div className="flex justify-center gap-4 text-xs">
-                  {progressData.imported > 0 && (
-                    <div className="flex flex-col items-center">
-                      <span className="font-semibold text-green-600 dark:text-green-400">
-                        {progressData.imported}
-                      </span>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Imported
-                      </span>
-                    </div>
-                  )}
-
-                  {progressData.updated > 0 && (
-                    <div className="flex flex-col items-center">
-                      <span className="font-semibold text-blue-600 dark:text-blue-400">
-                        {progressData.updated}
-                      </span>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Updated
-                      </span>
-                    </div>
-                  )}
-                  {progressData.skipped > 0 && (
-                    <div className="flex flex-col items-center">
-                      <span className="font-semibold text-amber-600 dark:text-amber-400">
-                        {progressData.skipped}
-                      </span>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Skipped
-                      </span>
-                    </div>
-                  )}
-                  {progressData.errors > 0 && (
-                    <div className="flex flex-col items-center">
-                      <span className="font-semibold text-red-600 dark:text-red-400">
-                        {progressData.errors}
-                      </span>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Errors
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-            {/* Step indicators */}
-            <div className="flex justify-center gap-6 py-2">
-              {steps.map((step, index) => {
-                const Icon = step.icon;
-                const isActive = index === currentStep;
-                const isComplete = index < currentStep;
-
-                return (
-                  <div
-                    key={index}
-                    className={`flex flex-col items-center gap-2 transition-all duration-300 ${
-                      isActive ? "scale-110" : "scale-100 opacity-60"
-                    }`}
-                  >
-                    <div
-                      className={`rounded-full p-2 ${
-                        isComplete
-                          ? "bg-green-100 dark:bg-green-900/30"
-                          : isActive
-                          ? "bg-blue-100 dark:bg-blue-900/30 animate-pulse"
-                          : "bg-gray-100 dark:bg-gray-800"
-                      }`}
-                    >
-                      <Icon
-                        className={`h-5 w-5 ${
-                          isComplete
-                            ? "text-green-600 dark:text-green-400"
-                            : isActive
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-400 dark:text-gray-500"
-                        }`}
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                      {step.label}
-                    </span>
+            {/* Error UI */}
+            {stoppedByError && (
+              <>
+                <div className="flex items-center justify-center">
+                  <div className="relative">
+                    <XCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
+                    <div className="absolute inset-0 h-12 w-12 animate-ping rounded-full bg-red-400 dark:bg-red-500 opacity-20" />
                   </div>
-                );
-              })}
-            </div>
+                </div>
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-1">
+                        Import stopped due to repeated errors
+                      </p>
+                      <p className="text-xs text-red-700 dark:text-red-300">
+                        {error?.message ||
+                          error?.response?.data?.message ||
+                          error?.response?.data?.error ||
+                          "The import process encountered multiple errors and was stopped. Please check your OJS connection and try again."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => onOpenChange && onOpenChange()}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </>
+            )}
 
-            {/* Warning message */}
-            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-              <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
-                <strong className="font-semibold">
-                  The import will continue in the background.
-                </strong>
-                <br />
-                You can safely close this dialog or navigate away; the import
-                process will not be interrupted.
-              </p>
-            </div>
+            {/* Normal progress UI - only show if not stopped by error */}
+            {!stoppedByError && (
+              <>
+                {/* Animated spinner with pulse effect */}
+                <div className="flex items-center justify-center">
+                  <div className="relative">
+                    <Loader2 className="h-12 w-12 animate-spin text-blue-600 dark:text-blue-400" />
+                    <div className="absolute inset-0 h-12 w-12 animate-ping rounded-full bg-blue-400 dark:bg-blue-500 opacity-20" />
+                  </div>
+                </div>
 
-            {/* Fun fact or tip */}
-            <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-              Tip: All imported submissions will appear in your page once
-              complete.
-            </p>
+                {/* Progress bar */}
+                <div className="space-y-2">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-full bg-secondary transition-all duration-300 ease-out"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    {progress.toFixed(1)}% Complete
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {displayStage}
+                  </p>
+                </div>
 
-            {/* Close button for dialog */}
-            <div className="flex justify-center pt-2">
-              <Button
-                type="button"
-                onClick={() => onOpenChange && onOpenChange()}
-              >
-                Close
-              </Button>
-            </div>
+                {/* Progress counts from backend */}
+                {progressData &&
+                  (progressData.imported > 0 ||
+                    progressData.updated > 0 ||
+                    progressData.skipped > 0 ||
+                    progressData.total > 0) && (
+                    <div className="flex justify-center gap-4 text-xs">
+                      {progressData.imported > 0 && (
+                        <div className="flex flex-col items-center">
+                          <span className="font-semibold text-green-600 dark:text-green-400">
+                            {progressData.imported}
+                          </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Imported
+                          </span>
+                        </div>
+                      )}
+
+                      {progressData.updated > 0 && (
+                        <div className="flex flex-col items-center">
+                          <span className="font-semibold text-blue-600 dark:text-blue-400">
+                            {progressData.updated}
+                          </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Updated
+                          </span>
+                        </div>
+                      )}
+                      {progressData.skipped > 0 && (
+                        <div className="flex flex-col items-center">
+                          <span className="font-semibold text-amber-600 dark:text-amber-400">
+                            {progressData.skipped}
+                          </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Skipped
+                          </span>
+                        </div>
+                      )}
+                      {progressData.errors > 0 && (
+                        <div className="flex flex-col items-center">
+                          <span className="font-semibold text-red-600 dark:text-red-400">
+                            {progressData.errors}
+                          </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Errors
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                {/* Step indicators */}
+                <div className="flex justify-center gap-6 py-2">
+                  {steps.map((step, index) => {
+                    const Icon = step.icon;
+                    const isActive = index === currentStep;
+                    const isComplete = index < currentStep;
+
+                    return (
+                      <div
+                        key={index}
+                        className={`flex flex-col items-center gap-2 transition-all duration-300 ${
+                          isActive ? "scale-110" : "scale-100 opacity-60"
+                        }`}
+                      >
+                        <div
+                          className={`rounded-full p-2 ${
+                            isComplete
+                              ? "bg-green-100 dark:bg-green-900/30"
+                              : isActive
+                              ? "bg-blue-100 dark:bg-blue-900/30 animate-pulse"
+                              : "bg-gray-100 dark:bg-gray-800"
+                          }`}
+                        >
+                          <Icon
+                            className={`h-5 w-5 ${
+                              isComplete
+                                ? "text-green-600 dark:text-green-400"
+                                : isActive
+                                ? "text-blue-600 dark:text-blue-400"
+                                : "text-gray-400 dark:text-gray-500"
+                            }`}
+                          />
+                        </div>
+                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                          {step.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Warning message */}
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                  <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
+                    <strong className="font-semibold">
+                      The import will continue in the background.
+                    </strong>
+                    <br />
+                    You can safely close this dialog or navigate away; the
+                    import process will not be interrupted.
+                  </p>
+                </div>
+
+                {/* Fun fact or tip */}
+                <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                  Tip: All imported submissions will appear in your page once
+                  complete.
+                </p>
+
+                {/* Close button for dialog */}
+                <div className="flex justify-center pt-2">
+                  <Button
+                    type="button"
+                    onClick={() => onOpenChange && onOpenChange()}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </>
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
       </AlertDialogContent>
