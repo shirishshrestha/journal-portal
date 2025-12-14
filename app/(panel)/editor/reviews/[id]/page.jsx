@@ -41,11 +41,21 @@ export default function ReviewDetailPage() {
     return <LoadingScreen message="Loading review details..." />;
   }
 
-  if (error || !review) {
+  if (error) {
     return (
       <ErrorCard
         title="Failed to load review"
         description={error?.message || "Review not found"}
+        onBack={() => router.back()}
+      />
+    );
+  }
+
+  if (!review) {
+    return (
+      <ErrorCard
+        title="Review not found"
+        description={"No review data was returned from the server."}
         onBack={() => router.back()}
       />
     );

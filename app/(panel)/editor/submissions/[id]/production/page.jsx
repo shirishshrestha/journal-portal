@@ -54,6 +54,7 @@ import {
   useCompleteProductionAssignment,
 } from "@/features/panel/editor/submission/hooks";
 import { format } from "date-fns";
+import { useSelector } from "react-redux";
 
 export default function ProductionWorkflowPage() {
   const params = useParams();
@@ -61,6 +62,7 @@ export default function ProductionWorkflowPage() {
   const submissionId = params?.id;
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
+  const userEmail = useSelector((state) => state.auth.userData.email);
 
   // Fetch submission details
   const {
@@ -71,8 +73,12 @@ export default function ProductionWorkflowPage() {
   } = useGetEditorSubmissionById(submissionId);
 
   // Fetch production assignment
-  const { data: assignmentsData, isPending: assignmentsLoading } =
-    useProductionAssignments({ submission: submissionId });
+  const {
+    data: assignmentsData,
+    isPending: assignmentsLoading,
+    error: assignmentsError,
+    refetch: refetchAssignment,
+  } = useProductionAssignments({ submission: submissionId });
 
   const assignment = assignmentsData?.results?.[0];
 
@@ -132,9 +138,9 @@ export default function ProductionWorkflowPage() {
     );
   };
 
-  if (isSubmissionLoading || assignmentsLoading) {
-    return <LoadingScreen />;
-  }
+  // if (isSubmissionLoading || assignmentsLoading) {
+  //   return <LoadingScreen />;
+  // }
 
   if (submissionError) {
     return (
@@ -147,18 +153,34 @@ export default function ProductionWorkflowPage() {
     );
   }
 
+  if (assignmentsError) {
+    return (
+      <div className="container mx-auto p-6">
+        <ErrorCard
+          title="Error Loading production assignment"
+          onRetry={refetchAssignment}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {(isSubmissionLoading || assignmentsLoading) && <LoadingScreen />}
       {/* Header with breadcrumbs and actions */}
       <div className="flex flex-col gap-4">
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/editor/submissions/${submissionId}`)}
-          className="w-fit"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Submission
-        </Button>
+        {assignmentsData &&
+          userEmail ===
+            assignmentsData?.results[0].production_assistant.user_email && (
+            <Button
+              variant="ghost"
+              onClick={() => router.push(`/editor/submissions/${submissionId}`)}
+              className="w-fit"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Submission
+            </Button>
+          )}
 
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">

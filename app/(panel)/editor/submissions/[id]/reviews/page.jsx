@@ -62,15 +62,23 @@ export default function SubmissionReviewsPage() {
     return <LoadingScreen message="Loading reviews..." />;
   }
 
-  if (submissionError || reviewsError) {
+  if (submissionError) {
+    return (
+      <ErrorCard
+        title="Failed to load submission details"
+        description={
+          submissionError?.message || "Error loading submission details."
+        }
+        onRetry={() => router.back()}
+      />
+    );
+  }
+
+  if (reviewsError) {
     return (
       <ErrorCard
         title="Failed to load reviews"
-        description={
-          submissionError?.message ||
-          reviewsError?.message ||
-          "Error loading data"
-        }
+        description={reviewsError?.message || "Error loading reviews."}
         onRetry={() => router.back()}
       />
     );

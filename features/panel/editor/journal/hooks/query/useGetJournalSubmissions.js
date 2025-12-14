@@ -14,7 +14,7 @@ export const useGetJournalSubmissions = (
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: true, // Refetch when window regains focus
     refetchOnMount: true, // Refetch on component mount
-    retry: 2,
+    retry: 3,
     ...options,
   });
 };

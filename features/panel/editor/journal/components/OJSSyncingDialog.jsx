@@ -5,28 +5,28 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
-import {
-  Loader2,
-  FileText,
-  CheckCircle2,
-  Upload,
-  Database,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, FileText, Upload, Database } from "lucide-react";
 
-export function OJSSyncingDialog({ open, progress, progressData }) {
+export function OJSSyncingDialog({
+  open,
+  onOpenChange,
+  progress,
+  progressData,
+}) {
   const steps = [
     { icon: Upload, label: "Connecting to OJS", threshold: 0 },
     { icon: Database, label: "Fetching submissions", threshold: 25 },
     { icon: FileText, label: "Processing data", threshold: 60 },
-    { icon: CheckCircle2, label: "Finalizing import", threshold: 90 },
   ];
 
   // Derive current step directly from progress (no state needed)
   const getCurrentStep = () => {
-    if (progress >= 90) return 3;
-    if (progress >= 60) return 2;
-    if (progress >= 25) return 1;
-    if (progress > 0) return 0;
+    if (progressData.status === "completed") return 3;
+    if (progressData.status === "processing") return 2;
+    if (progressData.status === "fetching") return 1;
+    if (progressData.status === "idle") return 0;
+
     return 0;
   };
 
@@ -44,7 +44,7 @@ export function OJSSyncingDialog({ open, progress, progressData }) {
       : "Initializing...");
 
   return (
-    <AlertDialog open={open}>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="pointer-events-none select-none max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-center text-xl">
@@ -79,7 +79,8 @@ export function OJSSyncingDialog({ open, progress, progressData }) {
             {progressData &&
               (progressData.imported > 0 ||
                 progressData.updated > 0 ||
-                progressData.skipped > 0) && (
+                progressData.skipped > 0 ||
+                progressData.total > 0) && (
                 <div className="flex justify-center gap-4 text-xs">
                   {progressData.imported > 0 && (
                     <div className="flex flex-col items-center">
@@ -91,6 +92,7 @@ export function OJSSyncingDialog({ open, progress, progressData }) {
                       </span>
                     </div>
                   )}
+
                   {progressData.updated > 0 && (
                     <div className="flex flex-col items-center">
                       <span className="font-semibold text-blue-600 dark:text-blue-400">
@@ -169,18 +171,29 @@ export function OJSSyncingDialog({ open, progress, progressData }) {
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
               <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
                 <strong className="font-semibold">
-                  Please keep this window open.
+                  The import will continue in the background.
                 </strong>
                 <br />
-                Closing or refreshing now may interrupt the import process.
+                You can safely close this dialog or navigate away; the import
+                process will not be interrupted.
               </p>
             </div>
 
             {/* Fun fact or tip */}
             <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-              Tip: Imported submissions will appear in your dashboard once
+              Tip: All imported submissions will appear in your page once
               complete.
             </p>
+
+            {/* Close button for dialog */}
+            <div className="flex justify-center pt-2">
+              <Button
+                type="button"
+                onClick={() => onOpenChange && onOpenChange()}
+              >
+                Close
+              </Button>
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
       </AlertDialogContent>
