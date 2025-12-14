@@ -79,6 +79,8 @@ export default function JournalSubmissionsPage() {
     error: journalError,
   } = useGetJournalById(journalId);
 
+  console.log(journalError);
+
   const handlePageChange = (page) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
