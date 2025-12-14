@@ -181,7 +181,7 @@ export default function MyJournalSubmissionsPage() {
             </Button>
           </div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-foreground">
+            <h1 className="text-3xl font-semibold text-foreground">
               {journal?.title}
             </h1>
             {myRole && (

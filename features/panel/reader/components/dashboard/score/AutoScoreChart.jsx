@@ -55,7 +55,7 @@ export function AutoScoreChart({
   // Center label component
   const centerContent = (
     <div className="text-center">
-      <div className="text-4xl font-bold text-foreground tabular-nums">
+      <div className="text-4xl font-semibold text-foreground tabular-nums">
         {totalScore}
       </div>
       <div className="text-sm text-muted-foreground font-medium">

@@ -36,7 +36,7 @@ export default function SettingsLayout({ children }) {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+        <h1 className="text-3xl font-semibold text-foreground">Settings</h1>
         <p className="text-muted-foreground">
           Manage your account settings and preferences
         </p>

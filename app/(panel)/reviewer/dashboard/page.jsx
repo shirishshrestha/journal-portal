@@ -54,7 +54,7 @@ export default function ReviewerDashboard() {
       {(isAssignmentsPending || isAnalyticsPending) && <LoadingScreen />}
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">
+        <h1 className="text-3xl font-semibold text-foreground">
           Reviewer Dashboard
         </h1>
         <p className="text-muted-foreground">
@@ -131,7 +131,7 @@ export default function ReviewerDashboard() {
       {/* Review Assignments Table */}
       <div className="space-y-4">
         <div>
-          <h2 className="text-xl font-bold">Review Assignments</h2>
+          <h2 className="text-xl font-semibold">Review Assignments</h2>
         </div>
         <ReviewAssignmentsTable
           assignments={assignments || []}

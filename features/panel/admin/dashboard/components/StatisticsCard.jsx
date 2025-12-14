@@ -7,7 +7,7 @@ export function StatisticsCard({ title, value, icon: Icon }) {
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold text-foreground">{value}</p>
+            <p className="text-2xl font-semibold text-foreground">{value}</p>
           </div>
           <div className="rounded-lg bg-primary/10 p-3">
             <Icon className="h-5 w-5 text-primary" />

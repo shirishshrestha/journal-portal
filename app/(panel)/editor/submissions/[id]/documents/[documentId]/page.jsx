@@ -57,7 +57,7 @@ export default function EditorDocumentViewPage() {
       {/* Header with Back Button */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold capitalize">
+          <h2 className="text-2xl font-semibold capitalize">
             {documentData.title}
           </h2>
           <p className="text-sm text-muted-foreground">

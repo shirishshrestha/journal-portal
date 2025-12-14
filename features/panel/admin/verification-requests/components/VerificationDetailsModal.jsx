@@ -80,7 +80,7 @@ export function VerificationDetailsModal({
         <DialogHeader className="px-6 pt-4 pb-2">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <DialogTitle className="text-2xl font-bold">
+              <DialogTitle className="text-2xl font-semibold">
                 {verification.profile_name}
               </DialogTitle>
               <DialogDescription className="flex items-center gap-2 mt-1">

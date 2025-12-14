@@ -57,7 +57,7 @@ export default function InactiveJournalsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-semibold text-foreground">
             Inactive Journals
           </h1>
           <p className="text-muted-foreground">
@@ -79,7 +79,7 @@ export default function InactiveJournalsPage() {
                 Total Inactive
               </p>
             </div>
-            <p className="text-3xl font-bold mt-2">
+            <p className="text-3xl font-semibold mt-2">
               {journalsData?.count || 0}
             </p>
           </div>

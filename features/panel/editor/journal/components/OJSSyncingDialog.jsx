@@ -13,7 +13,7 @@ import {
   Database,
 } from "lucide-react";
 
-export function OJSSyncingDialog({ open, progress }) {
+export function OJSSyncingDialog({ open, progress, progressData }) {
   const steps = [
     { icon: Upload, label: "Connecting to OJS", threshold: 0 },
     { icon: Database, label: "Fetching submissions", threshold: 25 },
@@ -31,6 +31,17 @@ export function OJSSyncingDialog({ open, progress }) {
   };
 
   const currentStep = getCurrentStep();
+
+  // Display stage from backend or derive from status
+  const displayStage =
+    progressData?.stage ||
+    (progressData?.status === "fetching"
+      ? "Fetching submissions from OJS"
+      : progressData?.status === "processing"
+      ? "Processing submissions"
+      : progressData?.status === "completed"
+      ? "Import completed"
+      : "Initializing...");
 
   return (
     <AlertDialog open={open}>
@@ -57,9 +68,61 @@ export function OJSSyncingDialog({ open, progress }) {
                 />
               </div>
               <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {progress}% Complete
+                {progress.toFixed(1)}% Complete
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {displayStage}
               </p>
             </div>
+
+            {/* Progress counts from backend */}
+            {progressData &&
+              (progressData.imported > 0 ||
+                progressData.updated > 0 ||
+                progressData.skipped > 0) && (
+                <div className="flex justify-center gap-4 text-xs">
+                  {progressData.imported > 0 && (
+                    <div className="flex flex-col items-center">
+                      <span className="font-semibold text-green-600 dark:text-green-400">
+                        {progressData.imported}
+                      </span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Imported
+                      </span>
+                    </div>
+                  )}
+                  {progressData.updated > 0 && (
+                    <div className="flex flex-col items-center">
+                      <span className="font-semibold text-blue-600 dark:text-blue-400">
+                        {progressData.updated}
+                      </span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Updated
+                      </span>
+                    </div>
+                  )}
+                  {progressData.skipped > 0 && (
+                    <div className="flex flex-col items-center">
+                      <span className="font-semibold text-amber-600 dark:text-amber-400">
+                        {progressData.skipped}
+                      </span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Skipped
+                      </span>
+                    </div>
+                  )}
+                  {progressData.errors > 0 && (
+                    <div className="flex flex-col items-center">
+                      <span className="font-semibold text-red-600 dark:text-red-400">
+                        {progressData.errors}
+                      </span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Errors
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
             {/* Step indicators */}
             <div className="flex justify-center gap-6 py-2">

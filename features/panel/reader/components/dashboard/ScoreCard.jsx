@@ -82,14 +82,14 @@ export function ScoreCard({ scoreData, pending }) {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-2xl font-bold">Auto-Score</CardTitle>
+            <CardTitle className="text-2xl font-semibold">Auto-Score</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
               Complete tasks to unlock premium features
             </p>
           </div>
           <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg">
             <TrendingUp className="h-5 w-5 text-primary" />
-            <span className="text-2xl font-bold text-primary tabular-nums">
+            <span className="text-2xl font-semibold text-primary tabular-nums">
               {totalScore}/{maxPossibleScore}
             </span>
           </div>

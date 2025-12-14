@@ -203,7 +203,7 @@ export default function EditorSubmissionDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold">Submission Details</h1>
+          <h1 className="text-3xl font-semibold">Submission Details</h1>
           <p className="text-muted-foreground">Review and manage submission</p>
         </div>
         <div className="flex items-center gap-3">

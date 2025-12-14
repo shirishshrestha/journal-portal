@@ -215,7 +215,7 @@ export const AnamolyDetectionDashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Anomaly Detection</h1>
+          <h1 className="text-3xl font-semibold">Anomaly Detection</h1>
           <p className="text-muted-foreground">
             {data?.scan_completed_at &&
               `Last scan: ${format(new Date(data.scan_completed_at), "PPp")}`}

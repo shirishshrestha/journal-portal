@@ -194,7 +194,7 @@ export default function CopyeditingAssignmentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-3xl font-semibold tracking-tight">
             My Copyediting Assignments
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -211,7 +211,7 @@ export default function CopyeditingAssignmentsPage() {
             <FileEdit className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-2xl font-semibold">{stats.total}</div>
             <p className="text-xs text-muted-foreground">All assignments</p>
           </CardContent>
         </Card>
@@ -222,7 +222,7 @@ export default function CopyeditingAssignmentsPage() {
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.pending}</div>
+            <div className="text-2xl font-semibold">{stats.pending}</div>
             <p className="text-xs text-muted-foreground">Not started</p>
           </CardContent>
         </Card>
@@ -233,7 +233,7 @@ export default function CopyeditingAssignmentsPage() {
             <FileEdit className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.in_progress}</div>
+            <div className="text-2xl font-semibold">{stats.in_progress}</div>
             <p className="text-xs text-muted-foreground">Active work</p>
           </CardContent>
         </Card>
@@ -244,7 +244,7 @@ export default function CopyeditingAssignmentsPage() {
             <CheckCircle2 className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.completed}</div>
+            <div className="text-2xl font-semibold">{stats.completed}</div>
             <p className="text-xs text-muted-foreground">Finished</p>
           </CardContent>
         </Card>
@@ -255,7 +255,7 @@ export default function CopyeditingAssignmentsPage() {
             <AlertCircle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-semibold text-red-600">
               {stats.overdue}
             </div>
             <p className="text-xs text-muted-foreground">Need attention</p>

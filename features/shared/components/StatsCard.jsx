@@ -40,7 +40,9 @@ export default function StatsCard({
                 <p className="text-sm font-medium text-muted-foreground">
                   {title}
                 </p>
-                <p className={`text-2xl font-bold ${valueClass}`}>{value}</p>
+                <p className={`text-2xl font-semibold ${valueClass}`}>
+                  {value}
+                </p>
               </>
             )}
           </div>

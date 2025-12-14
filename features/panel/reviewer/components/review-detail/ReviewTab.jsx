@@ -17,7 +17,7 @@ export function ReviewTab({ assignment }) {
         <CardContent className="pt-6">
           <div className="text-center py-12">
             <CheckCircle2 className="h-16 w-16 mx-auto text-green-600 mb-4" />
-            <h3 className="text-2xl font-bold mb-2">
+            <h3 className="text-2xl font-semibold mb-2">
               Review Already Submitted
             </h3>
             <p className="text-muted-foreground">

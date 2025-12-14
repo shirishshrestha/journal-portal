@@ -177,7 +177,9 @@ export default function NewSubmissionForm() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">New Submission</h1>
+        <h1 className="text-3xl font-semibold text-foreground">
+          New Submission
+        </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Complete all sections below to submit your manuscript
         </p>

@@ -96,7 +96,7 @@ export default function AuthorCopyeditingFileEditorPage() {
         </Button>
 
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-3xl font-semibold tracking-tight">
             {isReadOnly ? "View File" : "Review & Edit Copyedited File"}
           </h1>
           <p className="text-muted-foreground mt-2">

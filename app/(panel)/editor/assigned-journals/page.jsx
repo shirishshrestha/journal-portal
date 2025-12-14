@@ -165,7 +165,7 @@ export default function MyAssignedJournalsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-semibold text-foreground">
             Assigned Journals
           </h1>
           <p className="text-muted-foreground">
@@ -185,7 +185,7 @@ export default function MyAssignedJournalsPage() {
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{journals.length}</div>
+              <div className="text-2xl font-semibold">{journals.length}</div>
               <p className="text-xs text-muted-foreground">
                 Journals you&apos;re assigned to
               </p>
@@ -200,7 +200,7 @@ export default function MyAssignedJournalsPage() {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-semibold">
                 {journals.reduce(
                   (acc, journal) => acc + (journal.submissions_count || 0),
                   0
@@ -220,7 +220,7 @@ export default function MyAssignedJournalsPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-semibold">
                 {journals.filter((j) => j.is_active).length}
               </div>
               <p className="text-xs text-muted-foreground">

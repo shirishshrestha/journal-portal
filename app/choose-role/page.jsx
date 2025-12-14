@@ -83,7 +83,7 @@ export default function ChooseRole() {
       <div className="relative z-10 w-full max-w-5xl">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 text-balance">
+          <h1 className="text-4xl md:text-5xl font-semibold text-slate-900 dark:text-white mb-4 text-balance">
             Choose Your Role
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">

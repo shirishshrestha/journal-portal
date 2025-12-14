@@ -1,91 +1,104 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { importFromOJS } from "../../api/ojsConnectionApi";
+import { importFromOJS, getImportProgress } from "../../api/ojsConnectionApi";
 import { toast } from "sonner";
 import { useState, useRef, useEffect } from "react";
 
 /**
- * Custom hook to import submissions from OJS with simulated progress tracking
- * @returns {Object} Mutation object with progress state
+ * Custom hook to import submissions from OJS with real-time progress tracking
+ * @returns {Object} Mutation object with progress state and details
  */
 export function useImportFromOJS() {
   const queryClient = useQueryClient();
-  const [progress, setProgress] = useState(0);
-  const progressIntervalRef = useRef(null);
-  const isCompleteRef = useRef(false);
+  const [progressData, setProgressData] = useState({
+    percentage: 0,
+    status: "idle",
+    stage: "",
+    current: 0,
+    total: 0,
+    imported: 0,
+    updated: 0,
+    skipped: 0,
+    errors: 0,
+  });
+  const pollIntervalRef = useRef(null);
+  const isPollingRef = useRef(false);
 
-  // Simulate progress until it reaches 80%
-  const startFakeProgress = () => {
-    setProgress(0);
-    isCompleteRef.current = false;
+  // Poll backend for real progress
+  const startProgressPolling = (journalId) => {
+    if (isPollingRef.current) return;
 
-    const updateProgress = () => {
-      setProgress((prev) => {
-        if (isCompleteRef.current) {
-          clearInterval(progressIntervalRef.current);
-          return 100;
-        }
+    isPollingRef.current = true;
+    setProgressData({
+      percentage: 0,
+      status: "starting",
+      stage: "Initializing import...",
+      current: 0,
+      total: 0,
+      imported: 0,
+      updated: 0,
+      skipped: 0,
+      errors: 0,
+    });
 
-        if (prev >= 80) {
-          return 80;
-        }
+    const pollProgress = async () => {
+      try {
+        const data = await getImportProgress(journalId);
 
-        return prev + 1;
-      });
-    };
-
-    let currentInterval = 300;
-
-    const scheduleNext = () => {
-      progressIntervalRef.current = setTimeout(() => {
-        updateProgress();
-
-        setProgress((prev) => {
-          if (prev >= 60) {
-            currentInterval = 900;
-          } else if (prev >= 30) {
-            currentInterval = 700;
-          } else {
-            currentInterval = 500;
-          }
-
-          return prev;
+        // Update progress data
+        setProgressData({
+          percentage: data.percentage || 0,
+          status: data.status || "processing",
+          stage: data.stage || "Processing...",
+          current: data.current || 0,
+          total: data.total || 0,
+          imported: data.imported || 0,
+          updated: data.updated || 0,
+          skipped: data.skipped || 0,
+          errors: data.errors || 0,
         });
 
-        if (!isCompleteRef.current) {
-          scheduleNext();
+        // Stop polling if completed or error
+        if (data.status === "completed" || data.status === "error") {
+          stopProgressPolling();
+
+          // Set to 100% on completion
+          if (data.status === "completed") {
+            setProgressData((prev) => ({
+              ...prev,
+              percentage: 100,
+              status: "completed",
+            }));
+          }
         }
-      }, currentInterval);
+      } catch (error) {
+        console.error("Error polling progress:", error);
+        // Continue polling even on error (backend might be processing)
+      }
     };
 
-    scheduleNext();
+    // Poll immediately, then every 1 second
+    pollProgress();
+    pollIntervalRef.current = setInterval(pollProgress, 1000);
   };
 
-  const stopFakeProgress = () => {
-    if (progressIntervalRef.current) {
-      clearTimeout(progressIntervalRef.current);
-      progressIntervalRef.current = null;
+  const stopProgressPolling = () => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
     }
-  };
-
-  const handleRealCompletion = () => {
-    isCompleteRef.current = true;
-    setProgress(100);
-    stopFakeProgress();
-  };
-
-  const handleError = () => {
-    isCompleteRef.current = false;
-    stopFakeProgress();
+    isPollingRef.current = false;
   };
 
   const mutation = useMutation({
     mutationFn: (journalId) => {
-      startFakeProgress();
-      return importFromOJS(journalId, handleRealCompletion);
+      startProgressPolling(journalId);
+      return importFromOJS(journalId);
     },
     onSuccess: (data, journalId) => {
-      handleRealCompletion();
+      // Continue polling until backend reports completion
+      // The polling will stop when status is "completed"
 
+      // Wait a bit for final status, then invalidate queries
       setTimeout(() => {
         queryClient.invalidateQueries({
           queryKey: ["journal-submissions", journalId],
@@ -98,11 +111,24 @@ export function useImportFromOJS() {
           data.message || "Submissions imported from OJS successfully"
         );
 
-        setTimeout(() => setProgress(0), 500);
-      }, 500);
+        // Reset progress after a delay
+        setTimeout(() => {
+          setProgressData({
+            percentage: 0,
+            status: "idle",
+            stage: "",
+            current: 0,
+            total: 0,
+            imported: 0,
+            updated: 0,
+            skipped: 0,
+            errors: 0,
+          });
+        }, 2000);
+      }, 1000);
     },
     onError: (error) => {
-      handleError();
+      stopProgressPolling();
 
       const errorMessage =
         error?.response?.data?.error ||
@@ -110,18 +136,43 @@ export function useImportFromOJS() {
         "Failed to import submissions from OJS";
       toast.error(errorMessage);
 
-      setTimeout(() => setProgress(0), 2000);
+      setProgressData({
+        percentage: 0,
+        status: "error",
+        stage: "Import failed",
+        current: 0,
+        total: 0,
+        imported: 0,
+        updated: 0,
+        skipped: 0,
+        errors: 0,
+      });
+
+      setTimeout(() => {
+        setProgressData({
+          percentage: 0,
+          status: "idle",
+          stage: "",
+          current: 0,
+          total: 0,
+          imported: 0,
+          updated: 0,
+          skipped: 0,
+          errors: 0,
+        });
+      }, 2000);
     },
   });
 
   useEffect(() => {
     return () => {
-      stopFakeProgress();
+      stopProgressPolling();
     };
   }, []);
 
   return {
     ...mutation,
-    progress,
+    progressData,
+    progress: progressData.percentage, // Backward compatibility
   };
 }

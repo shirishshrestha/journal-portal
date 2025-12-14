@@ -65,7 +65,7 @@ export function ProfileCompletionCard({ completionPercentage, pending }) {
           {/* Left section with percentage */}
           <div className="flex flex-col items-start min-w-fit">
             <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-bold text-amber-900 dark:text-amber-100">
+              <span className="text-5xl font-semibold text-amber-900 dark:text-amber-100">
                 {completionPercentage.toFixed(2)}%
               </span>
             </div>

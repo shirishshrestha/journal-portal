@@ -160,7 +160,7 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-semibold text-foreground">
             Admin Dashboard
           </h1>
         </div>

@@ -56,7 +56,7 @@ export default function EditorDashboard() {
       {isAnalyticsPending && <LoadingScreen />}
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Editor Dashboard</h1>
+        <h1 className="text-3xl font-semibold">Editor Dashboard</h1>
         <p className="text-muted-foreground">
           Manage and track journal submissions and editorial workflow
         </p>

@@ -60,7 +60,7 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Submission Count
                 </p>
-                <p className="text-2xl font-bold text-primary">
+                <p className="text-2xl font-semibold text-primary">
                   {journal?.submission_count ?? "-"}
                 </p>
               </div>

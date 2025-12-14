@@ -78,7 +78,7 @@ export default function ReviewDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold">Review Assignment</h1>
+          <h1 className="text-3xl font-semibold">Review Assignment</h1>
           <p className="text-muted-foreground">
             Review manuscript and provide feedback
           </p>

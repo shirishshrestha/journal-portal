@@ -80,92 +80,92 @@ export default function JournalsPage() {
   const journals = JournalData?.results || [];
 
   return (
-      <div className="space-y-5">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Journal Management
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Manage all academic journals and their submission settings.
-            </p>
-          </div>
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-foreground">
+            Journal Management
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Manage all academic journals and their submission settings.
+          </p>
         </div>
-
-        {/* Toolbar */}
-        <FilterToolbar>
-          <FilterToolbar.Search
-            paramName="search"
-            placeholder="Search by title, short name, or publisher..."
-            label="Search"
-          />
-
-          <FilterToolbar.Select
-            label="Status"
-            paramName="status"
-            options={[
-              { value: "all", label: "All Status" },
-              { value: "active", label: "Active" },
-              { value: "inactive", label: "Inactive" },
-            ]}
-          />
-
-          <FilterToolbar.Select
-            label="Submissions"
-            paramName="submissions"
-            options={[
-              { value: "all", label: "All" },
-              { value: "accepting", label: "Accepting" },
-              { value: "not-accepting", label: "Not Accepting" },
-            ]}
-          />
-        </FilterToolbar>
-
-        {/* Journals Table */}
-        <AdminJournalsTable
-          journals={journals}
-          onViewDrawer={(row) => {
-            setSelectedJournal(row);
-            setIsDetailsOpen(true);
-          }}
-          onDelete={handleDelete}
-          isPending={isJournalDataPending}
-          error={JournalDataError}
-        />
-
-        {/* Pagination */}
-        {JournalData && JournalData.count > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={Math.ceil(JournalData.count / 10)}
-            totalCount={JournalData.count}
-            pageSize={10}
-            onPageChange={handlePageChange}
-            showPageSizeSelector={false}
-          />
-        )}
-
-        <JournalDetailsDrawer
-          journal={selectedJournal}
-          isOpen={isDetailsOpen}
-          onClose={() => setIsDetailsOpen(false)}
-        />
-
-        {/* Delete Confirmation Popup */}
-        <ConfirmationPopup
-          open={deleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-          title="Delete Journal"
-          description={`Are you sure you want to delete "${journalToDelete?.title}"? This action cannot be undone and will remove all associated data.`}
-          confirmText="Delete"
-          cancelText="Cancel"
-          variant="danger"
-          onConfirm={confirmDelete}
-          isPending={deleteJournalMutation.isPending}
-          isSuccess={deleteJournalMutation.isSuccess}
-          icon={<Trash2 className="h-6 w-6 text-destructive" />}
-        />
       </div>
+
+      {/* Toolbar */}
+      <FilterToolbar>
+        <FilterToolbar.Search
+          paramName="search"
+          placeholder="Search by title, short name, or publisher..."
+          label="Search"
+        />
+
+        <FilterToolbar.Select
+          label="Status"
+          paramName="status"
+          options={[
+            { value: "all", label: "All Status" },
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+          ]}
+        />
+
+        <FilterToolbar.Select
+          label="Submissions"
+          paramName="submissions"
+          options={[
+            { value: "all", label: "All" },
+            { value: "accepting", label: "Accepting" },
+            { value: "not-accepting", label: "Not Accepting" },
+          ]}
+        />
+      </FilterToolbar>
+
+      {/* Journals Table */}
+      <AdminJournalsTable
+        journals={journals}
+        onViewDrawer={(row) => {
+          setSelectedJournal(row);
+          setIsDetailsOpen(true);
+        }}
+        onDelete={handleDelete}
+        isPending={isJournalDataPending}
+        error={JournalDataError}
+      />
+
+      {/* Pagination */}
+      {JournalData && JournalData.count > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(JournalData.count / 10)}
+          totalCount={JournalData.count}
+          pageSize={10}
+          onPageChange={handlePageChange}
+          showPageSizeSelector={false}
+        />
+      )}
+
+      <JournalDetailsDrawer
+        journal={selectedJournal}
+        isOpen={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+      />
+
+      {/* Delete Confirmation Popup */}
+      <ConfirmationPopup
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Journal"
+        description={`Are you sure you want to delete "${journalToDelete?.title}"? This action cannot be undone and will remove all associated data.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={confirmDelete}
+        isPending={deleteJournalMutation.isPending}
+        isSuccess={deleteJournalMutation.isSuccess}
+        icon={<Trash2 className="h-6 w-6 text-destructive" />}
+      />
+    </div>
   );
 }

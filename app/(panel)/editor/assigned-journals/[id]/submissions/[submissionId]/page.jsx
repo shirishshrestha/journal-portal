@@ -199,7 +199,7 @@ export default function AssignedJournalSubmissionDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Submissions
           </Button>
-          <h1 className="text-3xl font-bold">Submission Details</h1>
+          <h1 className="text-3xl font-semibold">Submission Details</h1>
           <p className="text-muted-foreground">Review and manage submission</p>
         </div>
       </div>

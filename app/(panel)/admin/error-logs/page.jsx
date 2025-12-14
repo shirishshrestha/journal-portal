@@ -98,7 +98,7 @@ export default function ErrorLogsPage() {
       {isLoading && <LoadingScreen />}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Error Monitoring</h1>
+          <h1 className="text-3xl font-semibold">Error Monitoring</h1>
           <p className="text-muted-foreground mt-1">
             Track and manage application errors in real-time via Sentry
           </p>

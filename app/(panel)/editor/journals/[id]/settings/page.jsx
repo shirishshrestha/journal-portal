@@ -69,7 +69,7 @@ export default function JournalSettingsPage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-3xl font-semibold text-foreground">
                 Journal Settings
               </h1>
               <p className="text-muted-foreground mt-1">

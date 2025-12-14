@@ -211,7 +211,9 @@ export default function EditSubmissionForm({ submission }) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Edit Submission</h1>
+        <h1 className="text-3xl font-semibold text-foreground">
+          Edit Submission
+        </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Update your manuscript information
         </p>

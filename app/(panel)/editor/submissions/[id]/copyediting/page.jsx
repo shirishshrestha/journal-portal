@@ -98,7 +98,7 @@ export default function CopyeditingWorkflowPage() {
 
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-3xl font-semibold tracking-tight">
               Copyediting Workflow
             </h1>
             <p className="text-muted-foreground mt-2">

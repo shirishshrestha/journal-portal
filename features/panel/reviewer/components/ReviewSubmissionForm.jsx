@@ -204,7 +204,7 @@ export function ReviewSubmissionForm({ assignment }) {
         <CardContent className="pt-6">
           <div className="text-center py-12">
             <CheckCircle2 className="h-16 w-16 mx-auto text-green-600 dark:text-green-400 mb-4" />
-            <h3 className="text-2xl font-bold mb-2 text-green-800 dark:text-green-300">
+            <h3 className="text-2xl font-semibold mb-2 text-green-800 dark:text-green-300">
               Review Submitted Successfully!
             </h3>
             <p className="text-green-600 dark:text-green-400 mb-4">

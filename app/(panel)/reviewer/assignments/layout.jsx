@@ -33,7 +33,7 @@ export default function AssignmentsLayout({ children }) {
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Review Assignments</h1>
+        <h1 className="text-3xl font-semibold">Review Assignments</h1>
         <p className="text-muted-foreground">
           Manage your peer review invitations and assignments
         </p>

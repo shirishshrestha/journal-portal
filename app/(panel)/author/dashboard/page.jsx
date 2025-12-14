@@ -49,7 +49,7 @@ export default function AuthorDashboard() {
       {(isAnalyticsPending || isSubmissionsPending) && <LoadingScreen />}
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Author Dashboard</h1>
+        <h1 className="text-3xl font-semibold">Author Dashboard</h1>
         <p className="text-muted-foreground">
           Manage and track your manuscript submissions
         </p>
@@ -78,7 +78,7 @@ export default function AuthorDashboard() {
       {/* Submissions Table Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">Recent Submissions</h2>
+          <h2 className="text-xl font-semibold">Recent Submissions</h2>
           <Link href="/author/new-submission">
             <Button>
               <Plus className="w-4 h-4 mr-2" />

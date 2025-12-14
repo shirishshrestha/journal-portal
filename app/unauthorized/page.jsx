@@ -46,7 +46,7 @@ const Unauthorized = () => {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl md:text-5xl font-bold text-foreground">
+        <h1 className="text-2xl md:text-5xl font-semibold text-foreground">
           Access Denied
         </h1>
 

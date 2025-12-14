@@ -162,7 +162,7 @@ export default function ProductionWorkflowPage() {
 
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-3xl font-semibold tracking-tight">
               Production Workflow
             </h1>
             <p className="text-muted-foreground mt-2">

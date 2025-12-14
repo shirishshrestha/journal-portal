@@ -41,20 +41,23 @@ export async function disconnectOJS(journalId) {
 /**
  * Import submissions from OJS
  * @param {string} journalId
- * @param {Function} onComplete - Callback function when import completes
  * @returns {Promise}
  */
-export async function importFromOJS(journalId, onComplete) {
-  try {
-    const { data } = await instance.post(
-      `/journals/journals/${journalId}/import-from-ojs/`
-    );
+export async function importFromOJS(journalId) {
+  const { data } = await instance.post(
+    `/journals/journals/${journalId}/import-from-ojs/`
+  );
+  return data;
+}
 
-    // Signal completion to trigger 100%
-    onComplete?.();
-
-    return data;
-  } catch (error) {
-    throw error;
-  }
+/**
+ * Get import progress from backend
+ * @param {string} journalId
+ * @returns {Promise}
+ */
+export async function getImportProgress(journalId) {
+  const { data } = await instance.get(
+    `/journals/journals/${journalId}/import-progress/`
+  );
+  return data;
 }

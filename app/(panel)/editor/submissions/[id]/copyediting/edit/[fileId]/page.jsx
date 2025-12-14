@@ -68,7 +68,7 @@ export default function CopyeditingEditPage() {
         </Button>
 
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-3xl font-semibold tracking-tight">
             Edit Copyediting File
           </h1>
         </div>

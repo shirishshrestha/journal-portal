@@ -77,7 +77,9 @@ export default function ReviewDetailPage() {
               Back
             </Button>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">Review Details</h1>
+          <h1 className="text-3xl font-semibold text-foreground">
+            Review Details
+          </h1>
           <p className="text-muted-foreground">
             Detailed review submitted by the reviewer
           </p>
@@ -225,7 +227,7 @@ export default function ReviewDetailPage() {
                   <p className="text-xs text-muted-foreground capitalize mb-2">
                     {key.replace(/_/g, " ")}
                   </p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-2xl font-semibold">
                     {typeof value === "number" ? value.toFixed(1) : value}/10
                   </p>
                 </div>
@@ -238,7 +240,7 @@ export default function ReviewDetailPage() {
                   <p className="text-sm text-muted-foreground mb-2">
                     Overall Score
                   </p>
-                  <p className="text-3xl font-bold text-primary">
+                  <p className="text-3xl font-semibold text-primary">
                     {review.overall_score.toFixed(1)}/10
                   </p>
                 </div>

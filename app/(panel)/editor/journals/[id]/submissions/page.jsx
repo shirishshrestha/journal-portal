@@ -71,6 +71,7 @@ export default function JournalSubmissionsPage() {
   const {
     mutate: importFromOJSMutation,
     progress,
+    progressData,
     isPending: importOJSPending,
   } = useImportFromOJS();
 
@@ -177,7 +178,7 @@ export default function JournalSubmissionsPage() {
               Back
             </Button>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-semibold text-foreground">
             {journal?.title}
           </h1>
           <p className="text-muted-foreground">
@@ -263,7 +264,11 @@ export default function JournalSubmissionsPage() {
           />
         )}
 
-        <OJSSyncingDialog open={importOJSPending} progress={progress} />
+        <OJSSyncingDialog
+          open={importOJSPending}
+          progress={progress}
+          progressData={progressData}
+        />
       </div>
     </div>
   );

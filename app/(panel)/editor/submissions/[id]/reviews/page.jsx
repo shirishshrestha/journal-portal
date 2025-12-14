@@ -118,7 +118,7 @@ export default function SubmissionReviewsPage() {
               Back
             </Button>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-semibold text-foreground">
             Reviews for Submission
           </h1>
           <p className="text-muted-foreground">

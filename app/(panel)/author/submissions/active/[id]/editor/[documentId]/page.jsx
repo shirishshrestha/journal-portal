@@ -9,24 +9,15 @@ import {
   Download,
   AlertCircle,
   FileText,
-  Send,
   ArrowLeft,
-  File,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 import {
   loadDocument,
   downloadDocx,
 } from "@/features/panel/author/api/superdocApi";
-import {
-  LoadingScreen,
-  SuperDocEditor,
-  useSubmitUpdatedDocument,
-  ConfirmationInputPopup,
-  PDFViewer,
-} from "@/features";
+import { LoadingScreen, SuperDocEditor, PDFViewer } from "@/features";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function SuperDocEditorPage() {
