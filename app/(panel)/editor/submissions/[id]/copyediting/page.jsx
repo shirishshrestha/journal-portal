@@ -38,11 +38,13 @@ import {
   EditorCompleteCopyediting,
 } from "@/features/panel/editor/submission/components";
 import { Card } from "@/components/ui/card";
+import { useSelector } from "react-redux";
 
 export default function CopyeditingWorkflowPage() {
   const params = useParams();
   const router = useRouter();
   const submissionId = params?.id;
+  const userEmail = useSelector((state) => state.auth.userData.email);
 
   // Fetch submission details
   const {
@@ -56,6 +58,7 @@ export default function CopyeditingWorkflowPage() {
     data: assignmentsData,
     isPending: isAssignmentsPending,
     error: isAssignmentsError,
+    refetch: refetchAssignment,
   } = useCopyeditingAssignments({ submission: submissionId });
 
   // Get the first (active) assignment
@@ -82,19 +85,33 @@ export default function CopyeditingWorkflowPage() {
     );
   }
 
+  if (isAssignmentsError) {
+    return (
+      <div className="container mx-auto p-6">
+        <ErrorCard
+          title="Error Loading Submission"
+          onRetry={refetchAssignment}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className=" space-y-6">
       {/* Header with breadcrumbs and actions */}
       {(isSubmissionLoading || isAssignmentsPending) && <LoadingScreen />}
       <div className="flex flex-col gap-4">
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/editor/submissions/${submissionId}`)}
-          className="w-fit"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Submission
-        </Button>
+        {assignmentsData &&
+          assignmentsData?.results[0]?.copyeditor?.user_email === userEmail && (
+            <Button
+              variant="ghost"
+              onClick={() => router.push(`/editor/submissions/${submissionId}`)}
+              className="w-fit"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Submission
+            </Button>
+          )}
 
         <div className="flex items-start justify-between gap-4">
           <div>

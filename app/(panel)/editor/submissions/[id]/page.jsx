@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
 import {
@@ -35,6 +35,7 @@ import {
   useGetEditorSubmissionById,
   useGetReviewerRecommendations,
   useSyncSubmissionToOJS,
+  useToggle,
 } from "@/features";
 import { SubmissionInfoCard } from "@/features/panel/editor/submission/components/SubmissionInfoCard";
 import { SubmissionDocuments } from "@/features/panel/editor/submission/components/SubmissionDocumentsCard";
@@ -44,13 +45,14 @@ import { InvitedReviewersCard } from "@/features/panel/editor/submission/compone
 import { EditorialDecisionForm } from "@/features/panel/editor/submission/components/EditorialDecisionForm";
 import { CreateCopyeditingDialog } from "@/features/panel/editor/submission/components";
 
-export default function EditorSubmissionDetailPage() {
+export default function EditorSubmissionDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const submissionId = params?.id;
-  const [assigningReviewerId, setAssigningReviewerId] = useState(null);
-  const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false);
-  const [isCreateCopyeditingOpen, setIsCreateCopyeditingOpen] = useState(false);
+  const [assigningReviewerId, setAssigningReviewerId] = React.useState(null);
+  const [isSyncDialogOpen, toggleSyncDialog] = useToggle(false);
+  const [isCreateCopyeditingOpen, setIsCreateCopyeditingOpen] =
+    React.useState(false);
 
   // Fetch submission details
   const {
@@ -237,24 +239,39 @@ export default function EditorSubmissionDetailPage() {
             </Button>
           )}
           {submission?.journal?.ojs_connection_status?.configured && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setIsSyncDialogOpen(true)}
-              disabled={isSyncing}
-            >
-              {isSyncing ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Syncing...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Sync to OJS
-                </>
-              )}
-            </Button>
+            <>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={toggleSyncDialog}
+                disabled={isSyncing}
+              >
+                {isSyncing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Syncing...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Sync to OJS
+                  </>
+                )}
+              </Button>
+              <ConfirmationPopup
+                open={isSyncDialogOpen}
+                onOpenChange={toggleSyncDialog}
+                title="Sync Submission to OJS"
+                description="This will sync the current submission data to Open Journal Systems (OJS). Any changes made here will be reflected in OJS."
+                confirmText="Sync Now"
+                cancelText="Cancel"
+                variant="primary"
+                onConfirm={handleSyncToOJS}
+                isPending={isSyncing}
+                isSuccess={syncSuccess}
+                loadingText="Syncing to OJS..."
+              />
+            </>
           )}
         </div>
       </div>
@@ -444,20 +461,7 @@ export default function EditorSubmissionDetailPage() {
           </Card>
         )}
 
-      {/* Sync to OJS Confirmation Dialog */}
-      <ConfirmationPopup
-        open={isSyncDialogOpen}
-        onOpenChange={setIsSyncDialogOpen}
-        title="Sync Submission to OJS"
-        description="This will sync the current submission data to Open Journal Systems (OJS). Any changes made here will be reflected in OJS."
-        confirmText="Sync Now"
-        cancelText="Cancel"
-        variant="primary"
-        onConfirm={handleSyncToOJS}
-        isPending={isSyncing}
-        isSuccess={syncSuccess}
-        loadingText="Syncing to OJS..."
-      />
+      {/* Sync to OJS Confirmation Dialog handled inline above */}
 
       {/* Create Copyediting Assignment Dialog */}
       <CreateCopyeditingDialog

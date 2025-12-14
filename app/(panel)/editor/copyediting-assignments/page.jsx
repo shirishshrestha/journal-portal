@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import {
   FileEdit,
@@ -24,19 +24,25 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
-import { DataTable, ErrorCard, LoadingScreen } from "@/features/shared";
+import {
+  DataTable,
+  ErrorCard,
+  LoadingScreen,
+  FilterToolbar,
+} from "@/features/shared";
 import { useCopyeditingAssignments } from "@/features/panel/editor/submission/hooks";
 
 export default function CopyeditingAssignmentsPage() {
   const router = useRouter();
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const searchParams = useSearchParams();
+  const statusFilter = searchParams.get("status");
+  const searchQuery = searchParams.get("search") || "";
 
   // Get current user's profile ID
   const userData = useSelector((state) => state?.auth?.userData);
   const currentUserProfileId = userData?.profile?.id;
 
-  // Fetch copyediting assignments for the current user
+  // Fetch copyediting assignments for the current user, backend filtering only
   const {
     data: assignmentsData,
     isPending,
@@ -44,21 +50,11 @@ export default function CopyeditingAssignmentsPage() {
     refetch,
   } = useCopyeditingAssignments({
     copyeditor: currentUserProfileId,
+    status: statusFilter,
+    search: searchQuery,
   });
 
   const assignments = assignmentsData?.results || [];
-
-  // Filter assignments based on status and search query
-  const filteredAssignments = assignments.filter((assignment) => {
-    const matchesStatus =
-      statusFilter === "all" || assignment.status === statusFilter;
-    const matchesSearch =
-      !searchQuery ||
-      assignment.submission_title
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
 
   // Calculate statistics
   const stats = {
@@ -71,12 +67,19 @@ export default function CopyeditingAssignmentsPage() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      IN_PROGRESS: "bg-blue-100 text-blue-800 border-blue-200",
-      COMPLETED: "bg-green-100 text-green-800 border-green-200",
-      CANCELLED: "bg-gray-100 text-gray-800 border-gray-200",
+      PENDING:
+        "bg-yellow-100 dark:bg-yellow-600 text-yellow-700 dark:text-primary-foreground",
+      IN_PROGRESS:
+        "text-blue-700 dark:text-primary-foreground bg-blue-100 dark:bg-blue-600",
+      COMPLETED:
+        "bg-green-100 dark:bg-green-600 text-green-700 dark:text-primary-foreground",
+      CANCELLED:
+        "text-red-700 dark:text-primary-foreground bg-red-100 dark:bg-red-600",
     };
-    return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
+    return (
+      colors[status] ||
+      "text-gray-700 dark:text-primary-foreground bg-gray-100 dark:bg-gray-800"
+    );
   };
 
   const getStatusDisplay = (status) => {
@@ -195,7 +198,7 @@ export default function CopyeditingAssignmentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">
-            My Copyediting Assignments
+            Copyediting Assignments
           </h1>
           <p className="text-muted-foreground mt-1">
             Manage your assigned copyediting tasks
@@ -204,7 +207,7 @@ export default function CopyeditingAssignmentsPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total</CardTitle>
@@ -264,61 +267,39 @@ export default function CopyeditingAssignmentsPage() {
       </div>
 
       {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Status
-              </label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All statuses" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                  <SelectItem value="COMPLETED">Completed</SelectItem>
-                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Search</label>
-              <Input
-                placeholder="Search by submission title..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <FilterToolbar>
+        <FilterToolbar.Search
+          paramName="search"
+          placeholder="Search by submission title..."
+          label="Search"
+        />
+        <FilterToolbar.Select
+          paramName="status"
+          label="Status"
+          options={[
+            { value: "all", label: "All Statuses" },
+            { value: "PENDING", label: "Pending" },
+            { value: "IN_PROGRESS", label: "In Progress" },
+            { value: "COMPLETED", label: "Completed" },
+            { value: "CANCELLED", label: "Cancelled" },
+          ]}
+        />
+      </FilterToolbar>
 
       {/* Assignments Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Assignments ({filteredAssignments.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            data={filteredAssignments}
-            columns={columns}
-            isPending={isPending}
-            error={error}
-            emptyMessage="No copyediting assignments found"
-            errorMessage="Error loading assignments"
-            hoverable={true}
-            tableClassName="border"
-          />
-        </CardContent>
-      </Card>
+      <h2 className="text-xl font-semibold">
+        Assignments ({assignments.length})
+      </h2>
+      <DataTable
+        data={assignments}
+        columns={columns}
+        isPending={isPending}
+        error={error}
+        emptyMessage="No copyediting assignments found"
+        errorMessage="Error loading assignments"
+        hoverable={true}
+        tableClassName="bg-card border flex justify-center"
+      />
     </div>
   );
 }

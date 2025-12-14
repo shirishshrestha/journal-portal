@@ -22,6 +22,7 @@ import {
   BookCheck,
   BookA,
   CopyCheckIcon,
+  CalendarCheck,
 } from "lucide-react";
 import path from "path";
 
@@ -190,6 +191,11 @@ export const sidebarConfig = {
       name: "Production Assignments",
       path: "/editor/production-assignments",
       icon: BarChart,
+    },
+    {
+      name: "Publication Schedules",
+      path: "/editor/publication-schedules",
+      icon: CalendarCheck,
     },
     {
       name: "Verification Requests",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -19,6 +20,8 @@ import {
   StatusBadge,
   statusConfig,
   Pagination,
+  ConfirmationPopup,
+  useToggle,
 } from "@/features/shared";
 import { format } from "date-fns";
 import {
@@ -27,9 +30,30 @@ import {
 } from "@/features/panel/editor/journal";
 import { JournalInfoCard, OJSSyncingDialog } from "@/features";
 import { useImportFromOJS } from "@/features/panel/editor/journal/hooks/mutation/useImportFromOJS";
+import { useImportProgress } from "@/features/panel/editor/journal/hooks/query/useImportProgress";
 import { RefreshCw } from "lucide-react";
 import EllipsisTooltip from "@/components/ui/EllipsisTooltip";
 
+/**
+ * JournalSubmissionsPage component displays and manages the list of submissions for a specific journal.
+ *
+ * Features:
+ * - Fetches and displays journal details and submissions using provided hooks.
+ * - Supports searching, filtering by status, and pagination of submissions.
+ * - Allows syncing submissions from Open Journal Systems (OJS) with progress tracking.
+ * - Handles loading and error states for both journal and submissions data.
+ * - Provides actions to view submission details and reviews.
+ *
+ * UI Elements:
+ * - Journal information card.
+ * - Submissions data table with columns for submission number, title, author, submission date, status, reviews, and actions.
+ * - Filter toolbar for searching and filtering submissions.
+ * - Pagination controls.
+ * - Sync from OJS and import progress dialogs.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered JournalSubmissionsPage component.
+ */
 export default function JournalSubmissionsPage() {
   const params = useParams();
   const router = useRouter();
@@ -38,6 +62,8 @@ export default function JournalSubmissionsPage() {
   const statusParam = searchParams.get("status");
   const pageParam = searchParams.get("page");
   const currentPage = pageParam ? parseInt(pageParam) : 1;
+  const [isSyncDialogOpen, toggleSyncDialog] = useToggle(false);
+  const [isViewProgressOpen, toggleViewProgress] = useToggle(false);
 
   const submissionParams = {
     search: search,
@@ -47,7 +73,6 @@ export default function JournalSubmissionsPage() {
 
   const journalId = params.id;
 
-  // Fetch journal details using custom hook
   const {
     data: journal,
     isPending: isJournalPending,
@@ -60,24 +85,45 @@ export default function JournalSubmissionsPage() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  // Fetch submissions for this journal using custom hook
   const {
     data: submissionsData,
     isPending: isSubmissionsPending,
     error: submissionsError,
+    refetch,
   } = useGetJournalSubmissions(journalId, { params: submissionParams });
 
-  // OJS Import mutation
-  const {
-    mutate: importFromOJSMutation,
-    progress,
-    progressData,
-    isPending: importOJSPending,
-  } = useImportFromOJS();
+  const importMutation = useImportFromOJS();
+
+  const { progressData, isPolling, startPolling, isWaitingForStart } =
+    useImportProgress(journalId);
+
+  const isImportActive =
+    progressData?.status !== "idle" &&
+    progressData?.status !== "completed" &&
+    progressData?.status !== "error";
 
   const handleSyncFromOJS = () => {
-    importFromOJSMutation(journalId);
+    importMutation.mutate(journalId, {
+      onSuccess: () => {
+        // Start polling after import is initiated
+        startPolling();
+      },
+    });
   };
+
+  const handleViewProgress = () => {
+    if (!isPolling) {
+      startPolling();
+    }
+    toggleViewProgress();
+  };
+
+  // Close sync dialog when import actually starts (status changes from idle)
+  useEffect(() => {
+    if (isWaitingForStart && progressData.status !== "idle") {
+      toggleSyncDialog();
+    }
+  }, [isWaitingForStart, progressData.status, toggleSyncDialog]);
 
   const columns = [
     {
@@ -155,9 +201,27 @@ export default function JournalSubmissionsPage() {
   if (journalError) {
     return (
       <ErrorCard
-        title="Failed to load journal submissions"
-        description={journalError}
+        title="Failed to load journal details"
+        description={
+          journalError?.message ||
+          journalError?.toString() ||
+          "Error loading journal details."
+        }
         onBack={() => router.push("/editor/journals")}
+      />
+    );
+  }
+
+  if (submissionsError) {
+    return (
+      <ErrorCard
+        title="Failed to load submissions"
+        description={
+          submissionsError?.message ||
+          submissionsError?.toString() ||
+          "Error loading submissions."
+        }
+        onRetry={refetch()}
       />
     );
   }
@@ -185,26 +249,59 @@ export default function JournalSubmissionsPage() {
             View and manage all submissions for this journal
           </p>
         </div>
-        {journal?.ojs_connection_status?.connected && (
-          <Button
-            onClick={handleSyncFromOJS}
-            disabled={importFromOJSMutation.isPending}
-            variant="secondary"
-            size="sm"
-          >
-            {importFromOJSMutation.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Syncing...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Sync from OJS
-              </>
-            )}
-          </Button>
-        )}
+        {/* {journal?.ojs_connection_status?.connected && ( */}
+        <>
+          {!isImportActive ? (
+            <>
+              <Button
+                onClick={toggleSyncDialog}
+                disabled={importMutation.isPending || isPolling}
+                variant="secondary"
+                size="sm"
+              >
+                {importMutation.isPending || isPolling ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Starting...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Sync from OJS
+                  </>
+                )}
+              </Button>
+              <ConfirmationPopup
+                open={isSyncDialogOpen}
+                onOpenChange={(open) => {
+                  // Only allow closing if not waiting for import to start
+                  if (!isWaitingForStart) {
+                    toggleSyncDialog();
+                  }
+                }}
+                title="Sync Submissions from OJS"
+                description="This will import and update submissions from Open Journal Systems (OJS) for this journal. Are you sure you want to continue?"
+                confirmText="Sync Now"
+                cancelText="Cancel"
+                variant="primary"
+                onConfirm={handleSyncFromOJS}
+                isPending={importMutation.isPending || isWaitingForStart}
+                loadingText={
+                  isWaitingForStart
+                    ? "Waiting for import to start..."
+                    : "Starting import..."
+                }
+                autoClose={false}
+              />
+            </>
+          ) : (
+            <Button onClick={handleViewProgress} variant="secondary" size="sm">
+              <Eye className="h-4 w-4 mr-2" />
+              View Import Status
+            </Button>
+          )}
+        </>
+        {/* )} */}
       </div>
 
       {/* Journal Info Card */}
@@ -233,12 +330,10 @@ export default function JournalSubmissionsPage() {
             label="Status"
             options={[
               { value: "all", label: "All Status" },
-              { value: "SUBMITTED", label: "Submitted" },
-              { value: "UNDER_REVIEW", label: "Under Review" },
-              { value: "REVISION_REQUESTED", label: "Revision Requested" },
-              { value: "ACCEPTED", label: "Accepted" },
-              { value: "REJECTED", label: "Rejected" },
-              { value: "PUBLISHED", label: "Published" },
+              ...Object.entries(statusConfig).map(([value, { label }]) => ({
+                value,
+                label,
+              })),
             ]}
           />
         </FilterToolbar>
@@ -265,8 +360,9 @@ export default function JournalSubmissionsPage() {
         )}
 
         <OJSSyncingDialog
-          open={importOJSPending}
-          progress={progress}
+          open={isViewProgressOpen}
+          onOpenChange={toggleViewProgress}
+          progress={progressData?.percentage || 0}
           progressData={progressData}
         />
       </div>

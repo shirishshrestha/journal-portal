@@ -19,6 +19,11 @@ export const statusConfig = {
     text: "text-amber-700 dark:text-primary-foreground",
     label: "Revision Required",
   },
+  REVISED: {
+    bg: "bg-indigo-100 dark:bg-indigo-600",
+    text: "text-indigo-700 dark:text-primary-foreground",
+    label: "Revised",
+  },
   REVISION_REQUESTED: {
     bg: "bg-yellow-100 dark:bg-yellow-600",
     text: "text-yellow-700 dark:text-primary-foreground",
@@ -33,16 +38,6 @@ export const statusConfig = {
     bg: "bg-red-100 dark:bg-red-600",
     text: "text-red-700 dark:text-primary-foreground",
     label: "Rejection Requested",
-  },
-  REVISED: {
-    bg: "bg-indigo-100 dark:bg-indigo-600",
-    text: "text-indigo-700 dark:text-primary-foreground",
-    label: "Revised",
-  },
-  PRODUCTION: {
-    bg: "bg-indigo-100 dark:bg-indigo-600",
-    text: "text-indigo-700 dark:text-primary-foreground",
-    label: "Production",
   },
   ACCEPTED: {
     bg: "bg-green-100 dark:bg-green-600",
@@ -68,6 +63,11 @@ export const statusConfig = {
     bg: "bg-amber-100 dark:bg-amber-600",
     text: "text-amber-700 dark:text-primary-foreground",
     label: "Copy Editing",
+  },
+  PRODUCTION: {
+    bg: "bg-indigo-100 dark:bg-indigo-600",
+    text: "text-indigo-700 dark:text-primary-foreground",
+    label: "Production",
   },
   SCHEDULED: {
     bg: "bg-emerald-100 dark:bg-emerald-600",
