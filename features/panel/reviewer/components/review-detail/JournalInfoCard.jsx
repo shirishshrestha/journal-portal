@@ -31,7 +31,10 @@ export function JournalInfoCard({ journal, isPending = false }) {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 text-sm">
           {[...Array(10)].map((_, i) => (
-            <div className="flex items-start gap-2" key={i}>
+            <div
+              className="flex flex-col sm:flex-row items-start gap-2"
+              key={i}
+            >
               <Skeleton className="min-w-[140px] h-5 w-24" />
               <Skeleton className="h-5 w-32" />
             </div>
@@ -65,14 +68,14 @@ export function JournalInfoCard({ journal, isPending = false }) {
         <h3 className="font-semibold text-lg">Journal Information</h3>
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-        <div className="flex items-start gap-2">
+        <div className="flex flex-col sm:flex-row items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">
             Title:
           </span>
           <span className="text-foreground font-medium">{journal.title}</span>
         </div>
 
-        <div className="flex items-start gap-2">
+        <div className="flex flex-col sm:flex-row items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">
             Short Name:
           </span>
@@ -81,7 +84,7 @@ export function JournalInfoCard({ journal, isPending = false }) {
           </Badge>
         </div>
 
-        <div className="flex items-start gap-2">
+        <div className="flex flex-col sm:flex-row items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">
             Publisher:
           </span>
@@ -91,7 +94,7 @@ export function JournalInfoCard({ journal, isPending = false }) {
         </div>
 
         {currentRole !== "AUTHOR" && (
-          <div className="flex items-start gap-2">
+          <div className="flex  items-start gap-2">
             <span className="font-medium text-foreground/80 min-w-[140px]">
               Submission Count:
             </span>
@@ -101,7 +104,7 @@ export function JournalInfoCard({ journal, isPending = false }) {
           </div>
         )}
 
-        <div className="flex items-start gap-2">
+        <div className="flex  items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">
             ISSN (Print):
           </span>
@@ -110,7 +113,7 @@ export function JournalInfoCard({ journal, isPending = false }) {
           </code>
         </div>
 
-        <div className="flex items-start gap-2">
+        <div className="flex  items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">
             ISSN (Online):
           </span>
@@ -120,7 +123,7 @@ export function JournalInfoCard({ journal, isPending = false }) {
         </div>
 
         {journal.website_url && (
-          <div className="flex items-start gap-2">
+          <div className="flex flex-col sm:flex-row items-start gap-2">
             <span className="font-medium text-foreground/80 min-w-[140px]">
               Website:
             </span>
@@ -136,7 +139,7 @@ export function JournalInfoCard({ journal, isPending = false }) {
         )}
 
         {journal.contact_email && (
-          <div className="flex items-start gap-2">
+          <div className="flex flex-col sm:flex-row items-start gap-2">
             <span className="font-medium text-foreground/80 min-w-[140px]">
               Contact Email:
             </span>
@@ -186,7 +189,7 @@ export function JournalInfoCard({ journal, isPending = false }) {
         </div>
 
         {journal.editor_in_chief && (
-          <div className="flex items-start gap-2">
+          <div className="flex flex-col sm:flex-row items-start gap-2">
             <span className="font-medium text-foreground/80 min-w-[140px]">
               Editor in Chief:
             </span>

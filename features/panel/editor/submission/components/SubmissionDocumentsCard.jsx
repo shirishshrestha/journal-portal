@@ -43,7 +43,7 @@ export function SubmissionDocuments({ submission, submissionId }) {
             {submission.documents.map((doc) => (
               <div
                 key={doc.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex flex-col gap-3 sm:gap-0 sm:flex-row sm:items-cente justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <FileText className="h-8 w-8 text-primary stroke-[1.5]" />
@@ -51,8 +51,7 @@ export function SubmissionDocuments({ submission, submissionId }) {
                     <p className="font-medium">{doc.title}</p>
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                       <span>{doc.document_type_display}</span>
-                      <span>•</span>
-                      <span>{doc.file_name}</span>
+
                       {doc.file_size && (
                         <>
                           <span>•</span>

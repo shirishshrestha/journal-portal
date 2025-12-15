@@ -113,11 +113,11 @@ export default function Pagination({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4 ${className}`}
+      className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2 py-4 ${className}`}
     >
       {/* Page Info */}
       {showPageInfo && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground w-full sm:w-auto text-center sm:text-left">
           Showing <span className="font-medium">{startItem}</span> to{" "}
           <span className="font-medium">{endItem}</span> of{" "}
           <span className="font-medium">{totalCount}</span> results
@@ -125,7 +125,7 @@ export default function Pagination({
       )}
 
       {/* Pagination Controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full sm:w-auto justify-center">
         {/* First Page Button */}
         {showFirstLast && (
           <Button
@@ -153,7 +153,7 @@ export default function Pagination({
         </Button>
 
         {/* Page Numbers */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-thin max-w-full sm:max-w-none">
           {getPageNumbers().map((page, index) => {
             if (page === "...") {
               return (
@@ -172,7 +172,7 @@ export default function Pagination({
                 variant={currentPage === page ? "default" : "outline"}
                 size="sm"
                 onClick={() => handlePageChange(page)}
-                className="h-8 min-w-8"
+                className="h-8 min-w-8 px-2 sm:px-3 text-xs sm:text-sm"
               >
                 {page}
               </Button>
@@ -209,7 +209,7 @@ export default function Pagination({
 
       {/* Page Size Selector */}
       {showPageSizeSelector && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
           <span className="text-sm text-muted-foreground whitespace-nowrap">
             Items per page:
           </span>
