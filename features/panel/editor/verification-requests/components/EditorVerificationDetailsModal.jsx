@@ -208,7 +208,7 @@ export function EditorVerificationDetailsModal({
                       Research Interests
                     </h3>
                   </div>
-                  <ScrollArea className="h-32 w-full rounded border bg-muted/30 p-4">
+                  <ScrollArea className="max-h-32 overflow-auto w-full rounded border bg-muted/30 p-4">
                     <p className="text-sm leading-relaxed whitespace-pre-line">
                       {verification.research_interests}
                     </p>
@@ -226,7 +226,7 @@ export function EditorVerificationDetailsModal({
                     Supporting Letter
                   </h3>
                 </div>
-                <ScrollArea className="min-h-80 max-h-[500px] overflow-y-auto w-full rounded border bg-muted/30 p-4">
+                <ScrollArea className="min-h-80 max-h-[500px] overflow-auto w-full rounded border bg-muted/30 p-4">
                   <div
                     dangerouslySetInnerHTML={{
                       __html: verification.supporting_letter,

@@ -47,7 +47,7 @@ export function SubmissionDetailsTab({ submission, isPending }) {
                   {submission.title}
                 </p>
               </div>
-              <Separator className="bg-primary/10" />
+              <Separator className="bg-primary/10 lg:hidden" />
               {/* Submission Number */}
               <div className="flex items-start gap-2">
                 <div>
@@ -68,7 +68,7 @@ export function SubmissionDetailsTab({ submission, isPending }) {
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 Abstract
               </h3>
-              <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded-lg border border-border bg-white/50 dark:bg-black/20 p-4">
+              <ScrollArea className="min-h-[200px] overflow-auto max-h-[500px] w-full rounded-lg border border-border bg-white/50 dark:bg-black/20 p-4">
                 <div
                   dangerouslySetInnerHTML={{ __html: submission.abstract }}
                   className="text-foreground/80 whitespace-pre-wrap leading-relaxed"

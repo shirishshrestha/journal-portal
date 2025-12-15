@@ -17,7 +17,7 @@ export function AuthorGuidelinesDialog({ open, onOpenChange, guidelines }) {
             Detailed guidelines for manuscript preparation and submission
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="max-h-[60vh] pr-4">
+        <ScrollArea className="max-h-[60vh] overflow-auto pr-4">
           <div
             className="prose dark:prose-invert max-w-none text-sm"
             dangerouslySetInnerHTML={{ __html: guidelines }}

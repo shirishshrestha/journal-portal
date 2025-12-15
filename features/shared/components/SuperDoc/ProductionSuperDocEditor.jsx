@@ -142,7 +142,11 @@ export default function ProductionSuperDocEditor({
               ? false
               : {
                   selector: "#production-superdoc-toolbar",
-                  excludeItems: ["documentMode"],
+                  excludeItems: [
+                    "documentMode",
+                    "acceptTrackedChangeBySelection",
+                    "rejectTrackedChangeOnSelection",
+                  ],
                 },
           },
           onReady: () => {

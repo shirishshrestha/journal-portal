@@ -93,7 +93,7 @@ export default function SuperDocEditorPage() {
       <CardContent>
         {/* Header */}
         <CardHeader className="border-b pb-3 px-0">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm" onClick={handleBack}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -135,7 +135,7 @@ export default function SuperDocEditorPage() {
           <div className="mt-4">
             {/* Document Info */}
             <div className="p-3 border rounded-lg bg-muted/50 mb-4">
-              <div className="grid grid-cols-3 gap-2 text-sm">
+              <div className="grid sm:grid-cols-3 gap-2 text-sm">
                 <div>
                   <span className="font-medium">File:</span>{" "}
                   {documentData.file_name}

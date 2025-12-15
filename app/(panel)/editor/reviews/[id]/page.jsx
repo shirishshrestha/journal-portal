@@ -270,7 +270,7 @@ export default function ReviewDetailPage() {
         </CardHeader>
         <CardContent>
           <div className="prose prose-sm max-w-none dark:prose-invert">
-            <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded border bg-muted/30 p-4">
+            <ScrollArea className="min-h-[200px] overflow-auto max-h-[500px] w-full rounded border bg-muted/30 p-4">
               <div
                 dangerouslySetInnerHTML={{
                   __html: review.review_text,
@@ -299,7 +299,7 @@ export default function ReviewDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="prose prose-sm max-w-none dark:prose-invert">
-              <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded border border-yellow-200 dark:border-yellow-800 text-yellow-900 dark:text-yellow-200 p-4">
+              <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded border border-yellow-200 dark:border-yellow-800 text-yellow-900 dark:text-yellow-200 overflow-auto p-4">
                 <div
                   dangerouslySetInnerHTML={{
                     __html: review.confidential_comments,

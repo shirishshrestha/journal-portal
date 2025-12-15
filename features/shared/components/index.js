@@ -17,7 +17,6 @@ import StatsErrorCard from "./StatsErrorCard";
 import { FilterToolbar } from "./FilterToolbar";
 import SuperDocEditor from "./SuperDoc/SuperDocEditor";
 import CopyeditingSuperDocEditor from "./SuperDoc/CopyeditingSuperDocEditor";
-import ProductionSuperDocEditor from "./SuperDoc/ProductionSuperDocEditor";
 import StatusBadge from "./StatusBadge";
 import DecisionBadge from "./DecisionBadge";
 import { RichTextEditor } from "./RichTextEditor";
@@ -52,7 +51,6 @@ export {
   FilterToolbar,
   SuperDocEditor,
   CopyeditingSuperDocEditor,
-  ProductionSuperDocEditor,
   StatusBadge,
   DecisionBadge,
   RichTextEditor,

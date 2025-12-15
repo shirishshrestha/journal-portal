@@ -166,12 +166,17 @@
 #superdoc__container::-webkit-scrollbar {
   width: 7px !important;
   padding-top: 4px !important;
+  height: 4px !important;
 }
 
 #copyediting-superdoc__container::-webkit-scrollbar-thumb,
 #superdoc__container::-webkit-scrollbar-thumb {
   background-color: var(--secondary);
   border-radius: 10px;
+}
+
+.super-editor-container[data-v-9d25f5b3] {
+  min-width: auto !important;
 }
 
 .tools[data-v-29e35f23] {

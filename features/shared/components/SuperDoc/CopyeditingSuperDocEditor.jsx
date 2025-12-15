@@ -162,7 +162,11 @@ export default function CopyeditingSuperDocEditor({
               ? false
               : {
                   selector: "#copyediting-superdoc-toolbar",
-                  excludeItems: ["documentMode"],
+                  excludeItems: [
+                    "documentMode",
+                    "acceptTrackedChangeBySelection",
+                    "rejectTrackedChangeOnSelection",
+                  ],
                 },
           },
           onReady: () => {
@@ -324,18 +328,18 @@ export default function CopyeditingSuperDocEditor({
       )}
 
       <div
-        className={`${className} bg-white flex overflow-y-auto max-h-[95vh] flex-col`}
+        className={`${className} bg-white flex overflow-x-auto overflow-y-auto max-h-[95vh] flex-col `}
         id="copyediting-superdoc__container"
       >
         {/* Editor Container */}
         <div className="flex flex-col items-center relative">
           <div
             id="copyediting-superdoc-toolbar"
-            className="bg-white border-b sticky top-0 z-4  border-gray-200  overflow-x-auto max-w-5xl w-fit"
+            className="bg-white border-b sticky left-0 top-0 z-4 border-gray-200 overflow-x-auto max-w-[300px]  md:max-w-[600px] lg:max-w-[700px] xl:max-w-[800px] 2xl:max-w-5xl"
           />
           <div
             id="copyediting-superdoc-editor"
-            className="text-black w-fit"
+            className="text-black max-w-[320px] md:max-w-[600px] lg:max-w-[700px] xl:max-w-[800px] 2xl:max-w-5xl mx-auto"
             style={{
               minHeight: "600px",
               padding: "20px",

@@ -151,7 +151,7 @@ export function JournalFormModal({
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[calc(90vh-180px)] px-6">
+          <ScrollArea className="max-h-[calc(90vh-180px)] overflow-auto px-6">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleSubmit)}

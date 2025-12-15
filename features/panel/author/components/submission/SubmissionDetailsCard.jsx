@@ -82,7 +82,7 @@ export default function SubmissionDetailsCard({
         {/* Abstract */}
         <div>
           <h3 className="font-semibold mb-2">Abstract</h3>
-          <ScrollArea className="min-h-[200px] max-h-[500px] w-full rounded border bg-muted/30 p-4">
+          <ScrollArea className="min-h-[200px] overflow-auto max-h-[500px] w-full rounded border bg-muted/30 p-4">
             <div
               dangerouslySetInnerHTML={{ __html: submission?.abstract }}
               className="text-muted-foreground whitespace-pre-wrap"

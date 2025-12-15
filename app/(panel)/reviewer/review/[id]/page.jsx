@@ -76,7 +76,7 @@ export default function ReviewDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold">Review Assignment</h1>
           <p className="text-muted-foreground">
@@ -84,7 +84,11 @@ export default function ReviewDetailPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push(`/reviewer/assignments`)}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>

@@ -55,7 +55,7 @@ export function ErrorDetailsModal({ issue, open, onOpenChange }) {
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[70vh]">
+        <ScrollArea className="max-h-[70vh] overflow-auto">
           <div className="space-y-6 pr-4">
             {/* Level & Status */}
             <div className="flex items-center gap-2 flex-wrap">

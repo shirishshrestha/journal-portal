@@ -40,7 +40,7 @@ export function AnomalyDetailsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[65vh]">
+        <ScrollArea className="max-h-[65vh] overflow-auto">
           <div className="space-y-4 pr-4">
             {/* Severity and Description */}
             <div className="space-y-2">

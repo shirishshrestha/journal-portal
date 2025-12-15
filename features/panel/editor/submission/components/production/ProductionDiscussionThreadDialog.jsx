@@ -171,7 +171,7 @@ export function ProductionDiscussionThreadDialog({
         </DialogHeader>
 
         {/* Thread Messages */}
-        <ScrollArea className="flex-1 max-h-[400px] pr-4">
+        <ScrollArea className="flex-1 max-h-[400px] overflow-auto pr-4">
           <div className="space-y-4">
             {isPending ? (
               <div className="text-center py-8">

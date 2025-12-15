@@ -18,7 +18,7 @@ export default function ReviewerStatsChart({
 }) {
   if (isLoading) {
     return (
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Assignments by Status</CardTitle>
@@ -99,7 +99,7 @@ export default function ReviewerStatsChart({
   ];
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-6 lg:grid-cols-2">
       <BarChart
         title="Assignments by Status"
         data={barChartData}

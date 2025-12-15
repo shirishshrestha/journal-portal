@@ -99,11 +99,13 @@ export function UnifiedAppbar({ userName, roles, userRole, setNewRole }) {
                 ) : (
                   <Laptop className="h-4 w-4" />
                 )}
-                <span className="capitalize">{theme || "system"}</span>
+                <span className="capitalize hidden sm:inline">
+                  {theme || "system"}
+                </span>
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuContent align="end" className="sm:w-40">
               <DropdownMenuItem
                 className={"group"}
                 onClick={() => setTheme("light")}
