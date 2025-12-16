@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import {
-  JournalDetailsDrawer,
   JournalFormModal,
   JournalsTable,
   useGetJournals,
@@ -13,7 +12,6 @@ import {
 } from "@/features";
 import {
   FilterToolbar,
-  RoleBasedRoute,
   ConfirmationPopup,
   Pagination,
 } from "@/features/shared";
@@ -43,8 +41,6 @@ export default function JournalsPage() {
     page: currentPage,
   };
 
-  const [selectedJournal, setSelectedJournal] = useState(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [journalToDelete, setJournalToDelete] = useState(null);
@@ -173,12 +169,6 @@ export default function JournalsPage() {
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         onSave={handleSaveJournal}
-      />
-
-      <JournalDetailsDrawer
-        journal={selectedJournal}
-        isOpen={isDetailsOpen}
-        onClose={() => setIsDetailsOpen(false)}
       />
 
       {/* Delete Confirmation Popup */}

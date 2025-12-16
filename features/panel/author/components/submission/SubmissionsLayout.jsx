@@ -57,14 +57,14 @@ export default function SubmissionsLayout({ children, title, description }) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-2 sm:items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-foreground">{title}</h1>
           <p className="text-sm text-muted-foreground mt-1">{description}</p>
         </div>
         <Button
           onClick={() => router.push("/author/new-submission/")}
-          className="gap-2"
+          className="gap-2 w-fit sm:w-auto"
         >
           <Plus className="h-4 w-4" />
           New Submission
@@ -72,7 +72,7 @@ export default function SubmissionsLayout({ children, title, description }) {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-2 border-b">
+      <div className="grid grid-cols-2 sm:grid-cols-4 items-center gap-2 border-b">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -83,7 +83,7 @@ export default function SubmissionsLayout({ children, title, description }) {
               key={item.href}
               onClick={() => router.push(item.href)}
               className={cn(
-                "flex items-center cursor-pointer gap-2 px-4 py-2 border-b-2 transition-colors",
+                "flex items-center justify-center text-center w-full cursor-pointer gap-2 px-4 py-2 border-b-2 transition-colors",
                 isActive
                   ? "border-primary text-primary font-medium"
                   : "border-transparent text-muted-foreground hover:text-foreground"

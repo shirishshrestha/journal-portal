@@ -28,8 +28,14 @@ import { FileText, ExternalLink } from "lucide-react";
 export default function SubmissionGuidelines({ form }) {
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
 
-  const { data: journalData, isPending: isLoadingJournals } = useGetJournals({
+  const params = {
     active_role: "AUTHOR",
+    is_accepting_submissions: true,
+    is_active: true,
+  };
+
+  const { data: journalData, isPending: isLoadingJournals } = useGetJournals({
+    params,
   });
 
   const journals = useMemo(() => journalData?.results || [], [journalData]);
@@ -324,7 +330,7 @@ export default function SubmissionGuidelines({ form }) {
 
       {/* Journal Details Card */}
       {selectedJournalDetails && !isLoadingJournalDetails && (
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <JournalInfoCard
             journal={selectedJournalDetails}
             isPending={isLoadingJournalDetails}

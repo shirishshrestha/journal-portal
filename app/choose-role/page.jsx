@@ -83,17 +83,19 @@ export default function ChooseRole() {
       <div className="relative z-10 w-full max-w-5xl">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-semibold text-slate-900 dark:text-white mb-4 text-balance">
+          <h1 className="text-4xl pt-12 sm:pt-0 md:text-5xl font-semibold text-slate-900 dark:text-white mb-4 text-balance">
             Choose Your Role
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Select how you&apos;d like to access OMWay Technologies. Each role
-            gives you specialized tools and features for your academic journey.
+            Select how you&apos;d like to access the Journal Management System.
+            Each role provides dedicated tools and workflows for managing
+            journals, handling submissions, coordinating peer reviews, and
+            supporting the publication process.
           </p>
         </div>
 
         {/* Role Cards */}
-        <div className="flex gap-6 mb-12">
+        <div className="flex flex-col sm:flex-row gap-6 mb-12">
           {availableRoles.map((role) => {
             const Icon = role.icon;
             const isSelected = selectedRole === role.id;

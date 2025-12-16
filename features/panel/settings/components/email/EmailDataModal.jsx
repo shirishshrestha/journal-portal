@@ -20,7 +20,7 @@ export default function EmailDetailModal({ email, open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-foreground">{email.subject}</DialogTitle>
           <DialogDescription className="text-muted-foreground">

@@ -303,7 +303,7 @@ export default function EditSubmissionGuidelines({ form, submission }) {
 
       {/* Journal Details Card */}
       {journal && (
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <JournalInfoCard journal={journal} />
         </Card>
       )}

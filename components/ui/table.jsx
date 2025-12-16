@@ -8,7 +8,7 @@ function Table({ className, ...props }) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-[95vw] overflow-x-auto md:w-[97vw] lg:w-[73vw] xl:w-[77vw] 2xl:w-full "
+      className="relative w-[94vw] overflow-x-auto md:w-[96vw] lg:w-[73vw] xl:w-[77vw] 2xl:w-full "
     >
       <table
         data-slot="table"

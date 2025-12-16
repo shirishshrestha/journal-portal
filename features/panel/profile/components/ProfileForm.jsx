@@ -99,10 +99,12 @@ export default function ProfileForm({
   };
 
   const handleFormSubmit = (data) => {
-    // Ensure expertise_areas is sent as an array
+    // Ensure expertise_areas is sent as an array and include affiliation fields
     const formattedData = {
       ...data,
       expertise_areas: expertiseAreas,
+      affiliation_ror_id: form.getValues("affiliation_ror_id") || "",
+      affiliation_name: form.getValues("affiliation_name") || "",
     };
     onSubmit(formattedData);
   };

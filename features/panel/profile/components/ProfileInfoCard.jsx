@@ -83,14 +83,14 @@ export default function ProfileInfoCard({
             <p className="text-sm font-medium text-muted-foreground">
               Affiliation
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <p className="text-sm">{profileData.affiliation_name || "-"}</p>
               {profileData.affiliation_ror_id && (
                 <a
                   href={`https://ror.org/${profileData.affiliation_ror_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs bg-secondary hover:bg-secondary/80 text-primary-foreground px-2 py-0.5 rounded font-mono transition-colors"
+                  className="inline-flex w-fit items-center gap-1 text-xs bg-secondary hover:bg-secondary/80 text-primary-foreground px-2 py-0.5 rounded font-mono transition-colors"
                   title="View on ROR Registry"
                 >
                   ROR: {profileData.affiliation_ror_id}

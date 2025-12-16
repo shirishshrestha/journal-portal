@@ -6,7 +6,6 @@ import { Trash2 } from "lucide-react";
 import {
   AuthorSubmissionsTable,
   LoadingScreen,
-  RoleBasedRoute,
   SubmissionsLayout,
 } from "@/features";
 import { useGetDraftSubmissions } from "@/features/panel/author/hooks/query/useGetDraftSubmissions";
@@ -15,7 +14,6 @@ import DocumentViewModal from "@/features/panel/author/components/submission/Doc
 import { useSubmitForReview } from "@/features/panel/author/hooks/mutation/useSubmitForReview";
 import { useDeleteSubmission } from "@/features/panel/author/hooks/mutation/useDeleteSubmission";
 import { ConfirmationPopup, Pagination } from "@/features/shared";
-import { useSubmissionById } from "@/features/panel/author/hooks/query/useGetSubmissionById";
 
 export default function DraftsPage() {
   const router = useRouter();
@@ -84,7 +82,7 @@ export default function DraftsPage() {
   };
 
   return (
-    <>
+    <div>
       {isSubmissionsPending && <LoadingScreen />}
       <SubmissionsLayout
         title="Draft Submissions"
@@ -150,6 +148,6 @@ export default function DraftsPage() {
           showPageSizeSelector={false}
         />
       )}
-    </>
+    </div>
   );
 }

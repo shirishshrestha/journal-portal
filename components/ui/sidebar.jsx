@@ -464,10 +464,20 @@ function SidebarMenuButton({
   size = "default",
   tooltip,
   className,
+  hasChildren = false,
   ...props
 }) {
   const Comp = asChild ? Slot : "button";
-  const { isMobile, state } = useSidebar();
+  const { isMobile, state, setOpenMobile } = useSidebar();
+
+  const handleClick = (event) => {
+    // Close sidebar on mobile when clicking a menu item (but not if it has children)
+    if (isMobile && !hasChildren) {
+      setOpenMobile(false);
+    }
+    // Call the original onClick if provided
+    props.onClick?.(event);
+  };
 
   const button = (
     <Comp
@@ -477,6 +487,7 @@ function SidebarMenuButton({
       data-active={isActive}
       className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
       {...props}
+      onClick={handleClick}
     />
   );
 
@@ -615,6 +626,16 @@ function SidebarMenuSubButton({
   ...props
 }) {
   const Comp = asChild ? Slot : "a";
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleClick = (event) => {
+    // Close sidebar on mobile when clicking a submenu item
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+    // Call the original onClick if provided
+    props.onClick?.(event);
+  };
 
   return (
     <Comp
@@ -631,6 +652,7 @@ function SidebarMenuSubButton({
         className
       )}
       {...props}
+      onClick={handleClick}
     />
   );
 }

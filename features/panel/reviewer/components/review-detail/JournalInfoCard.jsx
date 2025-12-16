@@ -75,7 +75,7 @@ export function JournalInfoCard({ journal, isPending = false }) {
           <span className="text-foreground font-medium">{journal.title}</span>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-start gap-2">
+        <div className="flex items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">
             Short Name:
           </span>

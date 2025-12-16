@@ -90,7 +90,9 @@ const RoleRequestForm = () => {
       onError: (error) => {
         console.error("Role request error:", error);
         toast.error(
-          error?.response?.data?.message || "Failed to submit role request"
+          error?.response?.data?.message ||
+            error?.response?.data?.affiliation ||
+            "Failed to submit role request"
         );
       },
     });
