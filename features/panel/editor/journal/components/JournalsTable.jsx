@@ -117,22 +117,33 @@ export default function JournalsTable({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => onViewSubmissions(row)}
-              className="gap-2"
-            >
-              <FileText className="h-4 w-4" /> View Submissions
-            </DropdownMenuItem>
-
-            <DropdownMenuItem onClick={() => onSettings(row)} className="gap-2">
-              <Settings className="h-4 w-4" /> Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDelete(row)}
-              className="gap-2 text-destructive"
-            >
-              <Trash2 className="h-4 w-4" /> Delete
-            </DropdownMenuItem>
+            {row.is_active === false && (
+              <DropdownMenuItem className="gap-2">
+                Journal not activated
+              </DropdownMenuItem>
+            )}
+            {row.is_active === true && (
+              <>
+                <DropdownMenuItem
+                  onClick={() => onViewSubmissions(row)}
+                  className="gap-2"
+                >
+                  <FileText className="h-4 w-4" /> View Submissions
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onSettings(row)}
+                  className="gap-2"
+                >
+                  <Settings className="h-4 w-4" /> Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onDelete(row)}
+                  className="gap-2 text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" /> Delete
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),

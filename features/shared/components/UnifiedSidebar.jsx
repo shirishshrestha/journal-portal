@@ -88,7 +88,10 @@ export function UnifiedSidebar({ menuItems }) {
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton isActive={isActive}>
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          hasChildren={true}
+                        >
                           <Icon className="h-4 w-4" />
                           <span>{item.name}</span>
                           <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />

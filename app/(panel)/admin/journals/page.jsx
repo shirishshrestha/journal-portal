@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import {
   AdminJournalsTable,
   JournalDetailsDrawer,
@@ -12,7 +11,6 @@ import {
 } from "@/features";
 import {
   FilterToolbar,
-  RoleBasedRoute,
   ConfirmationPopup,
   Pagination,
 } from "@/features/shared";

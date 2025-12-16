@@ -26,7 +26,8 @@ export default function InitialValuePlugin({ initialValue }) {
       // Insert the nodes
       $insertNodes(nodes);
     });
-  }, [editor, initialValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
 
   return null;
 }

@@ -9,22 +9,18 @@ import {
   BookOpen,
   BarChart,
   Mail,
-  Shield,
   Palette,
   Files,
   FilePlus2Icon,
-  File,
   Inbox,
   Book,
   AlertTriangle,
   Bug,
   LogsIcon,
   BookCheck,
-  BookA,
   CopyCheckIcon,
   CalendarCheck,
 } from "lucide-react";
-import path from "path";
 
 // Sidebar configuration for each role
 export const sidebarConfig = {

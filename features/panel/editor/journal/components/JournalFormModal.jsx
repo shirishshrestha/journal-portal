@@ -138,12 +138,12 @@ export function JournalFormModal({
     onClose();
   };
 
-  const isMutating = isLoading || createJournalMutation.isLoading;
+  const isMutating = isLoading || createJournalMutation.isPending;
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] p-0">
+        <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] overflow-auto p-0">
           <DialogHeader className="px-6 pt-6">
             <DialogTitle className="text-xl">Create New Journal</DialogTitle>
             <DialogDescription>
@@ -151,7 +151,7 @@ export function JournalFormModal({
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[calc(90vh-180px)] overflow-auto px-6">
+          <div className="  px-6">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleSubmit)}
@@ -369,7 +369,7 @@ export function JournalFormModal({
                 </div>
               </form>
             </Form>
-          </ScrollArea>
+          </div>
 
           <DialogFooter className="px-6 py-4 border-t">
             <Button
@@ -394,11 +394,11 @@ export function JournalFormModal({
         </DialogContent>
       </Dialog>
 
-      <JournalCreatedDialog
+      {/* <JournalCreatedDialog
         open={showSuccessDialog}
         onOpenChange={setShowSuccessDialog}
         journalId={createdJournalId}
-      />
+      /> */}
     </>
   );
 }

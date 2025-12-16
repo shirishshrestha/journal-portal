@@ -54,7 +54,7 @@ export default function ChangePassword() {
   };
 
   return (
-    <Card className="p-6 ">
+    <Card className="p-5 sm:p-6 ">
       <h3 className="text-lg font-semibold text-foreground">Change Password</h3>
       <Form {...passwordForm}>
         <form

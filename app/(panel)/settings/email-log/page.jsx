@@ -10,12 +10,12 @@ import {
   Pagination,
 } from "@/features";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function EmailLogTab() {
   const searchParams = useSearchParams();
   const [selectedEmail, setSelectedEmail] = useState(null);
-
+  const router = useRouter();
   // Get filter values from URL
   const searchValue = searchParams.get("search") || "";
 
@@ -35,8 +35,11 @@ export default function EmailLogTab() {
   } = useGetUserEmailLogStats({ params });
 
   // Pagination data - TODO: Replace with actual API pagination data
-  const totalItems = EmailLogData?.recent_emails?.length || 0;
-  const pageSize = 10;
+  const handlePageChange = (page) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <div className="space-y-4">
@@ -72,15 +75,15 @@ export default function EmailLogTab() {
         />
       </div>
 
-      {/* Pagination */}
-      {totalItems > 0 && (
-        <div className="flex justify-center mt-4">
-          <Pagination
-            currentPage={currentPage}
-            totalItems={totalItems}
-            pageSize={pageSize}
-          />
-        </div>
+      {EmailLogData && EmailLogData.count > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(EmailLogData.count / 10)}
+          totalCount={EmailLogData.count}
+          pageSize={10}
+          onPageChange={handlePageChange}
+          showPageSizeSelector={false}
+        />
       )}
 
       {/* Email Detail Modal */}

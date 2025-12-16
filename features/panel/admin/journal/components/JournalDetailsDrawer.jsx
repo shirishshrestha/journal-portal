@@ -16,7 +16,7 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose} direction="right">
-      <DrawerContent className="w-full max-w-xl">
+      <DrawerContent className="w-full max-w-2xl">
         <DrawerHeader>
           <DrawerTitle>{journal?.title || "-"}</DrawerTitle>
           <DrawerDescription>{journal?.publisher || "-"}</DrawerDescription>

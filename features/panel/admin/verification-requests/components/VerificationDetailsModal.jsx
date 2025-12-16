@@ -293,9 +293,9 @@ export function VerificationDetailsModal({
         <Separator />
 
         {/* Action Buttons */}
-        <div className="px-6 pb-4">
+        <div className=" px-6 pb-4">
           {verification.status === "PENDING" && (
-            <div className="flex gap-3 justify-end">
+            <div className="flex gap-3 flex-col sm:flex-row justify-end">
               <Button
                 variant="destructive"
                 onClick={onReject}

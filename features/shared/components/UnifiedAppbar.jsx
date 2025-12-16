@@ -76,7 +76,7 @@ export function UnifiedAppbar({ userName, roles, userRole, setNewRole }) {
   };
 
   return (
-    <nav className="border rounded-xl shadow-new bg-card px-6 py-4">
+    <nav className="border rounded-xl shadow-new bg-card px-4 py-4 sm:px-6 sm:py-4">
       <div className="flex items-center justify-between">
         {/* Left: Sidebar Trigger */}
         <div>
