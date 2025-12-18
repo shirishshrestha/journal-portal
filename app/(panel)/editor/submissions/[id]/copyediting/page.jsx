@@ -273,7 +273,7 @@ export default function CopyeditingWorkflowPage() {
               />
             </div>
             <div>
-              <CopyeditingParticipants 
+              <CopyeditingParticipants
                 assignmentId={assignmentId}
                 isCompleted={assignment?.status === 'COMPLETED'}
               />
@@ -284,14 +284,14 @@ export default function CopyeditingWorkflowPage() {
         <TabsContent value="discussions" className="space-y-4">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <CopyeditingDiscussions 
-                assignmentId={assignmentId} 
+              <CopyeditingDiscussions
+                assignmentId={assignmentId}
                 submissionId={submissionId}
                 isCompleted={assignment?.status === 'COMPLETED'}
               />
             </div>
             <div>
-              <CopyeditingParticipants 
+              <CopyeditingParticipants
                 assignmentId={assignmentId}
                 isCompleted={assignment?.status === 'COMPLETED'}
               />
@@ -310,7 +310,7 @@ export default function CopyeditingWorkflowPage() {
               />
             </div>
             <div>
-              <CopyeditingParticipants 
+              <CopyeditingParticipants
                 assignmentId={assignmentId}
                 isCompleted={assignment?.status === 'COMPLETED'}
               />
@@ -329,7 +329,8 @@ export default function CopyeditingWorkflowPage() {
               />
             </div>
             <div>
-              <CopyeditingParticipants assignmentId={assignmentId} 
+              <CopyeditingParticipants
+                assignmentId={assignmentId}
                 isCompleted={assignment?.status === 'COMPLETED'}
               />
             </div>

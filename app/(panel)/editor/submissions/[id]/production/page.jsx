@@ -339,15 +339,15 @@ export default function ProductionWorkflowPage() {
                   <PlayCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-semibold text-lg mb-2">Production Not Started</h3>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    Start the production workflow to begin uploading galley files. Click the &quot;Start
-                    Production&quot; button above.
+                    Start the production workflow to begin uploading galley files. Click the
+                    &quot;Start Production&quot; button above.
                   </p>
                 </div>
               </CardContent>
             </Card>
           ) : (
-            <ProductionReadyFiles 
-              submissionId={submissionId} 
+            <ProductionReadyFiles
+              submissionId={submissionId}
               isCompleted={assignment?.status === 'COMPLETED'}
             />
           )}
@@ -368,8 +368,8 @@ export default function ProductionWorkflowPage() {
               </CardContent>
             </Card>
           ) : (
-            <ProductionDiscussions 
-              submissionId={submissionId} 
+            <ProductionDiscussions
+              submissionId={submissionId}
               isCompleted={assignment?.status === 'COMPLETED'}
             />
           )}
@@ -390,8 +390,8 @@ export default function ProductionWorkflowPage() {
               </CardContent>
             </Card>
           ) : (
-            <ProductionParticipants 
-              submissionId={submissionId} 
+            <ProductionParticipants
+              submissionId={submissionId}
               isCompleted={assignment?.status === 'COMPLETED'}
             />
           )}

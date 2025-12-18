@@ -12,7 +12,12 @@ import { useApproveCopyeditingFile, useCopyEditedFiles } from '../../hooks';
  * Component to display copyedited files
  * Shows edited manuscript files with tracking and version history
  */
-export function CopyeditedFiles({ assignmentId, isAuthorView = false, readOnly = false, isCompleted = false }) {
+export function CopyeditedFiles({
+  assignmentId,
+  isAuthorView = false,
+  readOnly = false,
+  isCompleted = false,
+}) {
   const router = useRouter();
   const params = useParams();
   const submissionIdFromParams = params?.id;

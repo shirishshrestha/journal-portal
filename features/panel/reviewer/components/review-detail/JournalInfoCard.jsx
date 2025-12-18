@@ -96,7 +96,9 @@ export function JournalInfoCard({ journal, isPending = false }) {
 
         <div className="flex  items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">ISSN (Online):</span>
-          <code className="text-xs bg-muted px-2 py-1 rounded">{journal?.issn_online || 'N/A'}</code>
+          <code className="text-xs bg-muted px-2 py-1 rounded">
+            {journal?.issn_online || 'N/A'}
+          </code>
         </div>
 
         {journal?.website_url && (
