@@ -200,7 +200,7 @@ export default function PublicationScheduleDetailPage() {
                 </Button>
                 <Button variant="default" size="sm" onClick={handlePublish}>
                   <PlayCircle className="h-4 w-4 mr-2" />
-                  Publish <span className='hidden sm:inline'>Now</span>
+                  Publish <span className="hidden sm:inline">Now</span>
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleCancel}>
                   <XCircle className="h-4 w-4 mr-2" />
@@ -385,7 +385,6 @@ export default function PublicationScheduleDetailPage() {
             <p className="text-sm text-muted-foreground">Submission ID</p>
             <p className="font-medium mt-1">{schedule?.submission}</p>
           </div>
-       
         </CardContent>
       </Card>
 

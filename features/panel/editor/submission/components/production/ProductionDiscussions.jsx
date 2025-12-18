@@ -65,8 +65,8 @@ export function ProductionDiscussions({ submissionId, isCompleted = false }) {
                 Communication threads between production assistants, editors, and authors
               </CardDescription>
             </div>
-            <Button 
-              onClick={() => setIsAddDialogOpen(true)} 
+            <Button
+              onClick={() => setIsAddDialogOpen(true)}
               disabled={!assignmentId || isCompleted}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -99,8 +99,8 @@ export function ProductionDiscussions({ submissionId, isCompleted = false }) {
               <p className="text-sm text-muted-foreground mb-4">
                 Start a discussion to communicate with the production team
               </p>
-              <Button 
-                onClick={() => setIsAddDialogOpen(true)} 
+              <Button
+                onClick={() => setIsAddDialogOpen(true)}
                 variant="outline"
                 disabled={isCompleted}
               >

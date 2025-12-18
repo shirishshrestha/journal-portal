@@ -150,9 +150,9 @@ export function ProductionReadyFiles({ submissionId, isCompleted = false }) {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setIsUploadDialogOpen(true)}
                 disabled={isCompleted}
               >

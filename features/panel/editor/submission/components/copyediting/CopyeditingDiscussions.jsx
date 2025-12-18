@@ -72,7 +72,11 @@ export function CopyeditingDiscussions({ assignmentId, isCompleted = false }) {
               <p className="text-sm text-muted-foreground mb-4">
                 Start a discussion to communicate with the copyeditor and author
               </p>
-              <Button onClick={() => setIsAddDialogOpen(true)} variant="outline" disabled={isCompleted}>
+              <Button
+                onClick={() => setIsAddDialogOpen(true)}
+                variant="outline"
+                disabled={isCompleted}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Start First Discussion
               </Button>
