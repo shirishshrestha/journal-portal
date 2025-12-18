@@ -57,6 +57,7 @@ export default function CopyeditingSuperDocEditor({
           router.push(goBack);
         }
       } catch (error) {
+        toast.error('Failed to approve copyediting file');
         console.error('Approve error:', error);
       } finally {
         setIsApproving(false);
@@ -269,7 +270,7 @@ export default function CopyeditingSuperDocEditor({
               </Badge>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               variant="default"
               size="sm"

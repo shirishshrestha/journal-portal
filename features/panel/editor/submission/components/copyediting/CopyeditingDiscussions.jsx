@@ -14,7 +14,7 @@ import { useCopyeditingDiscussions } from '../../hooks';
  * Component to display and manage copyediting discussions
  * Shows discussion threads between copyeditors, editors, and authors
  */
-export function CopyeditingDiscussions({ assignmentId }) {
+export function CopyeditingDiscussions({ assignmentId, isCompleted = false }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
   const [isThreadDialogOpen, setIsThreadDialogOpen] = useState(false);
@@ -49,7 +49,7 @@ export function CopyeditingDiscussions({ assignmentId }) {
                 Communication threads between copyeditors, editors, and authors
               </CardDescription>
             </div>
-            <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Button onClick={() => setIsAddDialogOpen(true)} disabled={isCompleted}>
               <Plus className="h-4 w-4 mr-2" />
               Start Discussion
             </Button>
@@ -72,7 +72,7 @@ export function CopyeditingDiscussions({ assignmentId }) {
               <p className="text-sm text-muted-foreground mb-4">
                 Start a discussion to communicate with the copyeditor and author
               </p>
-              <Button onClick={() => setIsAddDialogOpen(true)} variant="outline">
+              <Button onClick={() => setIsAddDialogOpen(true)} variant="outline" disabled={isCompleted}>
                 <Plus className="h-4 w-4 mr-2" />
                 Start First Discussion
               </Button>

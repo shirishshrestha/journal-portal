@@ -165,7 +165,7 @@ export default function ProductionWorkflowPage() {
             </Button>
           )}
 
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex-1">
             <h1 className="text-3xl font-semibold tracking-tight">Production Workflow</h1>
             <p className="text-muted-foreground mt-2">
@@ -298,17 +298,29 @@ export default function ProductionWorkflowPage() {
             <span className="hidden sm:inline">Production Ready</span>
             <span className="sm:hidden">Ready</span>
           </TabsTrigger>
-          <TabsTrigger value="galley-files" className="gap-2">
+          <TabsTrigger
+            value="galley-files"
+            className="gap-2"
+            disabled={!assignment || assignmentsData?.results.length === 0}
+          >
             <FileText className="h-4 w-4" />
             <span className="hidden sm:inline">Galley Files</span>
             <span className="sm:hidden">Galleys</span>
           </TabsTrigger>
-          <TabsTrigger value="discussions" className="gap-2">
+          <TabsTrigger
+            value="discussions"
+            className="gap-2"
+            disabled={!assignment || assignmentsData?.results.length === 0}
+          >
             <MessageSquare className="h-4 w-4" />
             <span className="hidden sm:inline">Discussions</span>
             <span className="sm:hidden">Chat</span>
           </TabsTrigger>
-          <TabsTrigger value="participants" className="gap-2">
+          <TabsTrigger
+            value="participants"
+            className="gap-2"
+            disabled={!assignment || assignmentsData?.results.length === 0}
+          >
             <UserPlus className="h-4 w-4" />
             <span className="hidden sm:inline">Participants</span>
             <span className="sm:hidden">Team</span>
@@ -320,15 +332,69 @@ export default function ProductionWorkflowPage() {
         </TabsContent>
 
         <TabsContent value="galley-files" className="space-y-4">
-          <ProductionReadyFiles submissionId={submissionId} />
+          {assignment?.status === 'PENDING' ? (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center">
+                  <PlayCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold text-lg mb-2">Production Not Started</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    Start the production workflow to begin uploading galley files. Click the &quot;Start
+                    Production&quot; button above.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <ProductionReadyFiles 
+              submissionId={submissionId} 
+              isCompleted={assignment?.status === 'COMPLETED'}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="discussions" className="space-y-4">
-          <ProductionDiscussions submissionId={submissionId} />
+          {assignment?.status === 'PENDING' ? (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center">
+                  <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold text-lg mb-2">Production Not Started</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    Start the production workflow to begin discussions with the production team.
+                    Click the &quot;Start Production&quot; button above.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <ProductionDiscussions 
+              submissionId={submissionId} 
+              isCompleted={assignment?.status === 'COMPLETED'}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="participants" className="space-y-4">
-          <ProductionParticipants submissionId={submissionId} />
+          {assignment?.status === 'PENDING' ? (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center">
+                  <UserPlus className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold text-lg mb-2">Production Not Started</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    Start the production workflow to manage participants. Click the &quot;Start
+                    Production&quot; button above.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <ProductionParticipants 
+              submissionId={submissionId} 
+              isCompleted={assignment?.status === 'COMPLETED'}
+            />
+          )}
         </TabsContent>
       </Tabs>
 

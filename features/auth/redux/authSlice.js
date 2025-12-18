@@ -33,7 +33,7 @@ const authSlice = createSlice({
 
     updateVerificationStatus: (state, action) => {
       if (state.userData) {
-        state.userData.is_verified = action.payload.isVerified;
+        state.userData.email_verified = action.payload.isVerified;
       }
     },
 

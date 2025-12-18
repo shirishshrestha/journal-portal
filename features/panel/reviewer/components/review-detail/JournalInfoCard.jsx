@@ -65,98 +65,98 @@ export function JournalInfoCard({ journal, isPending = false }) {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-8 gap-y-4 text-sm">
         <div className="flex flex-col sm:flex-row items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">Title:</span>
-          <span className="text-foreground font-medium">{journal.title}</span>
+          <span className="text-foreground font-medium">{journal?.title}</span>
         </div>
 
         <div className="flex items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">Short Name:</span>
           <Badge variant="secondary" className="font-medium">
-            {journal.short_name}
+            {journal?.short_name}
           </Badge>
         </div>
 
         <div className="flex flex-col sm:flex-row items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">Publisher:</span>
-          <span className="text-muted-foreground">{journal.publisher || 'N/A'}</span>
+          <span className="text-muted-foreground">{journal?.publisher || 'N/A'}</span>
         </div>
 
         {currentRole !== 'AUTHOR' && (
           <div className="flex  items-start gap-2">
             <span className="font-medium text-foreground/80 min-w-[140px]">Submission Count:</span>
             <Badge variant="outline" className="font-medium">
-              {journal.submission_count}
+              {journal?.submission_count}
             </Badge>
           </div>
         )}
 
         <div className="flex  items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">ISSN (Print):</span>
-          <code className="text-xs bg-muted px-2 py-1 rounded">{journal.issn_print || 'N/A'}</code>
+          <code className="text-xs bg-muted px-2 py-1 rounded">{journal?.issn_print || 'N/A'}</code>
         </div>
 
         <div className="flex  items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">ISSN (Online):</span>
-          <code className="text-xs bg-muted px-2 py-1 rounded">{journal.issn_online || 'N/A'}</code>
+          <code className="text-xs bg-muted px-2 py-1 rounded">{journal?.issn_online || 'N/A'}</code>
         </div>
 
-        {journal.website_url && (
+        {journal?.website_url && (
           <div className="flex flex-col sm:flex-row items-start gap-2">
             <span className="font-medium text-foreground/80 min-w-[140px]">Website:</span>
             <a
-              href={journal.website_url || 'N/A'}
+              href={journal?.website_url || 'N/A'}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline flex items-center gap-1"
             >
-              {journal.website_url || 'N/A'}
+              {journal?.website_url || 'N/A'}
             </a>
           </div>
         )}
 
-        {journal.contact_email && (
+        {journal?.contact_email && (
           <div className="flex flex-col sm:flex-row items-start gap-2">
             <span className="font-medium text-foreground/80 min-w-[140px]">Contact Email:</span>
             <a
-              href={`mailto:${journal.contact_email || 'N/A'}`}
+              href={`mailto:${journal?.contact_email || 'N/A'}`}
               className="text-primary hover:underline"
             >
-              {journal.contact_email || 'N/A'}
+              {journal?.contact_email || 'N/A'}
             </a>
           </div>
         )}
 
         <div className="flex items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">Status:</span>
-          <Badge variant={journal.is_active ? 'default' : 'secondary'} className="gap-1">
+          <Badge variant={journal?.is_active ? 'default' : 'secondary'} className="gap-1">
             <span
               className={`h-2 w-2 rounded-full ${
-                journal.is_active ? 'bg-green-500' : 'bg-gray-400'
+                journal?.is_active ? 'bg-green-500' : 'bg-gray-400'
               }`}
             ></span>
-            {journal.is_active ? 'Active' : 'Inactive'}
+            {journal?.is_active ? 'Active' : 'Inactive'}
           </Badge>
         </div>
 
         <div className="flex items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">Submissions:</span>
           <Badge
-            variant={journal.is_accepting_submissions ? 'default' : 'secondary'}
+            variant={journal?.is_accepting_submissions ? 'default' : 'secondary'}
             className="gap-1"
           >
             <span
               className={`h-2 w-2 rounded-full ${
-                journal.is_accepting_submissions ? 'bg-green-500' : 'bg-gray-400'
+                journal?.is_accepting_submissions ? 'bg-green-500' : 'bg-gray-400'
               }`}
             ></span>
-            {journal.is_accepting_submissions ? 'Accepting' : 'Not Accepting'}
+            {journal?.is_accepting_submissions ? 'Accepting' : 'Not Accepting'}
           </Badge>
         </div>
 
-        {journal.editor_in_chief && (
+        {journal?.editor_in_chief && (
           <div className="flex flex-col sm:flex-row items-start gap-2">
             <span className="font-medium text-foreground/80 min-w-[140px]">Editor in Chief:</span>
             <div className="flex flex-col gap-1">
-              <span className="font-medium text-foreground">{journal.editor_in_chief.name}</span>
+              <span className="font-medium text-foreground">{journal?.editor_in_chief.name}</span>
             </div>
           </div>
         )}
@@ -164,16 +164,16 @@ export function JournalInfoCard({ journal, isPending = false }) {
         <div className="flex items-start gap-2">
           <span className="font-medium text-foreground/80 min-w-[140px]">Created:</span>
           <span className="text-muted-foreground">
-            {journal.created_at ? format(new Date(journal.created_at), 'PPP') : 'N/A'}
+            {journal?.created_at ? format(new Date(journal?.created_at), 'PPP') : 'N/A'}
           </span>
         </div>
       </div>
-      {journal.description && (
+      {journal?.description && (
         <div className="mt-5 pt-5 border-t">
           <span className="font-medium text-foreground/80 block mb-2">Description:</span>
           <div className="flex flex-col gap-2">
             <p className="text-muted-foreground text-sm leading-relaxed pl-4 border-l-2 border-primary/30 italic">
-              {getDescriptionPreview(journal.description)}
+              {getDescriptionPreview(journal?.description)}
             </p>
             <Button
               variant="link"
@@ -191,10 +191,10 @@ export function JournalInfoCard({ journal, isPending = false }) {
         <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Journal Description</DialogTitle>
-            <DialogDescription>{journal.title}</DialogDescription>
+            <DialogDescription>{journal?.title}</DialogDescription>
           </DialogHeader>
           <div
-            dangerouslySetInnerHTML={{ __html: journal.description }}
+            dangerouslySetInnerHTML={{ __html: journal?.description }}
             className="text-sm leading-relaxed mt-4"
           />
         </DialogContent>

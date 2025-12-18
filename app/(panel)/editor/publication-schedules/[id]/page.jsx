@@ -190,7 +190,7 @@ export default function PublicationScheduleDetailPage() {
 
       {/* Schedule Information Card */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row sm: gap-2 sm:gap-0 sm:items-center justify-between">
           <CardTitle>Schedule Information</CardTitle>
           <div className="flex gap-2">
             {!isEditing && schedule?.status === 'SCHEDULED' && (
@@ -200,7 +200,7 @@ export default function PublicationScheduleDetailPage() {
                 </Button>
                 <Button variant="default" size="sm" onClick={handlePublish}>
                   <PlayCircle className="h-4 w-4 mr-2" />
-                  Publish Now
+                  Publish <span className='hidden sm:inline'>Now</span>
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleCancel}>
                   <XCircle className="h-4 w-4 mr-2" />
@@ -243,8 +243,8 @@ export default function PublicationScheduleDetailPage() {
             )}
             {schedule?.status !== 'PUBLISHED' && (
               <Button variant="destructive" size="sm" onClick={handleDelete}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                <Trash2 className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Delete</span>
               </Button>
             )}
           </div>
@@ -385,13 +385,7 @@ export default function PublicationScheduleDetailPage() {
             <p className="text-sm text-muted-foreground">Submission ID</p>
             <p className="font-medium mt-1">{schedule?.submission}</p>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => router.push(`/editor/submissions/${schedule?.submission}`)}
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            View Submission
-          </Button>
+       
         </CardContent>
       </Card>
 

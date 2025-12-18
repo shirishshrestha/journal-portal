@@ -36,7 +36,7 @@ const EmptyState = ({ icon: Icon, title, description }) => (
  * Component to display and manage production participants
  * Shows assigned production assistants, authors, and editors
  */
-export function ProductionParticipants({ submissionId, isAuthorView = false }) {
+export function ProductionParticipants({ submissionId, isAuthorView = false, isCompleted = false }) {
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [userToRemove, setUserToRemove] = useState(null);
   const [isAddParticipantOpen, setIsAddParticipantOpen] = useState(false);
@@ -120,7 +120,7 @@ export function ProductionParticipants({ submissionId, isAuthorView = false }) {
             variant="ghost"
             size="sm"
             onClick={() => handleRemoveClick(user)}
-            disabled={removeMutation.isPending}
+            disabled={removeMutation.isPending || isCompleted}
           >
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
@@ -146,7 +146,12 @@ export function ProductionParticipants({ submissionId, isAuthorView = false }) {
                 <CardDescription>All users involved in the production workflow</CardDescription>
               </div>
               {assignmentId && !isAuthorView && (
-                <Button size="sm" onClick={() => setIsAddParticipantOpen(true)} className="gap-2">
+                <Button 
+                  size="sm" 
+                  onClick={() => setIsAddParticipantOpen(true)} 
+                  className="gap-2"
+                  disabled={isCompleted}
+                >
                   <UserPlus className="h-4 w-4" />
                   Add Participant
                 </Button>
