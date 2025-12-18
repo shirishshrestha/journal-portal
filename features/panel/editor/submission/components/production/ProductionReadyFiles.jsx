@@ -35,7 +35,7 @@ import {
   useProductionAssignments,
 } from '../../hooks';
 
-export function ProductionReadyFiles({ submissionId }) {
+export function ProductionReadyFiles({ submissionId, isCompleted = false }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [uploadData, setUploadData] = useState({
@@ -150,7 +150,12 @@ export function ProductionReadyFiles({ submissionId }) {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setIsUploadDialogOpen(true)}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setIsUploadDialogOpen(true)}
+                disabled={isCompleted}
+              >
                 <Upload className="h-4 w-4 mr-2" />
                 Upload File
               </Button>

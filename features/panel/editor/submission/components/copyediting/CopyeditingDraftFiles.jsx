@@ -34,6 +34,7 @@ export function CopyeditingDraftFiles({
   submission,
   submissionId,
   readOnly = false,
+  isCompleted = false,
 }) {
   const router = useRouter();
 
@@ -144,6 +145,7 @@ export function CopyeditingDraftFiles({
                             )
                           }
                           title="Edit in SuperDoc"
+                          disabled={isCompleted}
                         >
                           <Edit className="h-4 w-4 sm:mr-2" />
                           <span className="hidden sm:inline">Edit</span>

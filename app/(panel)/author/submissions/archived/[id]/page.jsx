@@ -11,6 +11,7 @@ import {
   CoAuthorsCard,
   DocumentVersionsModal,
   ReviewSummaryCard,
+  LoadingScreen,
 } from '@/features';
 import { useGetSubmissionReviews } from '@/features/panel/editor/submission/hooks/useGetSubmissionReviews';
 
@@ -41,6 +42,7 @@ export default function ArchivedDetailPage() {
   return (
     <>
       {' '}
+      {(isPending||isReviewsPending) && <LoadingScreen/>}
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -57,7 +59,7 @@ export default function ArchivedDetailPage() {
         </div>
 
         {/* Submission Details Card */}
-        <SubmissionDetailsCard submission={submission} />
+        <SubmissionDetailsCard submission={submission} isSubmissionPending={isPending} />
 
         {/* Review Summary Card (latest review only, no confidential comments) */}
         {reviewsData && Array.isArray(reviewsData) && reviewsData.length > 0 && (

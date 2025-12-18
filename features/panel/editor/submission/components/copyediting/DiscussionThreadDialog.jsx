@@ -46,6 +46,8 @@ export function DiscussionThreadDialog({ isOpen, onClose, discussion, assignment
     enabled: isOpen && !!discussion?.id,
   });
 
+  console.log(discussion);
+
   const { currentRole } = useCurrentRole();
   console.log(currentRole);
 
@@ -130,7 +132,7 @@ export function DiscussionThreadDialog({ isOpen, onClose, discussion, assignment
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="md:max-w-[85%] lg:max-w-[60%] max-h-[90vh] overflow-y-auto p-5 sm:p-6">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -138,7 +140,7 @@ export function DiscussionThreadDialog({ isOpen, onClose, discussion, assignment
                 {discussion.subject || 'Untitled Discussion'}
               </DialogTitle>
               <DialogDescription className="mt-2">
-                Started by {discussion.from?.name || 'Unknown'} on{' '}
+                Started by {discussion.started_by?.user_name || 'Unknown'} on{' '}
                 {format(new Date(discussion.last_reply || discussion.created_at), 'MMM d, yyyy')}
               </DialogDescription>
             </div>

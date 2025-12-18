@@ -179,7 +179,7 @@ export const sidebarConfig = {
       icon: BookCheck,
     },
     {
-      name: 'Assigned Copyediting',
+      name: 'Copyediting Assignments',
       path: '/editor/copyediting-assignments',
       icon: CopyCheckIcon,
     },

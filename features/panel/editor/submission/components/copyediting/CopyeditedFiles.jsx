@@ -12,7 +12,7 @@ import { useApproveCopyeditingFile, useCopyEditedFiles } from '../../hooks';
  * Component to display copyedited files
  * Shows edited manuscript files with tracking and version history
  */
-export function CopyeditedFiles({ assignmentId, isAuthorView = false, readOnly = false }) {
+export function CopyeditedFiles({ assignmentId, isAuthorView = false, readOnly = false, isCompleted = false }) {
   const router = useRouter();
   const params = useParams();
   const submissionIdFromParams = params?.id;
@@ -158,6 +158,7 @@ export function CopyeditedFiles({ assignmentId, isAuthorView = false, readOnly =
                             router.push(route);
                           }}
                           title="Edit in SuperDoc"
+                          disabled={isCompleted}
                         >
                           <Edit className="h-4 w-4 sm:mr-2" />
                           <span className="hidden sm:inline">Edit</span>
@@ -168,7 +169,7 @@ export function CopyeditedFiles({ assignmentId, isAuthorView = false, readOnly =
                           variant="outline"
                           size="sm"
                           onClick={() => handleApprove(file.id)}
-                          disabled={approveMutation.isPending}
+                          disabled={approveMutation.isPending || isCompleted}
                           title="Approve this file"
                         >
                           <CheckCircle className="h-4 w-4 sm:mr-2" />

@@ -25,7 +25,7 @@ import { AddParticipantDialog } from './AddParticipantDialog';
  * Component to display and manage copyediting participants
  * Shows assigned copyeditors, authors, and editors
  */
-export function CopyeditingParticipants({ assignmentId, isAuthorView = false }) {
+export function CopyeditingParticipants({ assignmentId, isAuthorView = false, isCompleted = false }) {
   const queryClient = useQueryClient();
   const [removingUserId, setRemovingUserId] = useState(null);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
@@ -109,7 +109,7 @@ export function CopyeditingParticipants({ assignmentId, isAuthorView = false }) 
             variant="ghost"
             size="sm"
             onClick={() => handleRemoveClick(user)}
-            disabled={removingUserId === user.id}
+            disabled={removingUserId === user.id || isCompleted}
           >
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
@@ -138,7 +138,12 @@ export function CopyeditingParticipants({ assignmentId, isAuthorView = false }) 
                 <CardDescription>All users involved in the copyediting workflow</CardDescription>
               </div>
               {assignmentId && !isAuthorView && (
-                <Button size="sm" onClick={() => setIsAddParticipantOpen(true)} className="gap-2">
+                <Button 
+                  size="sm" 
+                  onClick={() => setIsAddParticipantOpen(true)} 
+                  className="gap-2"
+                  disabled={isCompleted}
+                >
                   <UserPlus className="h-4 w-4" />
                   Add Participant
                 </Button>

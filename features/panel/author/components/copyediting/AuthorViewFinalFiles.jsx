@@ -93,7 +93,7 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
             {finalFiles.map((file) => (
               <Card key={file.id} className="border rounded-lg hover:bg-muted/50 transition-colors">
                 <CardContent className="">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     {/* File info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">

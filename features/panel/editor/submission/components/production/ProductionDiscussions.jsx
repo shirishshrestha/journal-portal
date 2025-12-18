@@ -14,7 +14,7 @@ import { useProductionAssignments, useProductionAssignmentDiscussions } from '..
  * Component to display and manage production discussions
  * Shows discussion threads between production assistants, editors, and authors
  */
-export function ProductionDiscussions({ submissionId }) {
+export function ProductionDiscussions({ submissionId, isCompleted = false }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
   const [isThreadDialogOpen, setIsThreadDialogOpen] = useState(false);
@@ -65,7 +65,10 @@ export function ProductionDiscussions({ submissionId }) {
                 Communication threads between production assistants, editors, and authors
               </CardDescription>
             </div>
-            <Button onClick={() => setIsAddDialogOpen(true)} disabled={!assignmentId}>
+            <Button 
+              onClick={() => setIsAddDialogOpen(true)} 
+              disabled={!assignmentId || isCompleted}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Start Discussion
             </Button>
@@ -96,7 +99,11 @@ export function ProductionDiscussions({ submissionId }) {
               <p className="text-sm text-muted-foreground mb-4">
                 Start a discussion to communicate with the production team
               </p>
-              <Button onClick={() => setIsAddDialogOpen(true)} variant="outline">
+              <Button 
+                onClick={() => setIsAddDialogOpen(true)} 
+                variant="outline"
+                disabled={isCompleted}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Start First Discussion
               </Button>
