@@ -48,7 +48,6 @@ export const useUpdateJournalStaff = (options = {}) => {
     },
     onError: (error, variables, context) => {
       if (!options.onError) {
-        console.log('Erroor', error);
         const errorMessage = error?.response?.data?.error || 'Failed to update staff member';
         toast.error(errorMessage);
       }
