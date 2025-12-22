@@ -10,6 +10,16 @@ import { useGetMe } from './useGetMe';
 import { useDownloadDocument } from './useDownloadDocument';
 import { useGetRORInstitution } from './useGetRORInstitution';
 
+// Achievement hooks
+import { useGetBadges } from './query/useGetBadges';
+import { useGetMyBadges } from './query/useGetMyBadges';
+import { useGetAwards } from './query/useGetAwards';
+import { useGetLeaderboards } from './query/useGetLeaderboards';
+import { useGetTopReviewers } from './query/useGetTopReviewers';
+import { useGetMyCertificates } from './query/useGetMyCertificates';
+import { useGenerateAwardCertificate } from './mutation/useGenerateAwardCertificate';
+import { useGenerateCertificatePDF } from './mutation/useGenerateCertificatePDF';
+
 export {
   useToggle,
   useRoleRedirect,
@@ -23,4 +33,13 @@ export {
   useGetMe,
   useDownloadDocument,
   useGetRORInstitution,
+  // Achievements
+  useGetBadges,
+  useGetMyBadges,
+  useGetAwards,
+  useGetLeaderboards,
+  useGetTopReviewers,
+  useGetMyCertificates,
+  useGenerateAwardCertificate,
+  useGenerateCertificatePDF,
 };

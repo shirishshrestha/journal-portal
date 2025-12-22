@@ -30,6 +30,7 @@ import { SubmissionCreatedDialog } from './SubmissionCreatedDialog';
 import { AuthorGuidelinesDialog } from './AuthorGuidelinesDialog';
 import { PDFViewer } from './PDFViewer';
 export * from './charts';
+export * from './achievements';
 
 export {
   FormInputField,

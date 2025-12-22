@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePatchProfile } from '@/features/panel/profile/hooks/mutation/usePatchProfile';
 import {
@@ -15,7 +15,12 @@ import {
   useCurrentRole,
   useGetMe,
   VerificationStatusBadge,
+  useGetMyBadges,
+  BadgeCard,
+  AchievementStats,
 } from '@/features';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function ProfilePage() {
   const { data: meData, error: isMeError, isPending: isMePending, refetch } = useGetMe();
@@ -28,6 +33,9 @@ export default function ProfilePage() {
   const { currentRole } = useCurrentRole();
 
   const profileData = meData?.profile;
+
+  // Fetch user's badges
+  const { data: myBadgesData, isPending: badgesPending } = useGetMyBadges();
 
   const defaultValues = {
     user_name: profileData?.user_name || '',
@@ -144,6 +152,55 @@ export default function ProfilePage() {
                 onCancel={onCancel}
                 isPending={patchProfileMutation.isPending}
               />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Achievements Section */}
+        {!showEditForm && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>My Achievements</CardTitle>
+                  <CardDescription>Your badges and awards</CardDescription>
+                </div>
+                <Button asChild variant="outline">
+                  <Link href="/achievements">View All</Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {badgesPending ? (
+                <CardSkeleton />
+              ) : (
+                <>
+                  <AchievementStats 
+                    badges={myBadgesData?.results || []} 
+                    awards={[]} 
+                  />
+                  
+                  {myBadgesData?.results && myBadgesData.results.length > 0 && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold mb-4">Featured Badges</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {myBadgesData.results
+                          .filter(b => b.is_featured)
+                          .slice(0, 3)
+                          .map((userBadge) => (
+                            <BadgeCard
+                              key={userBadge.id}
+                              badge={userBadge.badge}
+                              earned={true}
+                              earnedAt={userBadge.earned_at}
+                              isFeatured={userBadge.is_featured}
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
         )}
