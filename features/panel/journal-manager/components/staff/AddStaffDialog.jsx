@@ -36,7 +36,7 @@ import { useGetUsers } from '@/features/panel/admin';
 const STAFF_ROLES = [
   { value: 'SECTION_EDITOR', label: 'Section Editor' },
   { value: 'ASSOCIATE_EDITOR', label: 'Associate Editor' },
-  { value: 'LAYOUT_EDITOR', label: 'Layout Editor' },
+  { value: 'GUEST_EDITOR', label: 'Guest Editor' },
   { value: 'MANAGING_EDITOR', label: 'Managing Editor' },
   { value: 'REVIEWER', label: 'Reviewer' },
 ];

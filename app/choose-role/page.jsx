@@ -101,7 +101,7 @@ export default function ChooseRole() {
         </div>
 
         {/* Role Cards */}
-        <div className="flex flex-col sm:flex-row gap-6 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {availableRoles.map((role) => {
             const Icon = role.icon;
             const isSelected = selectedRole === role.id;

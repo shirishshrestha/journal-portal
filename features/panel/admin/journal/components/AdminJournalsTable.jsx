@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Trash2, MoreVertical, UserPlus } from 'lucide-react';
+import { Eye, Trash2, MoreVertical, UserPlus, UserCog } from 'lucide-react';
 import { DataTable } from '@/features/shared';
 import {
   DropdownMenu,
@@ -24,12 +24,27 @@ export default function AdminJournalsTable({
   onViewDrawer,
   onDelete,
   onAssignManager,
+  onViewManager,
   isPending = false,
   error = null,
   sortColumn,
   sortOrder,
   onSort,
 }) {
+  // Helper function to check if journal has a manager
+  const hasJournalManager = (journal) => {
+    return (
+      journal.staff_members &&
+      journal.staff_members.some((staff) => staff.role === 'JOURNAL_MANAGER')
+    );
+  };
+
+  // Helper function to get journal manager
+  const getJournalManager = (journal) => {
+    if (!journal.staff_members) return null;
+    return journal.staff_members.find((staff) => staff.role === 'JOURNAL_MANAGER');
+  };
+
   const columns = [
     {
       key: 'title',
@@ -103,9 +118,18 @@ export default function AdminJournalsTable({
             <DropdownMenuItem onClick={() => onViewDrawer(row)} className="gap-2">
               <Eye className="h-4 w-4" /> View Details
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onAssignManager(row)} className="gap-2">
-              <UserPlus className="h-4 w-4" /> Assign Manager
-            </DropdownMenuItem>
+            {hasJournalManager(row) ? (
+              <DropdownMenuItem
+                onClick={() => onViewManager(row, getJournalManager(row))}
+                className="gap-2"
+              >
+                <UserCog className="h-4 w-4" /> View Manager
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem onClick={() => onAssignManager(row)} className="gap-2">
+                <UserPlus className="h-4 w-4" /> Assign Manager
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => onDelete(row.id)} className="gap-2 text-destructive">
               <Trash2 className="h-4 w-4" /> Delete
             </DropdownMenuItem>
