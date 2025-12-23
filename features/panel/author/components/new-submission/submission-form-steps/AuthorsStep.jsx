@@ -48,7 +48,7 @@ export default function AuthorsStep({
   );
 
   // Default roles if none provided from backend
-  const defaultRoles = useMemo(() => ['Author', 'Co-Author', 'Researcher', 'Contributor'], []);
+  const defaultRoles = useMemo(() => ['Co-Author', 'Researcher', 'Contributor'], []);
   const availableRoles = useMemo(
     () => (coauthorRoles.length > 0 ? coauthorRoles : defaultRoles),
     [coauthorRoles, defaultRoles]

@@ -32,6 +32,8 @@ export default function ProfilePage() {
 
   const { currentRole } = useCurrentRole();
 
+  console.log('Current Role in Profile Page:', currentRole);
+
   const profileData = meData?.profile;
 
   // Fetch user's badges
@@ -157,7 +159,7 @@ export default function ProfilePage() {
         )}
 
         {/* Achievements Section */}
-        {!showEditForm && (
+        {!showEditForm && currentRole !== 'ADMIN' && currentRole !== 'EDITOR' && (
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -166,7 +168,11 @@ export default function ProfilePage() {
                   <CardDescription>Your badges and awards</CardDescription>
                 </div>
                 <Button asChild variant="outline">
-                  <Link href="/achievements">View All</Link>
+                  <Link
+                    href={`${currentRole === 'AUTHOR' ? '/author/achievements' : '/reviewer/achievements'}`}
+                  >
+                    View All
+                  </Link>
                 </Button>
               </div>
             </CardHeader>
@@ -175,28 +181,34 @@ export default function ProfilePage() {
                 <CardSkeleton />
               ) : (
                 <>
-                  <AchievementStats 
-                    badges={myBadgesData?.results || []} 
-                    awards={[]} 
-                  />
-                  
+                  <AchievementStats badges={myBadgesData?.results || []} awards={[]} />
+
                   {myBadgesData?.results && myBadgesData.results.length > 0 && (
                     <div className="mt-6">
                       <h3 className="text-lg font-semibold mb-4">Featured Badges</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {myBadgesData.results
-                          .filter(b => b.is_featured)
-                          .slice(0, 3)
-                          .map((userBadge) => (
-                            <BadgeCard
-                              key={userBadge.id}
-                              badge={userBadge.badge}
-                              earned={true}
-                              earnedAt={userBadge.earned_at}
-                              isFeatured={userBadge.is_featured}
-                            />
-                          ))}
-                      </div>
+                      {myBadgesData.results.filter((b) => b.is_featured).length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {myBadgesData.results
+                            .filter((b) => b.is_featured)
+                            .slice(0, 3)
+                            .map((userBadge) => (
+                              <BadgeCard
+                                key={userBadge.id}
+                                badge={userBadge.badge}
+                                earned={true}
+                                earnedAt={userBadge.earned_at}
+                                isFeatured={userBadge.is_featured}
+                              />
+                            ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 bg-muted/50 rounded-lg border border-dashed">
+                          <p className="text-muted-foreground">
+                            No featured badges yet. Visit your achievements page to feature your
+                            best badges!
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </>

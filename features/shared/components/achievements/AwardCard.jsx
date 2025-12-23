@@ -18,7 +18,7 @@ export const AwardCard = ({ award, onGenerateCertificate }) => {
     LIFETIME_ACHIEVEMENT: 'bg-red-100 text-red-800 border-red-300',
   };
 
-  const hasCertificate = award.certificate_id !== null;
+  const hasCertificate = award.certificate_generated || award.certificate_url;
 
   return (
     <Card className="transition-all hover:shadow-lg">
@@ -67,7 +67,6 @@ export const AwardCard = ({ award, onGenerateCertificate }) => {
           </div>
         )}
 
-       
         {onGenerateCertificate && (
           <div className="pt-2">
             {hasCertificate ? (

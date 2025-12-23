@@ -1,39 +1,85 @@
 'use client';
 
 import React from 'react';
-import { useGetBadges, useGetMyBadges, useGetAwards, useGetTopReviewers, useGetMyCertificates, useGenerateAwardCertificate, useGenerateCertificatePDF } from '@/features';
-import { BadgeCard, AwardCard, LeaderboardTable, CertificateGrid, LoadingScreen, ErrorCard } from '@/features';
+import { useSearchParams } from 'next/navigation';
+import {
+  useGetBadges,
+  useGetMyBadges,
+  useGetAwards,
+  useGetTopReviewers,
+  useGetMyCertificates,
+  useGenerateAwardCertificate,
+  useGenerateCertificatePDF,
+  LoadingScreen,
+  ErrorCard,
+  AchievementsHeader,
+  OverviewTab,
+  BadgesTab,
+  AwardsTab,
+  CertificatesTab,
+  LeaderboardTab,
+} from '@/features';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, Award, Medal, TrendingUp, FileText } from 'lucide-react';
 
 export default function ReviewerAchievementsPage() {
-  // Fetch reviewer-specific badges (REVIEWER badge_type)
+  const searchParams = useSearchParams();
+
+  // Read filters from URL params
+  const searchQuery = searchParams.get('search') || '';
+  const selectedLevel = searchParams.get('level') || '';
+  const selectedYear = searchParams.get('year') || '';
+  const selectedAwardType = searchParams.get('award_type') || '';
+  const leaderboardPeriod = searchParams.get('period') || 'YEARLY';
+
+  // Generate year options (current year and past 5 years)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
+
+  // Award type options for reviewers
+  const awardTypeOptions = [
+    { value: 'all', label: 'All Types' },
+    { value: 'BEST_REVIEWER', label: 'Best Reviewer' },
+    { value: 'EXCELLENCE_REVIEW', label: 'Excellence in Review' },
+    { value: 'TOP_CONTRIBUTOR', label: 'Top Contributor' },
+  ];
+
+  // Fetch reviewer-specific badges (REVIEWER badge_type) - backend will filter
   const {
     data: badgesData,
     isPending: badgesPending,
     error: badgesError,
-  } = useGetBadges();
+  } = useGetBadges({
+    badge_type: 'REVIEWER',
+    search: searchQuery || undefined,
+    level: selectedLevel || undefined,
+  });
 
   const {
     data: myBadgesData,
     isPending: myBadgesPending,
     error: myBadgesError,
-  } = useGetMyBadges();
+  } = useGetMyBadges({
+    badge_type: 'REVIEWER',
+    year: selectedYear || undefined,
+  });
 
-  // Fetch reviewer-specific awards
+  // Fetch reviewer-specific awards - backend will filter
   const {
     data: awardsData,
     isPending: awardsPending,
     error: awardsError,
-  } = useGetAwards();
+  } = useGetAwards({
+    award_type: selectedAwardType || 'BEST_REVIEWER,EXCELLENCE_REVIEW,TOP_CONTRIBUTOR',
+    year: selectedYear || undefined,
+  });
 
   // Fetch reviewer leaderboards
   const {
     data: topReviewersData,
     isPending: leaderboardsPending,
     error: leaderboardsError,
-  } = useGetTopReviewers({ period: 'YEARLY' });
+  } = useGetTopReviewers({ period: leaderboardPeriod });
 
   // Fetch certificates
   const {
@@ -47,7 +93,13 @@ export default function ReviewerAchievementsPage() {
   const generatePDF = useGenerateCertificatePDF();
 
   // Loading state
-  if (badgesPending || myBadgesPending || awardsPending || leaderboardsPending || certificatesPending) {
+  if (
+    badgesPending ||
+    myBadgesPending ||
+    awardsPending ||
+    leaderboardsPending ||
+    certificatesPending
+  ) {
     return <LoadingScreen />;
   }
 
@@ -55,18 +107,18 @@ export default function ReviewerAchievementsPage() {
   if (badgesError || myBadgesError || awardsError || leaderboardsError || certificatesError) {
     return (
       <ErrorCard
-        error={badgesError || myBadgesError || awardsError || leaderboardsError || certificatesError}
+        error={
+          badgesError || myBadgesError || awardsError || leaderboardsError || certificatesError
+        }
         message="Failed to load achievements"
       />
     );
   }
 
-  // Filter for reviewer-specific data
-  const reviewerBadges = badgesData?.results?.filter(badge => badge.badge_type === 'REVIEWER') || [];
-  const myReviewerBadges = myBadgesData?.results?.filter(ub => ub.badge?.badge_type === 'REVIEWER') || [];
-  const reviewerAwards = awardsData?.results?.filter(award => 
-    ['BEST_REVIEWER', 'EXCELLENCE_REVIEW', 'TOP_CONTRIBUTOR'].includes(award.award_type)
-  ) || [];
+  // Data is already filtered by backend
+  const reviewerBadges = badgesData?.results || [];
+  const myReviewerBadges = myBadgesData?.results || [];
+  const reviewerAwards = awardsData?.results || [];
   const leaderboards = topReviewersData?.data || [];
   const certificates = certificatesData?.results || [];
 
@@ -80,15 +132,10 @@ export default function ReviewerAchievementsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <Trophy className="w-8 h-8 text-yellow-500" />
-          Reviewer Achievements
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Your achievements and recognition as a reviewer
-        </p>
-      </div>
+      <AchievementsHeader
+        title="Reviewer Achievements"
+        description="Your achievements and recognition as a reviewer"
+      />
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
@@ -114,174 +161,45 @@ export default function ReviewerAchievementsPage() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Badges</CardTitle>
-                <Medal className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{myReviewerBadges.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  {reviewerBadges.length} available
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Awards Won</CardTitle>
-                <Award className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{reviewerAwards.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Lifetime achievements
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Leaderboard Rank</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {leaderboards.find(lb => lb.profile?.id)?.rank || 'N/A'}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Current position
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Recent Badges */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Badges</CardTitle>
-              <CardDescription>Your latest achievements</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {myReviewerBadges.slice(0, 3).map((userBadge) => (
-                  <BadgeCard key={userBadge.id} badge={userBadge.badge} earned={true} />
-                ))}
-                {myReviewerBadges.length === 0 && (
-                  <p className="text-muted-foreground col-span-full text-center py-8">
-                    No badges earned yet. Complete reviews to earn badges!
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="overview">
+          <OverviewTab
+            myBadges={myReviewerBadges}
+            allBadges={reviewerBadges}
+            awards={reviewerAwards}
+            leaderboards={leaderboards}
+            emptyMessage="No badges earned yet. Complete reviews to earn badges!"
+          />
         </TabsContent>
 
-        {/* Badges Tab */}
-        <TabsContent value="badges" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>My Reviewer Badges</CardTitle>
-              <CardDescription>Badges you have earned</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {myReviewerBadges.map((userBadge) => (
-                  <BadgeCard key={userBadge.id} badge={userBadge.badge} earned={true} />
-                ))}
-                {myReviewerBadges.length === 0 && (
-                  <p className="text-muted-foreground col-span-full text-center py-8">
-                    No badges earned yet
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Available Reviewer Badges</CardTitle>
-              <CardDescription>Badges you can earn</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {reviewerBadges.map((badge) => {
-                  const earned = myReviewerBadges.some((ub) => ub.badge.id === badge.id);
-                  return <BadgeCard key={badge.id} badge={badge} earned={earned} />;
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="badges">
+          <BadgesTab
+            allBadges={reviewerBadges}
+            myBadges={myReviewerBadges}
+            yearOptions={yearOptions}
+            badgeTypeLabel="Reviewer"
+          />
         </TabsContent>
 
-        {/* Awards Tab */}
-        <TabsContent value="awards" className="space-y-6">
-          {reviewerAwards.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Award className="w-12 h-12 mb-3 opacity-50 text-muted-foreground" />
-                <p className="text-muted-foreground">No awards received yet</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {reviewerAwards.map((award) => (
-                <AwardCard key={award.id} award={award} onGenerateCertificate={handleGenerateCertificate} />
-              ))}
-            </div>
-          )}
+        <TabsContent value="awards">
+          <AwardsTab
+            awards={reviewerAwards}
+            yearOptions={yearOptions}
+            awardTypeOptions={awardTypeOptions}
+            onGenerateCertificate={handleGenerateCertificate}
+          />
         </TabsContent>
 
-        {/* Certificates Tab */}
-        <TabsContent value="certificates" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>My Certificates</CardTitle>
-              <CardDescription>
-                Your achievement certificates with verification codes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {certificates.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No certificates yet. Earn awards to receive certificates!
-                </p>
-              ) : (
-                <CertificateGrid certificates={certificates} onGeneratePDF={handleGeneratePDF} />
-              )}
-            </CardContent>
-          </Card>
+        <TabsContent value="certificates">
+          <CertificatesTab certificates={certificates} onGeneratePDF={handleGeneratePDF} />
         </TabsContent>
 
-        {/* Leaderboard Tab */}
-        <TabsContent value="leaderboard" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Reviewer Rankings</CardTitle>
-              <CardDescription>See where you stand among reviewers</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {leaderboards.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <TrendingUp className="w-12 h-12 mb-3 opacity-50 text-muted-foreground" />
-                  <p className="text-muted-foreground">No leaderboard data available</p>
-                </div>
-              ) : (
-                <LeaderboardTable 
-                  leaderboard={{
-                    name: 'Reviewer Rankings',
-                    description: 'Top reviewers based on reviews completed',
-                    period: 'yearly',
-                    data: leaderboards
-                  }} 
-                  showPeriod={false} 
-                />
-              )}
-            </CardContent>
-          </Card>
+        <TabsContent value="leaderboard">
+          <LeaderboardTab
+            leaderboards={leaderboards}
+            period={leaderboardPeriod}
+            title="Reviewer Rankings"
+            description="See where you stand among reviewers"
+          />
         </TabsContent>
       </Tabs>
     </div>

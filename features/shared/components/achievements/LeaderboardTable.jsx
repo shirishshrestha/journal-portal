@@ -76,7 +76,7 @@ export const LeaderboardTable = ({ leaderboard, showPeriod = true }) => {
               <TableHead className="w-[80px]">Rank</TableHead>
               <TableHead>User</TableHead>
               <TableHead>Score</TableHead>
-              {leaderboard.data[0]?.stats && <TableHead>Details</TableHead>}
+              {leaderboard.data[0]?.metrics && <TableHead>Details</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -91,17 +91,15 @@ export const LeaderboardTable = ({ leaderboard, showPeriod = true }) => {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar>
-                      <AvatarImage src={entry.user?.avatar} />
+                      <AvatarImage src={entry.profile?.avatar_url} />
                       <AvatarFallback>
-                        {entry.user?.first_name?.[0]}
-                        {entry.user?.last_name?.[0]}
+                        {entry.profile?.display_name?.[0]}
+                        {entry.profile?.display_name?.[1]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">
-                        {entry.user?.first_name} {entry.user?.last_name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">{entry.user?.email}</p>
+                      <p className="font-medium">{entry.profile?.display_name}</p>
+                      <p className="text-sm text-muted-foreground">{entry.profile?.user?.email}</p>
                     </div>
                   </div>
                 </TableCell>
@@ -110,12 +108,12 @@ export const LeaderboardTable = ({ leaderboard, showPeriod = true }) => {
                     {entry.score.toFixed(2)}
                   </Badge>
                 </TableCell>
-                {entry.stats && (
+                {entry.metrics && (
                   <TableCell>
                     <div className="text-sm text-muted-foreground space-y-1">
-                      {Object.entries(entry.stats).map(([key, value]) => (
+                      {Object.entries(entry.metrics).map(([key, value]) => (
                         <div key={key}>
-                          <span className="font-medium">{key}: </span>
+                          <span className="font-medium">{key.replace(/_/g, ' ')}: </span>
                           {value}
                         </div>
                       ))}

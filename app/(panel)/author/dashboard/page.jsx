@@ -115,7 +115,7 @@ export default function AuthorDashboard() {
               <CardDescription>Your recent badges and accomplishments</CardDescription>
             </div>
             <Button asChild variant="outline" size="sm">
-              <Link href="/achievements">View All</Link>
+              <Link href="/author/achievements">View All</Link>
             </Button>
           </div>
         </CardHeader>
