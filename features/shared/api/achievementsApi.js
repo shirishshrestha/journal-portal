@@ -166,7 +166,7 @@ export const generateCertificatePDF = async (certificateId) => {
  * @returns {string} Download URL
  */
 export const downloadCertificatePDF = (certificateId) => {
-  return `${instance.defaults.baseURL}/achievements/certificates/${certificateId}/download_pdf/`;
+  return `${instance.defaults.baseURL}achievements/certificates/${certificateId}/download_pdf/`;
 };
 
 /**
@@ -175,6 +175,17 @@ export const downloadCertificatePDF = (certificateId) => {
  * @returns {string} Preview URL
  */
 export const previewCertificatePDF = (certificateId) => {
-  return `${instance.defaults.baseURL}/achievements/certificates/${certificateId}/preview_pdf/`;
+  return `${instance.defaults.baseURL}achievements/certificates/${certificateId}/preview_pdf/`;
 };
 
+/**
+ * Fetch PDF with authentication
+ * @param {string} url - PDF URL
+ * @returns {Promise<Blob>} PDF blob
+ */
+export const fetchPDFWithAuth = async (url) => {
+  const response = await instance.get(url, {
+    responseType: 'blob',
+  });
+  return response.data;
+};
