@@ -8,6 +8,7 @@ import {
   JournalDetailsDrawer,
   AdminJournalFormModal,
   AssignJournalManagerDialog,
+  ViewJournalManagerDialog,
   useGetJournals,
   useDeleteJournal,
 } from '@/features';
@@ -41,6 +42,8 @@ export default function JournalsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAssignManagerDialogOpen, setIsAssignManagerDialogOpen] = useState(false);
   const [journalForManager, setJournalForManager] = useState(null);
+  const [isViewManagerDialogOpen, setIsViewManagerDialogOpen] = useState(false);
+  const [viewManagerData, setViewManagerData] = useState(null);
 
   const {
     data: JournalData,
@@ -64,6 +67,12 @@ export default function JournalsPage() {
   const handleAssignManager = (journal) => {
     setJournalForManager(journal);
     setIsAssignManagerDialogOpen(true);
+  };
+
+  const handleViewManager = (journal, manager) => {
+    setJournalForManager(journal);
+    setViewManagerData(manager);
+    setIsViewManagerDialogOpen(true);
   };
 
   const confirmDelete = () => {
@@ -133,6 +142,7 @@ export default function JournalsPage() {
         }}
         onDelete={handleDelete}
         onAssignManager={handleAssignManager}
+        onViewManager={handleViewManager}
         isPending={isJournalDataPending}
         error={JournalDataError}
       />
@@ -165,6 +175,14 @@ export default function JournalsPage() {
       <AssignJournalManagerDialog
         open={isAssignManagerDialogOpen}
         onOpenChange={setIsAssignManagerDialogOpen}
+        journalId={journalForManager?.id}
+      />
+
+      {/* View Journal Manager Dialog */}
+      <ViewJournalManagerDialog
+        open={isViewManagerDialogOpen}
+        onOpenChange={setIsViewManagerDialogOpen}
+        journalManager={viewManagerData}
         journalId={journalForManager?.id}
       />
 

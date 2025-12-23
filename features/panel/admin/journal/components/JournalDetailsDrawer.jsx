@@ -139,49 +139,6 @@ export function JournalDetailsDrawer({ journal, isOpen, onClose }) {
             </CardContent>
           </Card>
 
-          {/* Journal Managers */}
-          <Card>
-            <CardContent className=" space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Journal Managers
-                </p>
-                <Button size="sm" variant="outline" onClick={() => setIsAssignDialogOpen(true)}>
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Assign Manager
-                </Button>
-              </div>
-
-              {isLoadingManagers ? (
-                <p className="text-sm text-muted-foreground">Loading managers...</p>
-              ) : managers.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No managers assigned</p>
-              ) : (
-                <div className="space-y-2">
-                  {managers.map((manager) => (
-                    <div
-                      key={manager.id}
-                      className="flex items-center justify-between p-2 border rounded-lg hover:bg-accent/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{manager.user_name}</p>
-                        <p className="text-xs text-muted-foreground">{manager.user_email}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleRemoveManager(manager)}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
           {/* Description */}
           <Card>
             <CardContent className=" space-y-4">

@@ -5,8 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Eye, Settings } from 'lucide-react';
 import { DataTable } from '@/features/shared';
 import EllipsisTooltip from '@/components/ui/EllipsisTooltip';
+import { useRouter } from 'next/navigation';
 
 export function JournalsTable({ journals = [], isLoading = false, error = null }) {
+  const router = useRouter();
+
   const columns = [
     {
       key: 'title',
@@ -74,10 +77,18 @@ export function JournalsTable({ journals = [], isLoading = false, error = null }
       align: 'right',
       render: (row) => (
         <div className="flex items-center gap-2 justify-end">
-          <Button variant="ghost" size="sm">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push(`/journal_manager/journals/${row.id}`)}
+          >
             <Eye className="h-4 w-4 mr-1" /> View
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push(`/journal_manager/journals/${row.id}/settings`)}
+          >
             <Settings className="h-4 w-4 mr-1" /> Settings
           </Button>
         </div>

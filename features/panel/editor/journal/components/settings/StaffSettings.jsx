@@ -36,7 +36,6 @@ import { DataTable, SearchableSelect } from '@/features/shared';
 import EllipsisTooltip from '@/components/ui/EllipsisTooltip';
 
 const STAFF_ROLES = [
-  { value: 'EDITOR_IN_CHIEF', label: 'Editor-in-Chief' },
   { value: 'MANAGING_EDITOR', label: 'Managing Editor' },
   { value: 'ASSOCIATE_EDITOR', label: 'Associate Editor' },
   { value: 'SECTION_EDITOR', label: 'Section Editor' },
@@ -168,30 +167,41 @@ export function StaffSettings({ journalId }) {
       key: 'actions',
       header: 'Actions',
       align: 'right',
-      render: (staff) => (
-        <div className="flex justify-end gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              setSelectedStaff(staff);
-              setIsEditStaffOpen(true);
-            }}
-            disabled={updateStaffMutation.isPending}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleRemoveStaff(staff)}
-            className="text-destructive hover:text-destructive"
-            disabled={removeStaffMutation.isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
+      render: (staff) => {
+        // Don't show edit/delete buttons for JOURNAL_MANAGER role
+        if (staff.role === 'JOURNAL_MANAGER') {
+          return (
+            <div className="flex justify-end">
+              <span className="text-xs text-muted-foreground italic">Managed by Admin</span>
+            </div>
+          );
+        }
+
+        return (
+          <div className="flex justify-end gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setSelectedStaff(staff);
+                setIsEditStaffOpen(true);
+              }}
+              disabled={updateStaffMutation.isPending}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => handleRemoveStaff(staff)}
+              className="text-destructive hover:text-destructive"
+              disabled={removeStaffMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 

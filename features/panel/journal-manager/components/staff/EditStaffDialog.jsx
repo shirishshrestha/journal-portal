@@ -35,7 +35,6 @@ import { toast } from 'sonner';
 const STAFF_ROLES = [
   { value: 'SECTION_EDITOR', label: 'Section Editor' },
   { value: 'ASSOCIATE_EDITOR', label: 'Associate Editor' },
-  { value: 'LAYOUT_EDITOR', label: 'Layout Editor' },
   { value: 'MANAGING_EDITOR', label: 'Managing Editor' },
   { value: 'GUEST_EDITOR', label: 'Guest Editor' },
   { value: 'REVIEWER', label: 'Reviewer' },
