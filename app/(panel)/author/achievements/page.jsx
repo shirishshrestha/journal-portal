@@ -1,39 +1,86 @@
 'use client';
 
-import React from 'react';
-import { useGetBadges, useGetMyBadges, useGetAwards, useGetLeaderboards, useGetMyCertificates, useGenerateAwardCertificate, useGenerateCertificatePDF } from '@/features';
-import { BadgeCard, AwardCard, LeaderboardTable, CertificateGrid, LoadingScreen, ErrorCard } from '@/features';
+import React, { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import {
+  useGetBadges,
+  useGetMyBadges,
+  useGetAwards,
+  useGetLeaderboards,
+  useGetMyCertificates,
+  useGenerateAwardCertificate,
+  useGenerateCertificatePDF,
+  LoadingScreen,
+  ErrorCard,
+  AchievementsHeader,
+  OverviewTab,
+  BadgesTab,
+  AwardsTab,
+  CertificatesTab,
+  LeaderboardTab,
+} from '@/features';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, Award, Medal, TrendingUp, FileText } from 'lucide-react';
 
 export default function AuthorAchievementsPage() {
+  const searchParams = useSearchParams();
+
+  // Read filters from URL params
+  const searchQuery = searchParams.get('search') || '';
+  const selectedLevel = searchParams.get('level') || '';
+  const selectedYear = searchParams.get('year') || '';
+  const selectedAwardType = searchParams.get('award_type') || '';
+  const leaderboardPeriod = searchParams.get('period') || 'YEARLY';
+
+  // Generate year options (current year and past 5 years)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
+
+  // Award type options for authors
+  const awardTypeOptions = [
+    { value: 'all', label: 'All Types' },
+    { value: 'RESEARCHER_OF_YEAR', label: 'Researcher of the Year' },
+    { value: 'TOP_CONTRIBUTOR', label: 'Top Contributor' },
+    { value: 'RISING_STAR', label: 'Rising Star' },
+    { value: 'LIFETIME_ACHIEVEMENT', label: 'Lifetime Achievement' },
+  ];
+
   // Fetch author-specific badges (AUTHOR badge_type)
   const {
     data: badgesData,
     isPending: badgesPending,
     error: badgesError,
-  } = useGetBadges();
+  } = useGetBadges({
+    badge_type: 'AUTHOR',
+    search: searchQuery || undefined,
+    level: selectedLevel || undefined,
+  });
 
   const {
     data: myBadgesData,
     isPending: myBadgesPending,
     error: myBadgesError,
-  } = useGetMyBadges();
+  } = useGetMyBadges({
+    badge_type: 'AUTHOR',
+    year: selectedYear || undefined,
+  });
 
   // Fetch author-specific awards
   const {
     data: awardsData,
     isPending: awardsPending,
     error: awardsError,
-  } = useGetAwards();
+  } = useGetAwards({
+    year: selectedYear || undefined,
+    award_type: selectedAwardType || undefined,
+  });
 
   // Fetch author leaderboards
   const {
     data: leaderboardsData,
     isPending: leaderboardsPending,
     error: leaderboardsError,
-  } = useGetLeaderboards({ category: 'AUTHOR', period: 'YEARLY' });
+  } = useGetLeaderboards({ category: 'AUTHOR', period: leaderboardPeriod });
 
   // Fetch certificates
   const {
@@ -47,7 +94,13 @@ export default function AuthorAchievementsPage() {
   const generatePDF = useGenerateCertificatePDF();
 
   // Loading state
-  if (badgesPending || myBadgesPending || awardsPending || leaderboardsPending || certificatesPending) {
+  if (
+    badgesPending ||
+    myBadgesPending ||
+    awardsPending ||
+    leaderboardsPending ||
+    certificatesPending
+  ) {
     return <LoadingScreen />;
   }
 
@@ -55,40 +108,35 @@ export default function AuthorAchievementsPage() {
   if (badgesError || myBadgesError || awardsError || leaderboardsError || certificatesError) {
     return (
       <ErrorCard
-        error={badgesError || myBadgesError || awardsError || leaderboardsError || certificatesError}
+        error={
+          badgesError || myBadgesError || awardsError || leaderboardsError || certificatesError
+        }
         message="Failed to load achievements"
       />
     );
   }
 
-  // Filter for author-specific data
-  const authorBadges = badgesData?.results?.filter(badge => badge.badge_type === 'AUTHOR') || [];
-  const myAuthorBadges = myBadgesData?.results?.filter(ub => ub.badge?.badge_type === 'AUTHOR') || [];
-  const authorAwards = awardsData?.results?.filter(award => 
-    ['RESEARCHER_OF_YEAR', 'TOP_CONTRIBUTOR', 'RISING_STAR', 'LIFETIME_ACHIEVEMENT'].includes(award.award_type)
-  ) || [];
+  // Data is already filtered by backend
+  const authorBadges = badgesData?.results || [];
+  const myAuthorBadges = myBadgesData?.results || [];
+  const authorAwards = awardsData?.results || [];
   const leaderboards = leaderboardsData?.results || [];
   const certificates = certificatesData?.results || [];
 
   const handleGenerateCertificate = (awardId) => {
     generateCertificate.mutate(awardId);
   };
-const handleGeneratePDF = (certificateId) => {
+
+  const handleGeneratePDF = (certificateId) => {
     generatePDF.mutate(certificateId);
   };
 
-  
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <Trophy className="w-8 h-8 text-yellow-500" />
-          Author Achievements
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Your achievements and recognition as an author
-        </p>
-      </div>
+      <AchievementsHeader
+        title="Author Achievements"
+        description="Your achievements and recognition as an author"
+      />
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
@@ -114,166 +162,45 @@ const handleGeneratePDF = (certificateId) => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Badges</CardTitle>
-                <Medal className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{myAuthorBadges.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  {authorBadges.length} available
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Awards Won</CardTitle>
-                <Award className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{authorAwards.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Lifetime achievements
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Leaderboard Rank</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {leaderboards.find(lb => lb.profile?.id)?.rank || 'N/A'}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Current position
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Recent Badges */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Badges</CardTitle>
-              <CardDescription>Your latest achievements</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {myAuthorBadges.slice(0, 3).map((userBadge) => (
-                  <BadgeCard key={userBadge.id} badge={userBadge.badge} earned={true} />
-                ))}
-                {myAuthorBadges.length === 0 && (
-                  <p className="text-muted-foreground col-span-full text-center py-8">
-                    No badges earned yet. Keep publishing to earn badges!
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="overview">
+          <OverviewTab
+            myBadges={myAuthorBadges}
+            allBadges={authorBadges}
+            awards={authorAwards}
+            leaderboards={leaderboards}
+            emptyMessage="No badges earned yet. Keep publishing to earn badges!"
+          />
         </TabsContent>
 
-        {/* Badges Tab */}
-        <TabsContent value="badges" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>My Author Badges</CardTitle>
-              <CardDescription>Badges you have earned</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {myAuthorBadges.map((userBadge) => (
-                  <BadgeCard key={userBadge.id} badge={userBadge.badge} earned={true} />
-                ))}
-                {myAuthorBadges.length === 0 && (
-                  <p className="text-muted-foreground col-span-full text-center py-8">
-                    No badges earned yet
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Available Author Badges</CardTitle>
-              <CardDescription>Badges you can earn</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {authorBadges.map((badge) => {
-                  const earned = myAuthorBadges.some((ub) => ub.badge.id === badge.id);
-                  return <BadgeCard key={badge.id} badge={badge} earned={earned} />;
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="badges">
+          <BadgesTab
+            allBadges={authorBadges}
+            myBadges={myAuthorBadges}
+            yearOptions={yearOptions}
+            badgeTypeLabel="Author"
+          />
         </TabsContent>
 
-        {/* Awards Tab */}
-        <TabsContent value="awards" className="space-y-6">
-          {authorAwards.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Award className="w-12 h-12 mb-3 opacity-50 text-muted-foreground" />
-                <p className="text-muted-foreground">No awards received yet</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {authorAwards.map((award) => (
-                <AwardCard key={award.id} award={award} onGenerateCertificate={handleGenerateCertificate} />
-              ))}
-            </div>
-          )}
+        <TabsContent value="awards">
+          <AwardsTab
+            awards={authorAwards}
+            yearOptions={yearOptions}
+            awardTypeOptions={awardTypeOptions}
+            onGenerateCertificate={handleGenerateCertificate}
+          />
         </TabsContent>
 
-        {/* Certificates Tab */}
-        <TabsContent value="certificates" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>My Certificates</CardTitle>
-              <CardDescription>Your achievement certificates</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CertificateGrid certificates={certificates} onGeneratePDF={handleGeneratePDF} />
-            </CardContent>
-          </Card>
+        <TabsContent value="certificates">
+          <CertificatesTab certificates={certificates} onGeneratePDF={handleGeneratePDF} />
         </TabsContent>
 
-        {/* Leaderboard Tab */}
-        <TabsContent value="leaderboard" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Author Rankings</CardTitle>
-              <CardDescription>See where you stand among authors</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {leaderboards.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <TrendingUp className="w-12 h-12 mb-3 opacity-50 text-muted-foreground" />
-                  <p className="text-muted-foreground">No leaderboard data available</p>
-                </div>
-              ) : (
-                <LeaderboardTable 
-                  leaderboard={{
-                    name: 'Author Rankings',
-                    description: 'Top authors based on publications',
-                    period: 'yearly',
-                    data: leaderboards
-                  }} 
-                  showPeriod={false} 
-                />
-              )}
-            </CardContent>
-          </Card>
+        <TabsContent value="leaderboard">
+          <LeaderboardTab
+            leaderboards={leaderboards}
+            period={leaderboardPeriod}
+            title="Author Rankings"
+            description="See where you stand among authors"
+          />
         </TabsContent>
       </Tabs>
     </div>

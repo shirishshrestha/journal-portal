@@ -22,8 +22,6 @@ export const BadgeCard = ({ badge, earned, earnedAt, isFeatured }) => {
     PLATINUM: 'bg-slate-700 text-white',
   };
 
-  console.log('BadgeCard props:', { badge, earned, earnedAt, isFeatured });
-
   return (
     <Card
       className={`relative transition-all hover:shadow-lg ${
@@ -67,7 +65,7 @@ export const BadgeCard = ({ badge, earned, earnedAt, isFeatured }) => {
             <div className="space-y-1">
               {Object.entries(badge.criteria).map(([key, value]) => (
                 <p key={key}>
-                  {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: {value}
+                  {key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}: {value}
                 </p>
               ))}
             </div>
@@ -95,8 +93,6 @@ export const BadgeCard = ({ badge, earned, earnedAt, isFeatured }) => {
  * BadgeGrid Component - Displays a grid of badges
  */
 export const BadgeGrid = ({ badges = [], userBadges = [] }) => {
-
-    console.log('BadgeGrid props:', { badges, userBadges });
   // Create a map of earned badges for quick lookup
   const earnedBadgesMap = userBadges.reduce((acc, userBadge) => {
     acc[userBadge.badge.id] = {

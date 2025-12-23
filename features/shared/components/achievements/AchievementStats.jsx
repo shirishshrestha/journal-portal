@@ -59,12 +59,12 @@ export const AchievementStats = ({ badges = [], awards = [], leaderboardPosition
   return (
     <div className="space-y-6">
       {/* Overall Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index}>
-              <CardContent className="pt-6">
+              <CardContent className="">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
@@ -88,21 +88,29 @@ export const AchievementStats = ({ badges = [], awards = [], leaderboardPosition
             <CardDescription>Breakdown of badges by level</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 rounded-lg bg-amber-50 border border-amber-200">
-                <div className="text-2xl font-bold text-amber-700">{badgeCounts.BRONZE}</div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="text-center p-4 rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800">
+                <div className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+                  {badgeCounts.BRONZE}
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">Bronze</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gray-50 border border-gray-300">
-                <div className="text-2xl font-bold text-gray-600">{badgeCounts.SILVER}</div>
+              <div className="text-center p-4 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
+                <div className="text-2xl font-bold text-slate-700 dark:text-slate-200">
+                  {badgeCounts.SILVER}
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">Silver</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-yellow-50 border border-yellow-300">
-                <div className="text-2xl font-bold text-yellow-700">{badgeCounts.GOLD}</div>
+              <div className="text-center p-4 rounded-lg bg-yellow-50 dark:bg-yellow-950 border border-yellow-300 dark:border-yellow-800">
+                <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
+                  {badgeCounts.GOLD}
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">Gold</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-slate-100 border border-slate-400">
-                <div className="text-2xl font-bold text-slate-700">{badgeCounts.PLATINUM}</div>
+              <div className="text-center p-4 rounded-lg bg-purple-50 dark:bg-purple-950 border border-purple-300 dark:border-purple-800">
+                <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                  {badgeCounts.PLATINUM}
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">Platinum</div>
               </div>
             </div>
