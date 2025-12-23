@@ -10,12 +10,18 @@ import { format } from 'date-fns';
  */
 export const AwardCard = ({ award, onGenerateCertificate }) => {
   const awardTypeColors = {
-    BEST_REVIEWER: 'bg-blue-100 text-blue-800 border-blue-300',
-    RESEARCHER_OF_YEAR: 'bg-purple-100 text-purple-800 border-purple-300',
-    TOP_CONTRIBUTOR: 'bg-green-100 text-green-800 border-green-300',
-    EXCELLENCE_REVIEW: 'bg-indigo-100 text-indigo-800 border-indigo-300',
-    RISING_STAR: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    LIFETIME_ACHIEVEMENT: 'bg-red-100 text-red-800 border-red-300',
+    BEST_REVIEWER:
+      'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-800',
+    RESEARCHER_OF_YEAR:
+      'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-800',
+    TOP_CONTRIBUTOR:
+      'bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-200 border-green-300 dark:border-green-800',
+    EXCELLENCE_REVIEW:
+      'bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-200 border-indigo-300 dark:border-indigo-800',
+    RISING_STAR:
+      'bg-yellow-100 dark:bg-yellow-950 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-800',
+    LIFETIME_ACHIEVEMENT:
+      'bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-200 border-red-300 dark:border-red-800',
   };
 
   const hasCertificate = award.certificate_generated || award.certificate_url;
@@ -26,7 +32,7 @@ export const AwardCard = ({ award, onGenerateCertificate }) => {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-yellow-500" />
+              <Trophy className="w-5 h-5 text-yellow-500 dark:text-yellow-400" />
               {award.title}
             </CardTitle>
             <CardDescription className="mt-2">{award.description}</CardDescription>

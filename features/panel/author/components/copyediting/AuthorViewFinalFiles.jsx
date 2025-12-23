@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { PDFViewerModal } from '@/components/ui/pdf-viewer-modal';
 import { Eye, Download, FileText, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -15,6 +17,8 @@ import { toast } from 'sonner';
  */
 export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
   const router = useRouter();
+  const [showPDFModal, setShowPDFModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Fetch files for this assignment
   const { data: finalFiles, isLoading } = useCopyeditingFiles({
@@ -29,12 +33,40 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
     );
   };
 
-  const handleDownloadFile = (file) => {
-    if (file.file) {
-      window.open(file.file, '_blank');
-    } else {
+  const handleDownloadFile = async (file) => {
+    if (!file.file) {
       toast.error('File not available for download');
+      return;
     }
+
+    try {
+      const response = await fetch(file.file);
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.original_filename || 'document.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success('File downloaded successfully');
+    } catch (error) {
+      toast.error('Failed to download file');
+      console.error('Download error:', error);
+    }
+  };
+
+  const handleViewPDF = (file) => {
+    if (!file.file) {
+      toast.error('File not available for viewing');
+      return;
+    }
+    setSelectedFile(file);
+    setShowPDFModal(true);
   };
 
   if (isLoading) {
@@ -157,7 +189,17 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
                         className="border-green-600 dark:border-green-700 text-green-600 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900"
                       >
                         <Eye className="h-4 w-4 mr-2" />
-                        View
+                        Edit View
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleViewPDF(file)}
+                        disabled={!file.file}
+                        className="border-green-600 dark:border-green-700 text-green-600 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        View PDF
                       </Button>
                       <Button
                         size="sm"
@@ -193,6 +235,17 @@ export function AuthorViewFinalFiles({ assignmentId, submissionId }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* PDF Viewer Modal */}
+      {selectedFile && (
+        <PDFViewerModal
+          open={showPDFModal}
+          onOpenChange={setShowPDFModal}
+          pdfUrl={selectedFile.file}
+          title={selectedFile.original_filename || 'Document'}
+          filename={selectedFile.original_filename || 'document.pdf'}
+        />
+      )}
     </div>
   );
 }
