@@ -24,8 +24,6 @@ export function DeleteStaffDialog({ open, onOpenChange, staff }) {
     },
   });
 
-  console.log('DeleteStaffDialog staff prop:', staff);
-
   const handleConfirmDelete = () => {
     if (!staff) return;
 

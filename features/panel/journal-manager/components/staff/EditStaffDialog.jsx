@@ -54,8 +54,6 @@ export function EditStaffDialog({ open, onOpenChange, staff, journals = [] }) {
     },
   });
 
-  console.log('EditStaffDialog staff prop:', staff);
-
   const { mutate: updateStaff, isPending } = useUpdateJournalStaff({
     onSuccess: () => {
       toast.success('Staff member updated successfully');

@@ -40,7 +40,6 @@ export function AssignJournalManagerDialog({ open, onOpenChange, journalId }) {
   const selectedUserId = watch('userId');
 
   const onSubmit = (data) => {
-    console.log(data);
     if (data.userId) {
       assignManagerMutation.mutate({
         journalId,
