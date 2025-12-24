@@ -109,6 +109,15 @@ export const getTopReviewers = async (params = {}) => {
 };
 
 /**
+ * Update all leaderboards (Admin only)
+ * @returns {Promise} API response
+ */
+export const updateLeaderboards = async () => {
+  const response = await instance.post('/achievements/leaderboards/update_leaderboards/');
+  return response.data;
+};
+
+/**
  * Get user's certificates
  * @param {Object} params - Query parameters
  * @returns {Promise} API response

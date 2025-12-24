@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
   useGetBadges,
   useGetMyBadges,
@@ -24,13 +24,52 @@ import { Trophy, Award, Medal, TrendingUp, FileText } from 'lucide-react';
 
 export default function AuthorAchievementsPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // Read filters from URL params
+  // Read active tab and filters from URL params
+  const activeTab = searchParams.get('tab') || 'overview';
   const searchQuery = searchParams.get('search') || '';
   const selectedLevel = searchParams.get('level') || '';
   const selectedYear = searchParams.get('year') || '';
   const selectedAwardType = searchParams.get('award_type') || '';
   const leaderboardPeriod = searchParams.get('period') || 'YEARLY';
+  const leaderboardLimit = searchParams.get('limit') || '10';
+
+  // Handle tab change and clear irrelevant filters
+  const handleTabChange = (newTab) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', newTab);
+
+    // Clear filters that don't belong to the new tab
+    if (newTab === 'overview') {
+      // Keep all filters for overview
+    } else if (newTab === 'badges') {
+      // Keep only badges-related filters
+      params.delete('award_type');
+      params.delete('period');
+    } else if (newTab === 'awards') {
+      // Keep only awards-related filters
+      params.delete('level');
+      params.delete('search');
+      params.delete('period');
+    } else if (newTab === 'leaderboard') {
+      // Keep only leaderboard-related filters
+      params.delete('level');
+      params.delete('search');
+      params.delete('award_type');
+      params.delete('year');
+    } else if (newTab === 'certificates') {
+      // No filters for certificates
+      params.delete('level');
+      params.delete('search');
+      params.delete('award_type');
+      params.delete('year');
+      params.delete('period');
+    }
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   // Generate year options (current year and past 5 years)
   const currentYear = new Date().getFullYear();
@@ -80,7 +119,11 @@ export default function AuthorAchievementsPage() {
     data: leaderboardsData,
     isPending: leaderboardsPending,
     error: leaderboardsError,
-  } = useGetLeaderboards({ category: 'AUTHOR', period: leaderboardPeriod });
+  } = useGetLeaderboards({
+    category: 'AUTHOR',
+    period: leaderboardPeriod,
+    limit: leaderboardLimit,
+  });
 
   // Fetch certificates
   const {
@@ -138,8 +181,8 @@ export default function AuthorAchievementsPage() {
         description="Your achievements and recognition as an author"
       />
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 ">
+        <TabsList className="grid grid-cols-2 sm:grid-cols-5 h-full ">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <Trophy className="w-4 h-4" />
             Overview

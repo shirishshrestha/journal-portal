@@ -2,7 +2,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen } from 'lucide-react';
-import { DataTable } from '@/features/shared';
+import { DataTable, StatusBadge, statusConfig } from '@/features/shared';
 import EllipsisTooltip from '@/components/ui/EllipsisTooltip';
 
 // Table columns config
@@ -28,7 +28,7 @@ const columns = [
   {
     key: 'status',
     header: 'Status',
-    render: (row) => <StatusBadge status={row.status} />,
+    render: (row) => <StatusBadge status={row.status} statusConfig={statusConfig} />,
   },
   {
     key: 'submitted_at',
@@ -43,35 +43,6 @@ const columns = [
     render: (row) => (row.updated_at ? format(new Date(row.updated_at), 'PPP p') : '-'),
   },
 ];
-
-// StatusBadge component (copied from page.jsx for reuse)
-const statusConfig = {
-  DRAFT: {
-    bg: 'bg-gray-200 dark:bg-gray-700',
-    text: 'text-gray-900 dark:text-gray-100',
-    label: 'Draft',
-  },
-  UNDER_REVIEW: {
-    bg: 'bg-blue-100 dark:bg-blue-900',
-    text: 'text-blue-700 dark:text-blue-300',
-    label: 'Under Review',
-  },
-  REVISION_REQUIRED: {
-    bg: 'bg-amber-100 dark:bg-amber-900',
-    text: 'text-amber-700 dark:text-amber-300',
-    label: 'Revision Required',
-  },
-  ACCEPTED: {
-    bg: 'bg-green-100 dark:bg-green-900',
-    text: 'text-green-700 dark:text-green-300',
-    label: 'Accepted',
-  },
-};
-
-function StatusBadge({ status }) {
-  const config = statusConfig[status] || statusConfig.DRAFT;
-  return <Badge className={`${config.bg} ${config.text} border-0`}>{config.label}</Badge>;
-}
 
 export default function AuthorDashboardTable({
   submissions = [],

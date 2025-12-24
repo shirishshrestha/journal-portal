@@ -20,6 +20,7 @@ import {
   BookCheck,
   CopyCheckIcon,
   CalendarCheck,
+  TrendingUp,
 } from 'lucide-react';
 
 // Sidebar configuration for each role
@@ -328,6 +329,11 @@ export const sidebarConfig = {
       name: 'Anomaly Detection',
       path: '/admin/anomaly-detection',
       icon: AlertTriangle,
+    },
+    {
+      name: 'Leaderboard',
+      path: '/admin/leaderboard',
+      icon: TrendingUp,
     },
     {
       name: 'Error Logs',

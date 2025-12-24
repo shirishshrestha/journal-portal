@@ -22,6 +22,7 @@ import { useGetResearcherOfYear } from './query/useGetResearcherOfYear';
 import { useVerifyCertificate } from './query/useVerifyCertificate';
 import { useGenerateAwardCertificate } from './mutation/useGenerateAwardCertificate';
 import { useGenerateCertificatePDF } from './mutation/useGenerateCertificatePDF';
+import { useUpdateLeaderboards } from './mutation/useUpdateLeaderboards';
 
 export {
   useToggle,
@@ -48,4 +49,5 @@ export {
   useVerifyCertificate,
   useGenerateAwardCertificate,
   useGenerateCertificatePDF,
+  useUpdateLeaderboards,
 };

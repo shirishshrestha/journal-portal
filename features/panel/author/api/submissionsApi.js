@@ -15,7 +15,9 @@ export const createSubmission = async (data) => {
  * @returns {Promise} API response
  */
 export const getSubmissions = async () => {
-  const response = await instance.get('submissions/');
+  const response = await instance.get('submissions/', {
+    params: { view_as: 'author' },
+  });
   return response.data;
 };
 
