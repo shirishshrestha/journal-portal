@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { Clock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { toast } from 'sonner';
 import {
   AssignmentCard,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { FilterToolbar, Pagination } from '@/features/shared';
+import { FilterToolbar } from '@/features/shared';
 import { ActionConfirmationPopup, LoadingScreen } from '@/features';
 import {
   useGetEditorVerificationRequests,

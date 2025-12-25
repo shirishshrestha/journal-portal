@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CardSkeleton from '@/features/shared/components/CardSkeleton';
 import {
-  AvatarUpload,
   ErrorCard,
   LoadingScreen,
   ProfileForm,

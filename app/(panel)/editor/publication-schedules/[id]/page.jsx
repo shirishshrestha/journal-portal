@@ -5,12 +5,10 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   Calendar,
-  CheckCircle2,
   XCircle,
   PlayCircle,
   Trash2,
   Save,
-  FileText,
   User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

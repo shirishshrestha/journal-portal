@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Trash2, Send } from 'lucide-react';
 import {
-  RoleBasedRoute,
   LoadingScreen,
   useDeleteSubmission,
   DocumentUploadModal,

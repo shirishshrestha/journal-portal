@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { ArrowLeft, Loader2, RefreshCw, Calendar, FileEdit, Package } from 'lucide-react';
+import { ArrowLeft, Loader2, Calendar } from 'lucide-react';
 import { useGetSubmissionReviews } from '@/features/panel/editor/submission/hooks/useGetSubmissionReviews';
 import { useGetSubmissionDecisions } from '@/features/panel/editor/submission/hooks/useGetSubmissionDecisions';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,6 @@ import { SubmissionDocuments } from '@/features/panel/editor/submission/componen
 import { SubmissionCoAuthorsCard } from '@/features/panel/editor/submission/components/SubmissionCoAuthorsCard';
 import { ReviewerRecommendations } from '@/features/panel/editor/submission/components/ReviewerRecommendationsCard';
 import { InvitedReviewersCard } from '@/features/panel/editor/submission/components/InvitedReviewersCard';
-import { EditorialDecisionForm } from '@/features/panel/editor/submission/components/EditorialDecisionForm';
 
 export default function AssignedJournalSubmissionDetailPage() {
   const params = useParams();

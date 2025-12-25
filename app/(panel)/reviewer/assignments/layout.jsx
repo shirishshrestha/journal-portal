@@ -2,9 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useGetReviewAssignments } from '@/features/panel/reviewer/hooks/query/useGetReviewAssignments';
 import { StatsCard, useGetMyAnalytics } from '@/features';
 import { AlertCircle, CheckCircle2, Clock } from 'lucide-react';
 

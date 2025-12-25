@@ -1,10 +1,9 @@
 'use client';
 
-import { LoadingScreen, RoleBasedRoute } from '@/features';
+import { LoadingScreen } from '@/features';
 import ErrorCard from '@/features/shared/components/ErrorCard';
 import {
   ProfileCompletionCard,
-  ProfileLinksCard,
   ScoreCard,
   useGetUserScoreStatus,
 } from '@/features/panel';

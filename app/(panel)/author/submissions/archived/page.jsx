@@ -2,11 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
 import {
   AuthorSubmissionsTable,
   LoadingScreen,
-  RoleBasedRoute,
   SubmissionsLayout,
 } from '@/features';
 import { useGetArchivedSubmissions } from '@/features/panel/author/hooks/query/useGetArchivedSubmissions';
@@ -14,7 +12,7 @@ import DocumentUploadModal from '@/features/panel/author/components/submission/D
 import DocumentViewModal from '@/features/panel/author/components/submission/DocumentViewModal';
 import { useSubmitForReview } from '@/features/panel/author/hooks/mutation/useSubmitForReview';
 import { useDeleteSubmission } from '@/features/panel/author/hooks/mutation/useDeleteSubmission';
-import { ConfirmationPopup, Pagination } from '@/features/shared';
+import {  Pagination } from '@/features/shared';
 
 export default function ArchivedPage() {
   const router = useRouter();

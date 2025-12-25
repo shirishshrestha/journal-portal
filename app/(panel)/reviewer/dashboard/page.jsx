@@ -4,7 +4,7 @@ import {
   ReviewAssignmentsTable,
   ReviewerStatsChart,
 } from '@/features/panel/reviewer/components/dashboard';
-import { LoadingScreen, RoleBasedRoute, useGetMyBadges, BadgeCard, CardSkeleton } from '@/features';
+import { LoadingScreen, useGetMyBadges, BadgeCard, CardSkeleton } from '@/features';
 import { useGetMyAnalytics } from '@/features/shared/hooks';
 import { useGetReviewAssignments } from '@/features/panel/reviewer/hooks/query/useGetReviewAssignments';
 import ErrorCard from '@/features/shared/components/ErrorCard';

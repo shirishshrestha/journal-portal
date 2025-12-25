@@ -5,12 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileEdit, Send } from 'lucide-react';
 import {
-  RoleBasedRoute,
   LoadingScreen,
   DocumentUploadModal,
   useGetSubmissionById,
-  statusConfig,
-  StatusBadge,
   useSubmitForReview,
   SubmissionDetailsCard,
   SubmissionDocumentsCard,
@@ -18,9 +15,8 @@ import {
   DocumentVersionsModal,
   ReviewSummaryCard,
 } from '@/features';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useGetSubmissionReviews } from '@/features/panel/editor/submission/hooks/useGetSubmissionReviews';
-import { DecisionBadge, reviewRecommendationConfig } from '@/features';
 
 export default function ActiveDetailPage() {
   const params = useParams();

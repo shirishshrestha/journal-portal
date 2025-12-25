@@ -5,7 +5,6 @@ import {
   DashboardStatsCards,
   QuickActionsGrid,
   RoleInformationCard,
-  useGetJournals,
 } from '@/features/panel/journal-manager';
 
 export default function JournalManagerDashboard() {

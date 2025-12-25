@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  EditorDashboardStats,
-  ErrorCard,
-  LoadingScreen,
-  RoleBasedRoute,
-  useGetMyAnalytics,
-} from '@/features';
+import { EditorDashboardStats, ErrorCard, LoadingScreen, useGetMyAnalytics } from '@/features';
 import dynamic from 'next/dynamic';
 
 const EditorJournalsDoughnutChart = dynamic(

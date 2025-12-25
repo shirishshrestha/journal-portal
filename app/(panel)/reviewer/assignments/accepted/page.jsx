@@ -2,8 +2,7 @@
 
 import { CheckCircle2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useGetAcceptedAssignments } from '@/features/panel/reviewer/hooks/query/useGetAcceptedAssignments';
 import { AssignmentCard } from '../../../../../features/panel/reviewer/components/assignments/AssignmentCard';
 import { EmptyState } from '../../../../../features/panel/reviewer/components/assignments/EmptyState';

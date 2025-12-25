@@ -1,19 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { useDashboardAnalytics } from '@/features/panel/admin/dashboard/hooks/useDashboardAnalytics';
-import { Button } from '@/components/ui/button';
 import { Users, BookOpen, FileText, Clock, CheckCircle, XCircle, TrendingUp } from 'lucide-react';
-import {
-  ErrorCard,
-  LoadingScreen,
-  QuickLinksPanel,
-  RecentActivityFeed,
-  RoleBasedRoute,
-  StatsCard,
-  StatsErrorCard,
-  SystemHealth,
-} from '@/features';
+import { ErrorCard, LoadingScreen, QuickLinksPanel, StatsCard, SystemHealth } from '@/features';
 import {
   SubmissionStatusChart,
   ReviewStatusChart,
@@ -22,8 +11,6 @@ import {
 } from '@/features/panel/admin/dashboard/components';
 
 export default function AdminDashboard() {
-  const [dateRange, setDateRange] = useState('30d');
-
   // Fetch analytics data from API
   const {
     data: analyticsData,
