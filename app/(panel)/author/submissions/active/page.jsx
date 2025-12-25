@@ -1,13 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  AuthorSubmissionsTable,
-  LoadingScreen,
-  Pagination,
-  RoleBasedRoute,
-  SubmissionsLayout,
-} from '@/features';
+import { AuthorSubmissionsTable, LoadingScreen, Pagination, SubmissionsLayout } from '@/features';
 import { useGetActiveSubmissions } from '@/features/panel/author/hooks/query/useGetActiveSubmissions';
 import DocumentUploadModal from '@/features/panel/author/components/submission/DocumentUploadModal';
 import DocumentViewModal from '@/features/panel/author/components/submission/DocumentViewModal';

@@ -2,8 +2,7 @@
 
 import { XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useGetDeclinedAssignments } from '@/features/panel/reviewer/hooks/query/useGetDeclinedAssignments';
 import { AssignmentCard } from '../../../../../features/panel/reviewer/components/assignments/AssignmentCard';
 import { EmptyState } from '../../../../../features/panel/reviewer/components/assignments/EmptyState';

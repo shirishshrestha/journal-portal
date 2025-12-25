@@ -75,7 +75,7 @@ export function PDFViewerModal({ open, onOpenChange, pdfUrl, title, filename }) 
         URL.revokeObjectURL(URL.createObjectURL(pdfBlob));
       }
     };
-  }, [open, pdfUrl]);
+  }, [open, pdfUrl, pdfBlob]);
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -145,7 +145,7 @@ export function PDFViewerModal({ open, onOpenChange, pdfUrl, title, filename }) 
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  <span className="text-xs px-2 min-w-[4rem] text-center">
+                  <span className="text-xs px-2 min-w-12 text-center">
                     {pageNumber} / {numPages}
                   </span>
                   <Button
@@ -171,7 +171,7 @@ export function PDFViewerModal({ open, onOpenChange, pdfUrl, title, filename }) 
                 >
                   <ZoomOut className="h-4 w-4" />
                 </Button>
-                <span className="text-xs px-2 min-w-[3rem] text-center">
+                <span className="text-xs px-2 min-w-12 text-center">
                   {Math.round(scale * 100)}%
                 </span>
                 <Button

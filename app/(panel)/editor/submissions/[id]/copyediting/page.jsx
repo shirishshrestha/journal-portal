@@ -4,7 +4,6 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, HelpCircle, MessageSquare, FileText, Play, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import {

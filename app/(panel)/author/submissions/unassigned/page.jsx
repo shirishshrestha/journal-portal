@@ -6,7 +6,6 @@ import {
   AuthorSubmissionsTable,
   LoadingScreen,
   Pagination,
-  RoleBasedRoute,
   SubmissionsLayout,
 } from '@/features';
 import { useGetUnassignedSubmissions } from '@/features/panel/author/hooks/query/useGetUnassignedSubmissions';

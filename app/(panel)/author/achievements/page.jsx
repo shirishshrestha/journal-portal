@@ -34,7 +34,8 @@ export default function AuthorAchievementsPage() {
   const selectedYear = searchParams.get('year') || '';
   const selectedAwardType = searchParams.get('award_type') || '';
   const leaderboardPeriod = searchParams.get('period') || 'YEARLY';
-  const leaderboardLimit = searchParams.get('limit') || '10';
+  const pageParam = searchParams.get('page');
+  const currentPage = pageParam ? parseInt(pageParam) : 1;
 
   // Handle tab change and clear irrelevant filters
   const handleTabChange = (newTab) => {
@@ -122,7 +123,7 @@ export default function AuthorAchievementsPage() {
   } = useGetLeaderboards({
     category: 'AUTHOR',
     period: leaderboardPeriod,
-    limit: leaderboardLimit,
+    page: currentPage,
   });
 
   // Fetch certificates
@@ -165,6 +166,11 @@ export default function AuthorAchievementsPage() {
   const authorAwards = awardsData?.results || [];
   const leaderboards = leaderboardsData?.results || [];
   const certificates = certificatesData?.results || [];
+
+  // Extract pagination info for leaderboard
+  const leaderboardTotalCount = leaderboardsData?.count || 0;
+  const leaderboardPageSize = 10; // Default page size
+  const leaderboardTotalPages = Math.ceil(leaderboardTotalCount / leaderboardPageSize);
 
   const handleGenerateCertificate = (awardId) => {
     generateCertificate.mutate(awardId);
@@ -243,6 +249,10 @@ export default function AuthorAchievementsPage() {
             period={leaderboardPeriod}
             title="Author Rankings"
             description="See where you stand among authors"
+            totalPages={leaderboardTotalPages}
+            currentPage={currentPage}
+            totalCount={leaderboardTotalCount}
+            pageSize={leaderboardPageSize}
           />
         </TabsContent>
       </Tabs>

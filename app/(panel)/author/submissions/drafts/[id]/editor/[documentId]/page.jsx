@@ -3,15 +3,12 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Loader2, Download, FileText, Send, ArrowLeft } from 'lucide-react';
+import { Loader2, Download, FileText, ArrowLeft } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { useState } from 'react';
 import { loadDocument } from '@/features/panel/author/api/superdocApi';
 import {
   LoadingScreen,
   SuperDocEditor,
-  useSubmitUpdatedDocument,
-  ConfirmationInputPopup,
   useDownloadDocument,
   ErrorCard,
   PDFViewer,

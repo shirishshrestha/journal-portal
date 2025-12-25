@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ErrorCard } from '@/features';
 import { JournalsTable, useGetJournals } from '@/features/panel/journal-manager';

@@ -1,6 +1,6 @@
 'use client';
 
-import { LoadingScreen, OrcidConnection, RoleRequestForm } from '@/features';
+import { OrcidConnection, RoleRequestForm } from '@/features';
 
 export default function VerificationPage() {
   return (

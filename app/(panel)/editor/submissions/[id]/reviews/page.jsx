@@ -1,29 +1,16 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { format } from 'date-fns';
-import {
-  ArrowLeft,
-  Calendar,
-  Eye,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  FileText,
-} from 'lucide-react';
+import { ArrowLeft, Eye, CheckCircle2, XCircle, AlertTriangle, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   LoadingScreen,
   ErrorCard,
-  DecisionBadge,
   StatusBadge,
   statusConfig,
   ReviewSummaryCard,
 } from '@/features/shared';
-import { reviewRecommendationConfig } from '@/features';
 import { useGetSubmissionReviews } from '@/features/panel/editor/submission/hooks/useGetSubmissionReviews';
 import { useGetEditorSubmissionById } from '@/features/panel/editor/submission';
 

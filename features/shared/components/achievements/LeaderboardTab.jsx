@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp } from 'lucide-react';
 import { FilterToolbar } from '@/features';
 import { LeaderboardTable } from './LeaderboardTable';
 import Pagination from '@/features/shared/components/Pagination';
@@ -39,16 +37,6 @@ export default function LeaderboardTab({
             { value: 'MONTHLY', label: 'Monthly' },
             { value: 'QUARTERLY', label: 'Quarterly' },
             { value: 'YEARLY', label: 'Yearly' },
-          ]}
-        />
-        <FilterToolbar.Select
-          label="Limit"
-          paramName="limit"
-          options={[
-            { value: '10', label: 'Top 10' },
-            { value: '25', label: 'Top 25' },
-            { value: '50', label: 'Top 50' },
-            { value: '100', label: 'Top 100' },
           ]}
         />
       </FilterToolbar>

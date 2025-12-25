@@ -3,20 +3,12 @@
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import { FileEdit, Clock, CheckCircle2, AlertCircle, Eye, Filter, Calendar } from 'lucide-react';
+import { FileEdit, Clock, CheckCircle2, AlertCircle, Eye, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
-import { DataTable, ErrorCard, LoadingScreen, FilterToolbar } from '@/features/shared';
+import { DataTable, ErrorCard, FilterToolbar } from '@/features/shared';
 import { useCopyeditingAssignments } from '@/features/panel/editor/submission/hooks';
 import EllipsisTooltip from '@/components/ui/EllipsisTooltip';
 
