@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import dynamic from 'next/dynamic';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import {
@@ -16,8 +16,16 @@ import { Download, Loader2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from 'l
 import { toast } from 'sonner';
 import { fetchPDFWithAuth } from '@/features/shared/api/achievementsApi';
 
+// Dynamically import react-pdf components to avoid SSR issues
+const Document = dynamic(() => import('react-pdf').then((mod) => mod.Document), { ssr: false });
+const Page = dynamic(() => import('react-pdf').then((mod) => mod.Page), { ssr: false });
+
 // Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+if (typeof window !== 'undefined') {
+  import('react-pdf').then((pdfjs) => {
+    pdfjs.pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.pdfjs.version}/build/pdf.worker.min.mjs`;
+  });
+}
 
 /**
  * PDFViewerModal - Responsive PDF viewer in a modal dialog using react-pdf
