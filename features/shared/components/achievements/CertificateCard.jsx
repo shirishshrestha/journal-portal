@@ -18,15 +18,11 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import {
-  downloadCertificatePDF,
-  previewCertificatePDF,
-  fetchPDFWithAuth,
-} from '../../api/achievementsApi';
+import { downloadCertificatePDF, getPreviewCertificatePDFUrl } from '../../api/achievementsApi';
 
 export const CertificateCard = ({ certificate, onGeneratePDF, isGenerating }) => {
   const [showPDFModal, setShowPDFModal] = useState(false);
-
+  console.log(certificate);
   const certificateTypeColors = {
     AWARD:
       'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-800',
@@ -153,7 +149,7 @@ export const CertificateCard = ({ certificate, onGeneratePDF, isGenerating }) =>
                 variant="outline"
                 onClick={async () => {
                   try {
-                    const blob = await fetchPDFWithAuth(downloadCertificatePDF(certificate.id));
+                    const blob = await downloadCertificatePDF(certificate.id);
 
                     const url = window.URL.createObjectURL(blob);
                     const link = document.createElement('a');
@@ -216,7 +212,7 @@ export const CertificateCard = ({ certificate, onGeneratePDF, isGenerating }) =>
       <PDFViewerModal
         open={showPDFModal}
         onOpenChange={setShowPDFModal}
-        pdfUrl={previewCertificatePDF(certificate.id)}
+        pdfUrl={getPreviewCertificatePDFUrl(certificate.id)}
         title={certificate.title}
         filename={`certificate_${certificate.certificate_number}.pdf`}
       />

@@ -20,6 +20,7 @@ export const BadgeCard = ({ badge, earned, earnedAt, isFeatured }) => {
     SILVER: 'bg-gray-400 text-gray-900',
     GOLD: 'bg-yellow-500 text-gray-900',
     PLATINUM: 'bg-slate-700 text-white',
+    DIAMOND: 'bg-cyan-500 text-gray-900',
   };
 
   return (

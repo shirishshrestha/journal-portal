@@ -172,19 +172,34 @@ export const generateCertificatePDF = async (certificateId) => {
 /**
  * Download certificate PDF
  * @param {string} certificateId - Certificate ID
- * @returns {string} Download URL
+ * @returns {Promise<Blob>} PDF blob
  */
-export const downloadCertificatePDF = (certificateId) => {
-  return `${instance.defaults.baseURL}achievements/certificates/${certificateId}/download_pdf/`;
+export const downloadCertificatePDF = async (certificateId) => {
+  const response = await instance.get(`/achievements/certificates/${certificateId}/download_pdf/`, {
+    responseType: 'blob',
+  });
+  return response.data;
 };
 
 /**
  * Preview certificate PDF
  * @param {string} certificateId - Certificate ID
+ * @returns {Promise<Blob>} PDF blob
+ */
+export const previewCertificatePDF = async (certificateId) => {
+  const response = await instance.get(`/achievements/certificates/${certificateId}/preview_pdf/`, {
+    responseType: 'blob',
+  });
+  return response.data;
+};
+
+/**
+ * Get preview certificate PDF URL (for use with PDFViewerModal)
+ * @param {string} certificateId - Certificate ID
  * @returns {string} Preview URL
  */
-export const previewCertificatePDF = (certificateId) => {
-  return `${instance.defaults.baseURL}achievements/certificates/${certificateId}/preview_pdf/`;
+export const getPreviewCertificatePDFUrl = (certificateId) => {
+  return `/achievements/certificates/${certificateId}/preview_pdf/`;
 };
 
 /**

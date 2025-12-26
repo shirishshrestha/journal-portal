@@ -101,7 +101,9 @@ export default function ChooseRole() {
         </div>
 
         {/* Role Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div
+          className={`grid ${availableRoles.length === 2 ? 'md:grid-cols-2 mx-auto' : availableRoles.length === 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'} gap-6 mb-12`}
+        >
           {availableRoles.map((role) => {
             const Icon = role.icon;
             const isSelected = selectedRole === role.id;

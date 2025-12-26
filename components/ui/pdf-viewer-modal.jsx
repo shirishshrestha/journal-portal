@@ -68,14 +68,16 @@ export function PDFViewerModal({ open, onOpenChange, pdfUrl, title, filename }) 
 
       fetchPDF();
     }
+  }, [open, pdfUrl]);
 
-    // Cleanup blob URL on unmount
+  // Cleanup blob URL on unmount
+  useEffect(() => {
     return () => {
       if (pdfBlob) {
         URL.revokeObjectURL(URL.createObjectURL(pdfBlob));
       }
     };
-  }, [open, pdfUrl, pdfBlob]);
+  }, [pdfBlob]);
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
