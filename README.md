@@ -961,10 +961,6 @@ rm -rf .next
 npm run build
 ```
 
-## 📄 License
-
-[Add your license information here]
-
 ---
 
 **Last Updated**: December 26, 2025
