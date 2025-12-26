@@ -70,15 +70,6 @@ export function PDFViewerModal({ open, onOpenChange, pdfUrl, title, filename }) 
     }
   }, [open, pdfUrl]);
 
-  // Cleanup blob URL on unmount
-  useEffect(() => {
-    return () => {
-      if (pdfBlob) {
-        URL.revokeObjectURL(URL.createObjectURL(pdfBlob));
-      }
-    };
-  }, [pdfBlob]);
-
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
   };

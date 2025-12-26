@@ -22,7 +22,6 @@ import { downloadCertificatePDF, getPreviewCertificatePDFUrl } from '../../api/a
 
 export const CertificateCard = ({ certificate, onGeneratePDF, isGenerating }) => {
   const [showPDFModal, setShowPDFModal] = useState(false);
-  console.log(certificate);
   const certificateTypeColors = {
     AWARD:
       'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-800',

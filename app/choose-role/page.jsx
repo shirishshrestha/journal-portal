@@ -67,6 +67,13 @@ export default function ChooseRole() {
   // Filter ROLES based on user's actual roles
   const availableRoles = ROLES.filter((role) => userRoles.includes(role.id));
 
+  // Helper function to determine grid layout classes based on number of roles
+  const getGridLayoutClasses = (roleCount) => {
+    if (roleCount === 2) return 'md:grid-cols-2 mx-auto';
+    if (roleCount === 3) return 'md:grid-cols-2 lg:grid-cols-3';
+    return 'md:grid-cols-2 lg:grid-cols-4';
+  };
+
   // Redirect to unauthorized if user doesn't have multiple roles
   useEffect(() => {
     if (userRoles.length <= 2) {
@@ -101,9 +108,7 @@ export default function ChooseRole() {
         </div>
 
         {/* Role Cards */}
-        <div
-          className={`grid ${availableRoles.length === 2 ? 'md:grid-cols-2 mx-auto' : availableRoles.length === 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'} gap-6 mb-12`}
-        >
+        <div className={`grid ${getGridLayoutClasses(availableRoles.length)} gap-6 mb-12`}>
           {availableRoles.map((role) => {
             const Icon = role.icon;
             const isSelected = selectedRole === role.id;
