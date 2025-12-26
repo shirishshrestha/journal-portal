@@ -45,15 +45,18 @@ export default function AuthorAchievementsPage() {
     // Clear filters that don't belong to the new tab
     if (newTab === 'overview') {
       // Keep all filters for overview
+      params.delete('page');
     } else if (newTab === 'badges') {
       // Keep only badges-related filters
       params.delete('award_type');
       params.delete('period');
+      params.delete('page');
     } else if (newTab === 'awards') {
       // Keep only awards-related filters
       params.delete('level');
       params.delete('search');
       params.delete('period');
+      params.delete('page');
     } else if (newTab === 'leaderboard') {
       // Keep only leaderboard-related filters
       params.delete('level');
@@ -67,6 +70,7 @@ export default function AuthorAchievementsPage() {
       params.delete('award_type');
       params.delete('year');
       params.delete('period');
+      params.delete('page');
     }
 
     router.push(`${pathname}?${params.toString()}`);

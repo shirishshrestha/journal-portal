@@ -6,8 +6,33 @@ import { BadgeCard } from './BadgeCard';
 export default function BadgesTab({ allBadges, myBadges, yearOptions, badgeTypeLabel = 'Author' }) {
   return (
     <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>My {badgeTypeLabel} Badges</CardTitle>
+          <CardDescription>Badges you have earned</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {myBadges.map((userBadge) => (
+              <BadgeCard
+                key={userBadge.id}
+                badge={userBadge.badge}
+                earned={true}
+                earnedAt={userBadge.earned_at}
+                isFeatured={userBadge.is_featured}
+              />
+            ))}
+            {myBadges.length === 0 && (
+              <p className="text-muted-foreground col-span-full text-center py-8">
+                No badges earned yet
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Filters using FilterToolbar */}
-      <FilterToolbar>
+      {/* <FilterToolbar>
         <FilterToolbar.Search
           paramName="search"
           placeholder="Search badges by name..."
@@ -36,32 +61,7 @@ export default function BadgesTab({ allBadges, myBadges, yearOptions, badgeTypeL
             })),
           ]}
         />
-      </FilterToolbar>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>My {badgeTypeLabel} Badges</CardTitle>
-          <CardDescription>Badges you have earned</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {myBadges.map((userBadge) => (
-              <BadgeCard
-                key={userBadge.id}
-                badge={userBadge.badge}
-                earned={true}
-                earnedAt={userBadge.earned_at}
-                isFeatured={userBadge.is_featured}
-              />
-            ))}
-            {myBadges.length === 0 && (
-              <p className="text-muted-foreground col-span-full text-center py-8">
-                No badges earned yet
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      </FilterToolbar> */}
 
       <Card>
         <CardHeader>
@@ -69,7 +69,7 @@ export default function BadgesTab({ allBadges, myBadges, yearOptions, badgeTypeL
           <CardDescription>Badges you can earn</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {allBadges.length > 0 ? (
               allBadges.map((badge) => {
                 const earned = myBadges.some((ub) => ub.badge.id === badge.id);

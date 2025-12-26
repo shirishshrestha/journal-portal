@@ -14,9 +14,10 @@ export const useGenerateCertificatePDF = () => {
       toast.success('PDF generation started', {
         description: 'Your certificate PDF is being generated. This may take a moment.',
       });
-      
+
       // Invalidate and refetch certificates
       queryClient.invalidateQueries({ queryKey: ['certificates'] });
+      queryClient.invalidateQueries({ queryKey: ['my-certificates'] });
       queryClient.invalidateQueries({ queryKey: ['certificate', certificateId] });
     },
     onError: (error) => {
