@@ -51,10 +51,11 @@ export default function EditSubmissionGuidelines({ form, submission }) {
   const { data: taxonomyTree, isPending: isLoadingTaxonomy } = useGetTaxonomyTree(journalId);
 
   // Get submission requirements and author guidelines from journal settings
-  const submissionRequirements = useMemo(
-    () => journal?.settings?.submission_requirements || [],
-    [journal]
-  );
+  const submissionRequirements = useMemo(() => {
+    const requirements = journal?.settings?.submission_requirements || [];
+    // Filter out empty strings to prevent rendering empty checkboxes
+    return requirements.filter((req) => req && req.trim() !== '');
+  }, [journal]);
 
   const authorGuidelines = useMemo(() => journal?.settings?.author_guidelines || '', [journal]);
 

@@ -8,8 +8,14 @@ export const useDeleteJournal = (options = {}) => {
   return useMutation({
     mutationFn: (journalId) => deleteJournal(journalId),
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['admin-journals'] });
-      queryClient.invalidateQueries({ queryKey: ['editor-journals'] });
+      queryClient.invalidateQueries({
+        queryKey: ['journals'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['editor-journals'],
+        refetchType: 'active',
+      });
       toast.success('Journal deleted successfully!');
       options.onSuccess?.(data, variables, context);
     },

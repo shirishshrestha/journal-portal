@@ -4,8 +4,11 @@ export const submissionSettingsSchema = z.object({
   // Submission Guidelines
   submission_guidelines: z.string().optional(),
   author_guidelines: z.string().optional(),
-  submission_requirements: z.array(z.string()).optional().default([]),
-  coauthor_roles: z.array(z.string()).optional().default([]),
+  submission_requirements: z
+    .array(z.string().min(1, 'Requirement cannot be empty'))
+    .optional()
+    .default([]),
+  coauthor_roles: z.array(z.string().min(1, 'Role cannot be empty')).optional().default([]),
 
   // Review Process
   review_type: z.enum(['SINGLE_BLIND', 'DOUBLE_BLIND', 'OPEN_REVIEW']).default('DOUBLE_BLIND'),

@@ -7,9 +7,17 @@ export const useAssignJournalManager = (options = {}) => {
 
   return useMutation({
     mutationFn: ({ journalId, profile_id }) => assignJournalManager({ journalId, profile_id }),
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['journal-managers', variables.journalId] });
-      queryClient.invalidateQueries({ queryKey: ['admin-journals'] });
+    onSuccess: async (data, variables, context) => {
+      await Promise.all([
+        queryClient.refetchQueries({
+          queryKey: ['journal-managers', variables.journalId],
+          type: 'active',
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['admin-journals'],
+          type: 'active',
+        }),
+      ]);
       toast.success('Journal manager assigned successfully!');
       options.onSuccess?.(data, variables, context);
     },
@@ -29,9 +37,17 @@ export const useRemoveJournalManager = (options = {}) => {
 
   return useMutation({
     mutationFn: ({ journalId, userId }) => removeJournalManager({ journalId, userId }),
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['journal-managers', variables.journalId] });
-      queryClient.invalidateQueries({ queryKey: ['admin-journals'] });
+    onSuccess: async (data, variables, context) => {
+      await Promise.all([
+        queryClient.refetchQueries({
+          queryKey: ['journal-managers', variables.journalId],
+          type: 'active',
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['admin-journals'],
+          type: 'active',
+        }),
+      ]);
       toast.success('Journal manager removed successfully!');
       options.onSuccess?.(data, variables, context);
     },

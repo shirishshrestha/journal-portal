@@ -9,9 +9,9 @@ import {
   AdminJournalFormModal,
   AssignJournalManagerDialog,
   ViewJournalManagerDialog,
-  useGetJournals,
-  useDeleteJournal,
 } from '@/features';
+import { useGetJournals } from '@/features/panel/admin/journal/hooks/query/useGetJournals';
+import { useDeleteJournal } from '@/features/panel/admin/journal/hooks/mutation/useDeleteJournal';
 import { FilterToolbar, ConfirmationPopup, Pagination } from '@/features/shared';
 import { Button } from '@/components/ui/button';
 
@@ -77,12 +77,19 @@ export default function JournalsPage() {
 
   const confirmDelete = () => {
     if (journalToDelete) {
-      deleteJournalMutation.mutate(journalToDelete.id, {
-        onSuccess: () => {
-          setDeleteDialogOpen(false);
-          setJournalToDelete(null);
-        },
-      });
+      deleteJournalMutation.mutate(journalToDelete.id);
+    }
+  };
+
+  // Reset state when dialog closes
+  const handleDeleteDialogChange = (open) => {
+    setDeleteDialogOpen(open);
+    if (!open) {
+      // Clean up when dialog closes
+      setJournalToDelete(null);
+      if (deleteJournalMutation.isSuccess) {
+        deleteJournalMutation.reset();
+      }
     }
   };
 
@@ -189,7 +196,7 @@ export default function JournalsPage() {
       {/* Delete Confirmation Popup */}
       <ConfirmationPopup
         open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
+        onOpenChange={handleDeleteDialogChange}
         title="Delete Journal"
         description={`Are you sure you want to delete "${journalToDelete?.title}"? This action cannot be undone and will remove all associated data.`}
         confirmText="Delete"
