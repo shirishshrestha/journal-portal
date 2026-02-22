@@ -80,10 +80,11 @@ export default function SubmissionGuidelines({ form }) {
   );
 
   // Get submission requirements and author guidelines from journal settings
-  const submissionRequirements = useMemo(
-    () => selectedJournalDetails?.settings?.submission_requirements || [],
-    [selectedJournalDetails]
-  );
+  const submissionRequirements = useMemo(() => {
+    const requirements = selectedJournalDetails?.settings?.submission_requirements || [];
+    // Filter out empty strings to prevent rendering empty checkboxes
+    return requirements.filter((req) => req && req.trim() !== '');
+  }, [selectedJournalDetails]);
 
   const authorGuidelines = useMemo(
     () => selectedJournalDetails?.settings?.author_guidelines || '',

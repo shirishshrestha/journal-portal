@@ -7,10 +7,17 @@ export const useDeleteJournal = (options = {}) => {
 
   return useMutation({
     mutationFn: (journalId) => deleteJournal(journalId),
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['admin-journals'] });
+    onSuccess: async (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: ['admin-journals'],
+        refetchType: 'active',
+      });
       toast.success('Journal deleted successfully!');
-      options.onSuccess?.(data, variables, context);
+
+      // Call custom callback after refetch completes
+      if (options.onSuccess) {
+        await options.onSuccess(data, variables, context);
+      }
     },
     onError: (error, variables, context) => {
       const errorMessage =

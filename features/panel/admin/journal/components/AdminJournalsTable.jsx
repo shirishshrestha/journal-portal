@@ -130,7 +130,7 @@ export default function AdminJournalsTable({
                 <UserPlus className="h-4 w-4" /> Assign Manager
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem onClick={() => onDelete(row.id)} className="gap-2 text-destructive">
+            <DropdownMenuItem onClick={() => onDelete(row)} className="gap-2 text-destructive">
               <Trash2 className="h-4 w-4" /> Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

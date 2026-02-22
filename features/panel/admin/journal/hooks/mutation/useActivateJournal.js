@@ -7,16 +7,27 @@ export const useActivateJournal = () => {
 
   return useMutation({
     mutationFn: (id) => activateJournal(id),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: ['admin-inactive-journals'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['admin-journal', data.id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['admin-journals'],
-      });
+    onSuccess: async (data) => {
+      // Invalidate all related queries first
+      queryClient.invalidateQueries({ queryKey: ['admin-inactive-journals'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-journal', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['admin-journals'] });
+
+      // Then refetch active queries
+      await Promise.all([
+        queryClient.refetchQueries({
+          queryKey: ['admin-inactive-journals'],
+          type: 'active',
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['admin-journal', data.id],
+          type: 'active',
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['admin-journals'],
+          type: 'active',
+        }),
+      ]);
       toast.success('Journal activated successfully');
     },
     onError: (error) => {

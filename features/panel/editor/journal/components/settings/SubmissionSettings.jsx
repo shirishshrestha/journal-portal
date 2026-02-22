@@ -98,9 +98,18 @@ export function SubmissionSettings({ journalId }) {
   });
 
   const onSubmit = (data) => {
+    // Filter out empty strings from arrays to prevent validation errors
+    const cleanedData = {
+      ...data,
+      submission_requirements: (data.submission_requirements || []).filter(
+        (req) => req && req.trim() !== ''
+      ),
+      coauthor_roles: (data.coauthor_roles || []).filter((role) => role && role.trim() !== ''),
+    };
+
     updateSettingsMutation.mutate({
       journalId,
-      settings: data,
+      settings: cleanedData,
     });
   };
 

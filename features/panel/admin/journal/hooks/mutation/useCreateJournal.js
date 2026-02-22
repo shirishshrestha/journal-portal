@@ -7,10 +7,23 @@ export const useCreateJournal = (options = {}) => {
 
   return useMutation({
     mutationFn: (journalData) => createJournal(journalData),
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['admin-journals'] });
+    onSuccess: async (data, variables, context) => {
+      // Invalidate all admin-journals queries regardless of params
+      await queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === 'admin-journals',
+      });
+
+      // Force immediate refetch of all matching queries
+      await queryClient.refetchQueries({
+        predicate: (query) => query.queryKey[0] === 'admin-journals',
+      });
+
       toast.success('Journal created successfully!');
-      options.onSuccess?.(data, variables, context);
+
+      // Call custom callback after refetch completes
+      if (options.onSuccess) {
+        await options.onSuccess(data, variables, context);
+      }
     },
     onError: (error, variables, context) => {
       const errorMessage =

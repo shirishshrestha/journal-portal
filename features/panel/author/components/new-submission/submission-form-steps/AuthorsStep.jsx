@@ -49,10 +49,11 @@ export default function AuthorsStep({
 
   // Default roles if none provided from backend
   const defaultRoles = useMemo(() => ['Co-Author', 'Researcher', 'Contributor'], []);
-  const availableRoles = useMemo(
-    () => (coauthorRoles.length > 0 ? coauthorRoles : defaultRoles),
-    [coauthorRoles, defaultRoles]
-  );
+  const availableRoles = useMemo(() => {
+    const roles = coauthorRoles.length > 0 ? coauthorRoles : defaultRoles;
+    // Filter out empty strings to prevent Select.Item validation errors
+    return roles.filter((role) => role && role.trim() !== '');
+  }, [coauthorRoles, defaultRoles]);
 
   return (
     <div className="space-y-6">
